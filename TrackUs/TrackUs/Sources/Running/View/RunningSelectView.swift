@@ -186,7 +186,7 @@ struct selectedCell: View {
                     HStack {
                         KFImage(URL(string: user.profileImageUrl ?? ""))
                             .placeholder({ProgressView()})
-                            .onFailureImage(KFCrossPlatformImage(named: "ProfileDefault"))
+                            .onFailureImage(KFCrossPlatformImage(named: "profile_img"))
                             .resizable()
                             .frame(width: 24, height: 24)
                             .padding(.vertical, 12)

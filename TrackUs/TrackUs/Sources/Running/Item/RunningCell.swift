@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-
-import SwiftUI
 import Kingfisher
 
 struct RunningCell: View {
@@ -18,7 +16,7 @@ struct RunningCell: View {
         VStack(spacing: 0) {
             KFImage(URL(string: course.routeImageUrl))
                 .placeholder({ProgressView()})
-                .onFailureImage(KFCrossPlatformImage(named: "ProfileDefault"))
+                .onFailureImage(KFCrossPlatformImage(named: "profile_img"))
                 .resizable()
                 .frame(height: 140)
                 .cornerRadius(12, corners: [.topLeft, .topRight])
@@ -28,16 +26,17 @@ struct RunningCell: View {
                 
                 Text(course.title)
                     .customFontStyle(.gray1_B16)
+                    .lineLimit(1)
                 
                 VStack(alignment: .leading, spacing: 2) {
-                    Label(course.address, image: "Pin")
+                    Label(course.address, image: "pin_icon")
                         .customFontStyle(.gray2_L12)
                     
                     Label(course.startDate?.formattedString() ?? Date().formatted(), systemImage: "calendar")
                         .customFontStyle(.gray2_L12)
                     
                     HStack {
-                        Label(course.distance.asString(unit: .kilometer), image: "arrowBoth")
+                        Label(course.distance.asString(unit: .kilometer), image: "arrowBoth_icon")
                             .customFontStyle(.gray2_L12)
                         Spacer()
                         Label("\(course.members.count)/\(course.numberOfPeople)", systemImage: "person.2.fill")
@@ -47,7 +46,7 @@ struct RunningCell: View {
                     HStack(spacing: 0) {
                         KFImage(URL(string: user.profileImageUrl ?? ""))
                             .placeholder({ProgressView()})
-                            .onFailureImage(KFCrossPlatformImage(named: "ProfileDefault"))
+                            .onFailureImage(KFCrossPlatformImage(named: "profile_img"))
                             .resizable()
                             .scaledToFill()
                             .frame(width: 24, height: 24)

@@ -23,6 +23,7 @@ struct RunningResultView: View {
         self.settingViewModel = settingViewModel
         self.showingPopup = showingPopup
         self.showingAlert = showingAlert
+        
         self.exerciseManager = ExerciseManager(
             distance: trackingViewModel.distance,
             target: trackingViewModel.goalDistance,
@@ -81,7 +82,7 @@ extension RunningResultView {
                         }
                         
                         HStack {
-                            Image(.timeIcon)
+                            Image(.timeImg)
                             VStack(alignment: .leading) {
                                 Text("러닝 타임")
                                 Text(exerciseManager.compareEstimatedTime)
