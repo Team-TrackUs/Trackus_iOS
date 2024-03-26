@@ -28,7 +28,7 @@ struct MainTabView: View {
                         router.buildScreen(page: .running)
                     }
                     .tabItem {
-                        Image("Running")
+                        Image(.runIcon)
                             .renderingMode(.template)
                         Text("러닝")
                     }
@@ -36,7 +36,7 @@ struct MainTabView: View {
                     
                     router.buildScreen(page: .chat)
                         .tabItem {
-                            Image("Chatting")
+                            Image(.chattingIcon)
                                 .renderingMode(.template)
                             Text("채팅")
                         }
@@ -44,7 +44,7 @@ struct MainTabView: View {
                     
                     router.buildScreen(page: .report)
                         .tabItem {
-                            Image("Report")
+                            Image(.reportIcon)
                                 .renderingMode(.template)
                             Text("리포트")
                         }
@@ -53,7 +53,7 @@ struct MainTabView: View {
                     
                     router.buildScreen(page: .profile)
                         .tabItem {
-                            Image("Profile")
+                            Image(.profileIcon)
                                 .renderingMode(.template)
                             Text("프로필")
                         }

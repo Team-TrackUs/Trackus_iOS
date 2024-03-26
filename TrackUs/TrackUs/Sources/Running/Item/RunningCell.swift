@@ -56,7 +56,7 @@ struct RunningCell: View {
                         Text(user.username)
                             .customFontStyle(.gray2_L12)
                             .padding(.leading, 4)
-                        Image(.crown)
+                        Image(.crownIcon)
                             .padding(.leading, 2)
                     }
                 }

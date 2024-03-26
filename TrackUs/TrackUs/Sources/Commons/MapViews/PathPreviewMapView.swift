@@ -111,10 +111,10 @@ extension PathPreviewMapViewController {
     private func drawRouteOnlyLine() {
         self.drawPath()
         if coordinates.first! == coordinates.last! {
-            self.mapView.makeMarkerWithUIImage(coordinate: self.coordinates.first!, imageName: "StartPin")
+            self.mapView.makeMarkerWithUIImage(coordinate: self.coordinates.first!, imageName: "start_icon")
         } else {
-            self.mapView.makeMarkerWithUIImage(coordinate: self.coordinates.first!, imageName: "StartPin")
-            self.mapView.makeMarkerWithUIImage(coordinate: self.coordinates.last!, imageName: "Puck")
+            self.mapView.makeMarkerWithUIImage(coordinate: self.coordinates.first!, imageName: "start_icon")
+            self.mapView.makeMarkerWithUIImage(coordinate: self.coordinates.last!, imageName: "puck_icon")
         }
     }
     

@@ -30,7 +30,7 @@ struct MyProfileView: View {
                             .clipShape(Circle())
                             .shadow(radius: 1)
                     }else {
-                        Image(.profileDefault)
+                        Image(.profileImg)
                             .resizable()
                             .frame(width: 116, height: 116)
                             .padding(.vertical, 12)
@@ -43,7 +43,7 @@ struct MyProfileView: View {
                         HStack(spacing: 6) {
                             Text("\(authViewModel.userInfo.username)님")
                                 .customFontStyle(.gray1_SB16)
-                            Image(.chevronRight)
+                            Image(.chevronRightIcon)
                         }
                     }
                     
@@ -67,7 +67,7 @@ struct MyProfileView: View {
                     Button(action: {
                         router.push(.runningRecorded)
                     }) {
-                        MenuItem(title: "러닝기록", image: .init(.chevronRight))
+                        MenuItem(title: "러닝기록", image: .init(.chevronRightIcon))
                     }
                 }
                 
@@ -82,12 +82,12 @@ struct MyProfileView: View {
                     Button(action: {
                         router.present(sheet: .webView(url: Constants.WebViewUrl.TERMS_OF_SERVICE_URL))
                     }) {
-                        MenuItem(title: "이용약관", image: .init(.chevronRight))
+                        MenuItem(title: "이용약관", image: .init(.chevronRightIcon))
                     }
                     Button(action: {
                         router.present(sheet: .webView(url: Constants.WebViewUrl.OPEN_SOURCE_LICENSE_URL))
                     }) {
-                        MenuItem(title: "오픈소스/라이센스", image: .init(.chevronRight))
+                        MenuItem(title: "오픈소스/라이센스", image: .init(.chevronRightIcon))
                     }
                 }
                 
@@ -102,33 +102,14 @@ struct MyProfileView: View {
                     Button(action: {
                         router.push(.faq)
                     }) {
-                        MenuItem(title: "자주묻는 질문 Q&A", image: .init(.chevronRight))
+                        MenuItem(title: "자주묻는 질문 Q&A", image: .init(.chevronRightIcon))
                     }
                     Button(action: {
                         router.present(sheet: .webView(url: Constants.WebViewUrl.SERVICE_REQUEST_URL))
                     }) {
-                        MenuItem(title: "문의하기", image: .init(.chevronRight))
+                        MenuItem(title: "문의하기", image: .init(.chevronRightIcon))
                     }
                 }
-                
-//                Divider()
-//                    .background(.divider)
-//
-//                // MARK: - 프리미엄 결제
-//                MenuItems {
-//                    HStack(spacing: 6) {
-//                        Text("트랙어스 응원하기")
-//                            .customFontStyle(.gray1_SB16)
-//                        Image(.star)
-//                    }
-//                } content: {
-//                    Button {
-//                        router.present(fullScreenCover: .payment)
-//                    } label: {
-//                        MenuItem(title: "프리미엄 결제하기", image: .init(.chevronRight))
-//                    }
-//                }
-//                .padding(.bottom, 60)
             }
         }
         .customNavigation {
@@ -137,7 +118,7 @@ struct MyProfileView: View {
             Button(action: {
                 router.push(.setting)
             }) {
-                Image(.settingLogo)
+                Image(.settingIcon)
                     .foregroundColor(Color.gray1)
             }
         }

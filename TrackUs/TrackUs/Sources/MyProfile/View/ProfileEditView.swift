@@ -101,7 +101,7 @@ struct ProfileEditView: View {
                                             Text("정보 없음")
                                                 .customFontStyle(.gray2_L12)
                                         }
-                                        Image(.pickerLogo)
+                                        Image(.arrowUpwardIcon)
                                             .resizable()
                                             .frame(width: 9,height: 18)
                                             .scaledToFit()
@@ -135,10 +135,10 @@ struct ProfileEditView: View {
                                         .customFontStyle(.gray1_R16)
                                     Spacer()
                                     HStack(spacing: 8){
-                                        SelectButton(image: [Image(.maleMain), Image(.maleGray1)],text: "남성", selected: gender == true, widthSize: 80){
+                                        SelectButton(image: [Image(.maleMainImg), Image(.maleGrayImg)],text: "남성", selected: gender == true, widthSize: 80){
                                             gender = true
                                         }
-                                        SelectButton(image: [Image(.femaleMain), Image(.femaleGray1)],text: "여성", selected: gender == false, widthSize: 80){
+                                        SelectButton(image: [Image(.femaleMainImg), Image(.femaleGrayImg)],text: "여성", selected: gender == false, widthSize: 80){
                                             gender = false
                                         }
                                     }
@@ -167,7 +167,7 @@ struct ProfileEditView: View {
                         .padding(.vertical, 14)
                     }
                 }
-                .padding(.horizontal, Constants.ViewLayout.VIEW_STANDARD_HORIZONTAL_SPACING)
+                .padding(.horizontal, 16)
             }
             .customNavigation {
                 NavigationText(title: "프로필 변경")
@@ -175,7 +175,7 @@ struct ProfileEditView: View {
                 NavigationBackButton()
             }
             MainButton(active: editCheck(userInfo: authViewModel.userInfo), buttonText: "수정완료", action: modifyButtonTapped)
-                .padding(Constants.ViewLayout.VIEW_STANDARD_HORIZONTAL_SPACING)
+                .padding(16)
                 .simultaneousGesture(TapGesture().onEnded {
                 })
         }
@@ -302,7 +302,7 @@ struct pickerButton: View {
                     Text("정보 없음")
                         .customFontStyle(.gray2_L12)
                 }
-                Image(.pickerLogo)
+                Image(.arrowUpwardIcon)
                     .resizable()
                     .frame(width: 9,height: 18)
                     .scaledToFit()

@@ -195,7 +195,7 @@ struct Withdrawal: View {
                 }
         )
         
-        .padding(.horizontal, Constants.ViewLayout.VIEW_STANDARD_HORIZONTAL_SPACING)
+        .padding(.horizontal, 16)
         .customNavigation {
             Text("회원탈퇴")
                 .customFontStyle(.gray1_SB16)

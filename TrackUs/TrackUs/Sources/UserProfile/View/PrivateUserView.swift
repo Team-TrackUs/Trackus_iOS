@@ -11,7 +11,7 @@ struct PrivateUserView: View {
     var body: some View {
         VStack {
             Spacer()
-            Image("Lock")
+            Image(.lockImg)
             Text("프로필 비공개 유저입니다.")
                 .customFontStyle(.gray1_B24)
                 .padding(8)

@@ -35,7 +35,7 @@ struct UserList: View {
                                     HStack {
                                         Text(owner.username)
                                             .customFontStyle(.gray1_R12)
-                                        Image(.crown)
+                                        Image(.crownIcon)
                                     }
                                 }
                             })

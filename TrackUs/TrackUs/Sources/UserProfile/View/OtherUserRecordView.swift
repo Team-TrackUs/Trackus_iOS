@@ -79,7 +79,7 @@ struct OtherUserRecordView: View {
                         Button {
                             calendarButton.toggle()
                         } label: {
-                            Image("Calendar")
+                            Image(.calendarIcon)
                         }
                     }
                     LazyVGrid(columns: vGridItems, spacing: 0) {
@@ -190,20 +190,20 @@ struct OtherUserRecordCell: View {
                     
                     HStack(spacing: 10) {
                         HStack {
-                            Image(.pin)
+                            Image(.pinIcon)
                             Text(runningLog.address ?? "대한민국 서울시")
                                 .customFontStyle(.gray1_R9)
                                 .lineLimit(1)
                         }
                         
                         HStack {
-                            Image(.timerLine)
+                            Image(.timeIcon)
                             Text(formatTime(runningLog.timestamp))
                                 .customFontStyle(.gray1_R9)
                         }
                         
                         HStack {
-                            Image(.arrowBoth)
+                            Image(.arrowBothIcon)
                             Text("\((runningLog.distance).asString(unit: .kilometer))") // 수정된부분^^
                                 .customFontStyle(.gray1_R9)
                         }

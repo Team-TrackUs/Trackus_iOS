@@ -81,7 +81,7 @@ struct userReportContent: View {
                         .clipShape(Circle())
                         .shadow(radius: 1)
                 } else {
-                    Image(.profileDefault)
+                    Image(.profileImg)
                         .resizable()
                         .frame(width: 116, height: 116)
                         .padding(.vertical, 12)

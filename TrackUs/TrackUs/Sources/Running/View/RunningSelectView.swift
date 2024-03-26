@@ -170,13 +170,13 @@ struct selectedCell: View {
                 
                 HStack {
                     HStack {
-                        Image(.pin)
+                        Image(.pinIcon)
                         Text(course.address)
                             .customFontStyle(.gray1_R9)
                     }
                     
                     HStack {
-                        Image(.arrowBoth)
+                        Image(.arrowBothIcon)
                         Text(course.distance.asString(unit: .kilometer))
                             .customFontStyle(.gray1_R9)
                     }
@@ -193,7 +193,7 @@ struct selectedCell: View {
                             .clipShape(Circle())
                         Text(user.username)
                             .customFontStyle(.gray2_R12)
-                        Image(.crown)
+                        Image(.crownIcon)
                     }
                     
                     Spacer()
