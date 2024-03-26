@@ -124,7 +124,7 @@ extension RunningHomeView {
             HStack {
                 KFImage(URL(string: authViewModel.userInfo.profileImageUrl ?? ""))
                     .placeholder({ProgressView()})
-                    .onFailureImage(KFCrossPlatformImage(named: "ProfileDefault"))
+                    .onFailureImage(KFCrossPlatformImage(named: "profile_img"))
                     .resizable()
                     .scaledToFill()
                     .frame(width: 48, height: 48)
@@ -178,7 +178,7 @@ extension RunningHomeView {
     var runningAroundMe: some View {
         VStack(spacing: 16) {
             HStack {
-                Image(.smallFire)
+                Image(.fire3DImg)
                     .resizable()
                     .frame(width: 38, height: 38)
                 
@@ -250,7 +250,7 @@ extension RunningHomeView {
                         }
                     }
         }, label: {
-            Image(.locationButton)
+            Image(.locationIcon)
         })
     }
 }

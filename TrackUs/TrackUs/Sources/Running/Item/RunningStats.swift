@@ -17,7 +17,7 @@ struct RunningStats: View {
         HStack {
             Spacer()
             VStack {
-                Image(.distance)
+                Image(.distanceIcon)
                 Text("러닝 거리")
                     .customFontStyle(.gray1_R16)
                     .foregroundStyle(Color.init(hex: 0x3d3d3d))
@@ -26,7 +26,7 @@ struct RunningStats: View {
             }
             Spacer()
             VStack {
-                Image(.fire)
+                Image(.fireIcon)
                 Text("예상 칼로리")
                     .customFontStyle(.gray1_R16)
                 Text(calories.asString(unit: .calorie))
@@ -34,7 +34,7 @@ struct RunningStats: View {
             }
             Spacer()
             VStack {
-                Image(.time)
+                Image(.timeImg)
                 Text("예상 시간")
                     .customFontStyle(.gray1_R16)
                 Text(estimatedTime.asString(style: .positional))

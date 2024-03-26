@@ -25,7 +25,7 @@ struct SettingsView: View {
                     Button {
                         router.present(sheet: .webView(url: Constants.WebViewUrl.TEAM_INTRO_URL))
                     } label: {
-                        MenuItem(title: "팀 트랙어스", image: .init(.chevronRight))
+                        MenuItem(title: "팀 트랙어스", image: .init(.chevronRightIcon))
                     }
                 }
                 

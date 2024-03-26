@@ -66,7 +66,7 @@ struct MyRecordDetailView: View {
                                 Label(runningLog.address ?? "대한민국 서울시", image: "Pin")
                                     .customFontStyle(.gray1_R12)
                                 
-                                Label(runningLog.timestamp.formattedString(style: .time), image: "timerLine") //
+                                Label(runningLog.timestamp.formattedString(style: .time), image: "time_icon") //
                                     .customFontStyle(.gray1_R12)
                             }
                         }
@@ -78,7 +78,7 @@ struct MyRecordDetailView: View {
                                 .customFontStyle(.gray1_R16)
                             
                             HStack {
-                                Image(.shose)
+                                Image(.distanceIcon)
                                 VStack(alignment: .leading) {
                                     Text("킬로미터")
                                     Text(exerciseManager.compareKilometers)
@@ -90,7 +90,7 @@ struct MyRecordDetailView: View {
                             }
                             
                             HStack {
-                                Image(.fire)
+                                Image(.fireIcon)
                                 VStack(alignment: .leading) {
                                     Text("소모 칼로리")
                                     
@@ -103,7 +103,7 @@ struct MyRecordDetailView: View {
                             }
                             
                             HStack {
-                                Image(.time)
+                                Image(.timeImg)
                                 VStack(alignment: .leading) {
                                     Text("러닝 타임")
                                     
@@ -116,7 +116,7 @@ struct MyRecordDetailView: View {
                             }
                             
                             HStack {
-                                Image(.pace)
+                                Image(.paceIcon)
                                 VStack(alignment: .leading) {
                                     Text("페이스")
                                     Text(runningLog.pace.asString(unit: .pace))
@@ -135,7 +135,7 @@ struct MyRecordDetailView: View {
                         }
                         .fixedSize(horizontal: false, vertical: true)
                     }
-                    .padding(Constants.ViewLayout.VIEW_STANDARD_HORIZONTAL_SPACING)
+                    .padding(16)
                     .background(
                         GeometryReader { innerGeometry in
                             Color.clear

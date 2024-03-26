@@ -50,7 +50,6 @@
 		61A6A3A22BA98CA50065EB48 /* UserReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A6A3A12BA98CA50065EB48 /* UserReportView.swift */; };
 		61B914C32B89A506008CAC92 /* RunningSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61B914C22B89A506008CAC92 /* RunningSelectView.swift */; };
 		820330D82B70127800CB97F7 /* SettingPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 820330D72B70127800CB97F7 /* SettingPopup.swift */; };
-		82135D892BAD3635009F2978 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 82135D882BAD3635009F2978 /* GoogleService-Info.plist */; };
 		821CD24D2B72C82900CE6D42 /* PreventionGestureModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821CD24C2B72C82900CE6D42 /* PreventionGestureModifier.swift */; };
 		821CD24F2B72C8A600CE6D42 /* View+Gesture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821CD24E2B72C8A600CE6D42 /* View+Gesture.swift */; };
 		8224637D2B68E7F6008D3DAA /* MyProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8224637C2B68E7F6008D3DAA /* MyProfileView.swift */; };
@@ -70,6 +69,7 @@
 		824201892B8A8E780009ED45 /* UserSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824201882B8A8E780009ED45 /* UserSearchViewModel.swift */; };
 		8242018D2B8A93930009ED45 /* UserList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8242018C2B8A93930009ED45 /* UserList.swift */; };
 		82494DD82B7AD67400FB3EB8 /* ImageUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82494DD72B7AD67400FB3EB8 /* ImageUploader.swift */; };
+		824B844C2BB2CA910016B7FA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 824B844B2BB2CA910016B7FA /* GoogleService-Info.plist */; };
 		824DA8982B6FB92200B15B89 /* RunningHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824DA8972B6FB92200B15B89 /* RunningHomeView.swift */; };
 		824DA89A2B6FB95100B15B89 /* BottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824DA8992B6FB95100B15B89 /* BottomSheet.swift */; };
 		824F4DF12B83CDEA00EFDF42 /* TrackingModeMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824F4DF02B83CDEA00EFDF42 /* TrackingModeMapView.swift */; };
@@ -180,7 +180,6 @@
 		61A6A3A12BA98CA50065EB48 /* UserReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserReportView.swift; sourceTree = "<group>"; };
 		61B914C22B89A506008CAC92 /* RunningSelectView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunningSelectView.swift; sourceTree = "<group>"; };
 		820330D72B70127800CB97F7 /* SettingPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingPopup.swift; sourceTree = "<group>"; };
-		82135D882BAD3635009F2978 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		821CD24C2B72C82900CE6D42 /* PreventionGestureModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreventionGestureModifier.swift; sourceTree = "<group>"; };
 		821CD24E2B72C8A600CE6D42 /* View+Gesture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Gesture.swift"; sourceTree = "<group>"; };
 		8224637C2B68E7F6008D3DAA /* MyProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyProfileView.swift; sourceTree = "<group>"; };
@@ -200,6 +199,7 @@
 		824201882B8A8E780009ED45 /* UserSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSearchViewModel.swift; sourceTree = "<group>"; };
 		8242018C2B8A93930009ED45 /* UserList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserList.swift; sourceTree = "<group>"; };
 		82494DD72B7AD67400FB3EB8 /* ImageUploader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploader.swift; sourceTree = "<group>"; };
+		824B844B2BB2CA910016B7FA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		824DA8972B6FB92200B15B89 /* RunningHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningHomeView.swift; sourceTree = "<group>"; };
 		824DA8992B6FB95100B15B89 /* BottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheet.swift; sourceTree = "<group>"; };
 		824F4DF02B83CDEA00EFDF42 /* TrackingModeMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingModeMapView.swift; sourceTree = "<group>"; };
@@ -658,7 +658,7 @@
 		963AE4032B678EAC00E98BF4 /* TrackUs */ = {
 			isa = PBXGroup;
 			children = (
-				82135D882BAD3635009F2978 /* GoogleService-Info.plist */,
+				824B844B2BB2CA910016B7FA /* GoogleService-Info.plist */,
 				82ECF0962B679E10002CFD00 /* Resources */,
 				82ECF0952B679E05002CFD00 /* Sources */,
 			);
@@ -841,7 +841,7 @@
 			files = (
 				963AE40C2B678EAE00E98BF4 /* Preview Assets.xcassets in Resources */,
 				963AE4092B678EAE00E98BF4 /* Assets.xcassets in Resources */,
-				82135D892BAD3635009F2978 /* GoogleService-Info.plist in Resources */,
+				824B844C2BB2CA910016B7FA /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1115,7 +1115,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TrackUs/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자의 정확한 운동정보를 추적하기 위해서 러닝중에는 백그라운드에서 위치를 추적합니다.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "TrackUs에서 사진을 등록하기 위해 사진 라이브러리에 접근합니다";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "사진을 등록하기 위해 사진 라이브러리에 접근합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1153,7 +1153,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TrackUs/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자의 정확한 운동정보를 추적하기 위해서 러닝중에는 백그라운드에서 위치를 추적합니다.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "TrackUs에서 사진을 등록하기 위해 사진 라이브러리에 접근합니다";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "사진을 등록하기 위해 사진 라이브러리에 접근합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

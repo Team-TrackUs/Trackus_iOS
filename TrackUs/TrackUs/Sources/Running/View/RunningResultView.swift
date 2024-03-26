@@ -57,7 +57,7 @@ extension RunningResultView {
                             .customFontStyle(.gray1_R16)
                         
                         HStack {
-                            Image(.distance)
+                            Image(.distanceIcon)
                             VStack(alignment: .leading) {
                                 Text("킬로미터")
                                 Text(exerciseManager.compareKilometers)
@@ -69,7 +69,7 @@ extension RunningResultView {
                         }
                         
                         HStack {
-                            Image(.fire)
+                            Image(.fireIcon)
                             VStack(alignment: .leading) {
                                 Text("소모 칼로리")
                                 Text(exerciseManager.compareCalories)
@@ -81,7 +81,7 @@ extension RunningResultView {
                         }
                         
                         HStack {
-                            Image(.time)
+                            Image(.timeIcon)
                             VStack(alignment: .leading) {
                                 Text("러닝 타임")
                                 Text(exerciseManager.compareEstimatedTime)
@@ -93,7 +93,7 @@ extension RunningResultView {
                         }
                         
                         HStack {
-                            Image(.pace)
+                            Image(.paceIcon)
                             VStack(alignment: .leading) {
                                 Text("페이스")
                                 Text(trackingViewModel.pace.asString(unit: .pace))

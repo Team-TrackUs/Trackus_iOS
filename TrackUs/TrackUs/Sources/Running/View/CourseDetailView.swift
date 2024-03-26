@@ -134,7 +134,7 @@ extension CourseDetailView {
                 
                 HStack(spacing: 10) {
                     HStack {
-                        Image(.pin)
+                        Image(.pinIcon)
                         
                         Text(courseViewModel.course.address)
                             .customFontStyle(.gray1_R12)
@@ -142,7 +142,7 @@ extension CourseDetailView {
                     }
                     
                     HStack {
-                        Image(.arrowBoth)
+                        Image(.arrowBothIcon)
                         Text(courseViewModel.course.distance.asString(unit: .kilometer))
                             .customFontStyle(.gray1_R12)
                     }

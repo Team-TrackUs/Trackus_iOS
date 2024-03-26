@@ -127,7 +127,7 @@ struct SelectPicker: View {
                                 .customFontStyle(.gray2_L16)
                         }
                         Spacer()
-                        Image(.pickerLogo)
+                        Image(.arrowUpwardIcon)
                             .resizable()
                             .frame(width: 9,height: 18)
                             .scaledToFit()

@@ -260,7 +260,7 @@ extension TrackingModeMapViewController {
         
         let fireImage = UIImageView(image: UIImage(named: "Fire"))
         let paceImage = UIImageView(image: UIImage(named: "Pace"))
-        let timeImage = UIImageView(image: UIImage(named: "Time"))
+        let timeImage = UIImageView(image: UIImage(named: "time_img"))
         
         let calorieTextLabel = makeTextLabel(text: "소모 칼로리")
         let paceTextLabel = makeTextLabel(text: "페이스")
@@ -345,7 +345,7 @@ extension TrackingModeMapViewController {
         self.mapView.location.options.puckBearingEnabled = true
         self.mapView.gestures.delegate = self
         self.mapView.mapboxMap.styleURI = .init(rawValue: "mapbox://styles/seokki/clslt5i0700m901r64bli645z")
-        self.puckConfiguration.topImage = UIImage(named: "Puck")
+        self.puckConfiguration.topImage = UIImage(named: "puck_icon")
         self.mapView.location.options.puckType = .puck2D(puckConfiguration)
         
         /// 스냅셔터
@@ -445,7 +445,7 @@ extension TrackingModeMapViewController {
     private func cameraMoveBeforeCapture(completion: (() -> ())? = nil) {
         // 시작마커 생성
         guard let first = self.trackingViewModel.coordinates.first else { return }
-        self.mapView.makeMarkerWithUIImage(coordinate: first, imageName: "StartPin")
+        self.mapView.makeMarkerWithUIImage(coordinate: first, imageName: "start_icon")
         
         
         // 2. 적당한 줌레벨 설정

@@ -66,7 +66,7 @@ class MapViewController: UIViewController, GestureManagerDelegate {
         locationButton.addTarget(self, action: #selector(centerMapOnUser), for: .touchDown)
 
         if #available(iOS 13.0, *) {
-            locationButton.setImage(UIImage(named: "locationButton"), for: .normal)
+            locationButton.setImage(UIImage(named: "location_icon"), for: .normal)
         } else {
             locationButton.setTitle("No tracking", for: .normal)
         }

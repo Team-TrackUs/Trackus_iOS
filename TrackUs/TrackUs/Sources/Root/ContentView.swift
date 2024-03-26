@@ -20,7 +20,7 @@ struct ContentView: View {
             case .startapp:
                 VStack{
                     Spacer()
-                    Image(.trackusBigLogo)
+                    Image(.trackusBigLogoImg)
                         .resizable()
                         .frame(width: 200, height: 65)
                         .padding(.top,80)

@@ -28,7 +28,7 @@ struct CustomNavigationBarModifier<C, L, R>: ViewModifier where C: View, L: View
                 }
                 .frame(height: 47)
                 .frame(maxWidth: .infinity)
-                .padding(.horizontal, Constants.ViewLayout.VIEW_STANDARD_HORIZONTAL_SPACING)
+                .padding(.horizontal, 16)
                 
                 HStack {
                     Spacer()

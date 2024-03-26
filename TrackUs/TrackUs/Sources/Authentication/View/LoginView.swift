@@ -30,13 +30,13 @@ struct LoginView: View {
                 Text("러닝을 즐기고, 사랑하다.")
                     .foregroundStyle(Color.init(hex: 0x575757))
                     .font(.system(size: 16))
-                Image(.trackusBigLogo)
+                Image(.trackusBigLogoImg)
                   
                 
             }
             
             // 메인 이미지
-            Image("LoginImage")
+            Image(.loginBannerImg)
                 .resizable()
                 .scaledToFill()
                 .frame(minWidth: 200, minHeight: 200, maxHeight: 300)
@@ -84,7 +84,7 @@ struct LoginView: View {
                 }, label: {
                     HStack(alignment: .center) {
                         // 구글 로고
-                        Image("GoogleLogo")
+                        Image(.googleLogoImg)
                             .resizable()
                             .frame(width: 25, height: 25)
                             .padding(.horizontal, 8)

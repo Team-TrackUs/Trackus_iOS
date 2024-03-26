@@ -64,10 +64,10 @@ struct Accordian: View {
                 HStack {
                     Text("Q. \(faq.label)").customFontStyle(.gray1_R16)
                     Spacer()
-                    Image("ChevronRight")
+                    Image(.chevronRightIcon)
                         .rotationEffect(.degrees(isExpanded ? 90 : 0))
                 }
-                .padding(.horizontal, Constants.ViewLayout.VIEW_STANDARD_HORIZONTAL_SPACING)
+                .padding(.horizontal, 16)
             }
             .padding(.vertical, 20)
             Divider()
@@ -81,7 +81,7 @@ struct Accordian: View {
                         .customFontStyle(.gray1_R12)
                 }
                 .padding(.vertical, 20)
-                .padding(.horizontal, Constants.ViewLayout.VIEW_STANDARD_HORIZONTAL_SPACING)
+                .padding(.horizontal, 16)
                 Divider()
                     .background(.divider)
             }

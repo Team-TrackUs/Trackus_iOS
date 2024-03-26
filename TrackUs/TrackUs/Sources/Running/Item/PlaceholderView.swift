@@ -14,7 +14,7 @@ struct PlaceholderView: View {
     
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
-            Image(.aroundMePlaceholder)
+            Image(.aroundPlaceholderImg)
             Text(title)
                 .customFontStyle(.gray1_B16)
             

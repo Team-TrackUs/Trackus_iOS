@@ -72,7 +72,7 @@ struct LocationMeMapView: UIViewControllerRepresentable {
             locationButton.addTarget(self, action: #selector(locationButtonTapped), for: .touchDown)
             
             if #available(iOS 13.0, *) {
-                locationButton.setImage(UIImage(named: "locationButton"), for: .normal)
+                locationButton.setImage(UIImage(named: "location_icon"), for: .normal)
             } else {
                 locationButton.setTitle("No tracking", for: .normal)
             }
@@ -106,7 +106,7 @@ struct LocationMeMapView: UIViewControllerRepresentable {
         private func setupAddRunningButton() {
             let buttonWidth = 52.0
             let plusButton = UIButton(type: .custom)
-            plusButton.setImage(UIImage(named: "Plus"), for: .normal)
+            plusButton.setImage(UIImage(named: "plus_icon"), for: .normal)
             plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchDown)
             plusButton.translatesAutoresizingMaskIntoConstraints = false
             view.addSubview(plusButton)
