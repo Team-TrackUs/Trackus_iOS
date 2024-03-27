@@ -26,7 +26,7 @@ struct TermsOfServiceView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 40){
-            Description(title: "이용 약관", detail: "TrackUs의 원할한 서비스 제공을 위해 이용 약관의 동의가 필요합니다.")
+            Description(title: "약관 동의", detail: "TrackUs의 원할한 서비스 제공을 위해 이용 약관의 동의가 필요합니다.")
             
             VStack(alignment: .leading, spacing: 16){
                 
@@ -58,9 +58,9 @@ struct TermsOfServiceView: View {
                     .foregroundStyle(.gray3)
                 
                 TermsButton(selected: $isOver14Selected, text: "만 14세 이상입니다")
-                TermsButton(selected: $isUserSelected, text: "이용약관 동의")
-                TermsButton(selected: $isPrivacyPolicySelected, text: "개인정보 처리방침 동의")
-                TermsButton(selected: $isLocationTermsSelected, text: "위치정보 서비스 이용약관 동의")
+                TermsButton(selected: $isUserSelected, text: "서비스 이용약관 동의", detailUrl: Constants.WebViewUrl.TERMS_OF_SERVICE_URL)
+                TermsButton(selected: $isPrivacyPolicySelected, text: "개인정보 처리방침 동의", detailUrl: Constants.WebViewUrl.PERSONAL_INFORMATION_PROCESSING_POLICY)
+                TermsButton(selected: $isLocationTermsSelected, text: "위치정보 서비스 이용약관 동의", detailUrl: Constants.WebViewUrl.TERMS_OF_LOCATION_INFORMATION_SERVICE)
             }
             Spacer()
             
@@ -73,30 +73,46 @@ struct TermsOfServiceView: View {
 
 struct TermsButton: View {
     @Binding var selected: Bool
+    
+    @State var presentSheet: Bool = false
+    
     let text: String
+    let detailUrl: String
+    
+    init(selected: Binding<Bool>, text: String, detailUrl: String = "") {
+        self._selected = selected
+        self.text = text
+        self.detailUrl = detailUrl
+    }
     
     var body: some View{
-        Button(action: {
-            selected.toggle()
-        }, label: {
-            HStack{
-                Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(selected ? .main : .gray3)
-                Text(text)
-                    .customFontStyle(.gray1_R14)
-                Spacer()
-                
+        HStack{
+            Button(action: {
+                selected.toggle()
+            }, label: {
+                HStack{
+                    Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                        .foregroundStyle(selected ? .main : .gray3)
+                    Text(text)
+                        .customFontStyle(.gray1_R14)
+                }
+            })
+            Spacer()
+            if !detailUrl.isEmpty {
+                Button {
+                    presentSheet.toggle()
+                } label: {
+                    Text("보기")
+                        .customFontStyle(.gray2_R12)
+                }
+
             }
-        })
+        }
+        .sheet(isPresented: $presentSheet) {
+            WebViewSurport(url: detailUrl)
+        }
         
     }
-//    func makeBody(configuration: Configuration) -> some View {
-//        HStack {
-//            Image(systemName: configuration.isOn ? "checkmark.circle.fill" : "circle")
-//                .foregroundColor(configuration.isOn ? .green : .gray)
-//            configuration.label
-//        }
-//    }
 }
 
 //#Preview {
