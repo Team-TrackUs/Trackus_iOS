@@ -57,10 +57,10 @@ struct ChattingView: View {
                         }
                     }
                     .onChange(of: chatViewModel.messageMap.count) { _ in // 새 메시지가 추가될 때마다 호출
-                        proxy.scrollTo(chatViewModel.messageMap.last!.message, anchor: .bottom)
+                        proxy.scrollTo(chatViewModel.messageMap.last!.message, anchor: .top)
                     }
                     .onAppear {
-                        proxy.scrollTo(chatViewModel.messageMap.last?.message.id, anchor: .bottom)
+                        proxy.scrollTo(chatViewModel.messageMap.last?.message, anchor: .top)
                     }
                 }
                 Spacer()
