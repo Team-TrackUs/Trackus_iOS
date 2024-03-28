@@ -46,6 +46,7 @@ struct ChattingView: View {
                                 ChatMessageView(messageMap: messageMap,
                                                 myUid: authViewModel.userInfo.uid)
                                 .padding(.horizontal, 16)
+                                .id(messageMap)
                             }
 //                            ForEach(chatViewModel.messageMap, id: \.self.id) { messageMap in
 //                                ChatMessageView(messageMap: messageMap,
@@ -207,13 +208,15 @@ struct ChattingView: View {
                     .customFontStyle(.gray1_R12)
                 // 참여 중인 사용자 프로필 정보
                 ForEach(chatViewModel.chatRoom.members, id: \.self) { uid in
-                    Button {
-                        router.push(.userProfile(uid))
-                    } label: {
-                        HStack{
-                            ProfileImage(ImageUrl: chatViewModel.members[uid]?.profileImageUrl, size: 40)
-                            Text("\(chatViewModel.members[uid]?.userName ?? "")")
-                                .customFontStyle(.gray1_R14)
+                    if let member = chatViewModel.members[uid]{
+                        Button {
+                            router.push(.userProfile(uid))
+                        } label: {
+                            HStack{
+                                ProfileImage(ImageUrl: member.profileImageUrl, size: 40)
+                                Text(member.userName)
+                                    .customFontStyle(.gray1_R14)
+                            }
                         }
                     }
 
@@ -289,7 +292,8 @@ struct ChatMessageView: View {
             
             VStack(alignment: .leading) {
                 if !mymessge && (!messageMap.sameUser || !messageMap.sameDate) {
-                    Text(messageMap.message.sendMember.userName) // 상대방 이름
+                    let userName = messageMap.message.sendMember.userName
+                    Text(userName.isEmpty ? "알수없음" : userName) // 상대방 이름
                         .customFontStyle(.gray1_R12)
                 }
                 HStack(alignment: .bottom){
