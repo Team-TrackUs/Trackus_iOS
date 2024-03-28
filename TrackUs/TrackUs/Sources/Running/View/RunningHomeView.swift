@@ -74,11 +74,6 @@ extension RunningHomeView {
                     
                     // 내주변 러닝메이트
                     runningAroundMe
-                    
-//                    // 러닝 리포트 확인하기
-//                    GraphicTextCard(title: "러닝 리포트 확인하기", subTitle: "러닝 거리, 통계, 달성 기록을 확인할 수 있습니다.", resource: .clipboard)
-//                        .modifier(BorderLineModifier())
-//                        .padding(.horizontal, 16)
                 }
             } onChanged: { gestureValue in
                 let newDeltaY = gestureValue.translation.height

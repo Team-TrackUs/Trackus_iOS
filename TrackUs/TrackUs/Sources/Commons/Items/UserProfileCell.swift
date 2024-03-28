@@ -13,7 +13,7 @@ struct UserProfileCell: View {
     var body: some View {
         VStack {
             KFImage(URL(string: user.profileImageUrl ?? ""))
-                .onFailureImage(KFCrossPlatformImage(named: "ProfileDefault"))
+                .onFailureImage(KFCrossPlatformImage(named: "profile_img"))
                 .placeholder({ProgressView()})
                 .resizable()
                 .scaledToFill()

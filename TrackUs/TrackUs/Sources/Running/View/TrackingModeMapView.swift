@@ -247,7 +247,7 @@ extension TrackingModeMapViewController {
     private func setupUI() {
         // setup UI
         let distanceToNowLabel = makeTextLabel(text: "현재까지 거리")
-        let distanceToNowImage = UIImageView(image: UIImage(named: "Distance"))
+        let distanceToNowImage = UIImageView(image: UIImage(named: "distance_icon"))
         
         [distanceToNowImage, distanceToNowLabel, kilometerLabel].forEach { roundedVStackView.addArrangedSubview($0) }
         
@@ -258,14 +258,13 @@ extension TrackingModeMapViewController {
         let paceStackView = makeCircleStackView()
         let timeStackView = makeCircleStackView()
         
-        let fireImage = UIImageView(image: UIImage(named: "Fire"))
-        let paceImage = UIImageView(image: UIImage(named: "Pace"))
+        let fireImage = UIImageView(image: UIImage(named: "fire_icon"))
+        let paceImage = UIImageView(image: UIImage(named: "pace_icon"))
         let timeImage = UIImageView(image: UIImage(named: "time_img"))
         
         let calorieTextLabel = makeTextLabel(text: "소모 칼로리")
         let paceTextLabel = makeTextLabel(text: "페이스")
         let timeTextLabel = makeTextLabel(text: "경과시간")
-        
         
         [fireImage, calorieTextLabel, calorieLable].forEach { calorieStackView.addArrangedSubview($0) }
         [paceImage, paceTextLabel, paceLabel].forEach { paceStackView.addArrangedSubview($0) }

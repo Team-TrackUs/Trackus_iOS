@@ -13,11 +13,6 @@ enum Constants {
     // 기본위치 상수, 광화문
     static let DEFAULT_LOCATION = CLLocationCoordinate2D(latitude: 37.570946308046466, longitude: 126.97893407434964)
     
-    enum ViewLayout {
-        static let VIEW_STANDARD_HORIZONTAL_SPACING: CGFloat = 16
-        static let VIEW_STANDARD_VERTICAL_SPACING: CGFloat = 16
-    }
-    
     enum WebViewUrl {
         static let TERMS_OF_SERVICE_URL = "https://lizard-basketball-e41.notion.site/TrackUs-6015541452f14ed2b2f1541e5259ea72?pvs=4"
         static let OPEN_SOURCE_LICENSE_URL = "https://lizard-basketball-e41.notion.site/a57a3078e21c4821932d2189859b8bcb?pvs=4"
