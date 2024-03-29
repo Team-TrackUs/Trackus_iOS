@@ -126,7 +126,7 @@ extension RunningHomeView {
                     .clipShape(Circle())
                 
                 VStack(alignment: .leading) {
-                    Text("\(authViewModel.userInfo.username)님!")
+                    Text("\(authViewModel.userInfo.username.subString(count: 10))님!")
                         .customFontStyle(.gray1_B16)
                     
                     Text(cheeringPhrase)
