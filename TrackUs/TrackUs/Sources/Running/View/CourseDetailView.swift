@@ -180,12 +180,13 @@ extension CourseDetailView {
                     }
                } label: {
                    Text(menu.rawValue)
-                       
+                      
                }
            }
         } label: {
             Image(systemName: "ellipsis")
                 .foregroundStyle(.black)
+                .padding(15)
         }
     }
 }

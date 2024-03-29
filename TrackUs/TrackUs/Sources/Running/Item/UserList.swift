@@ -33,7 +33,7 @@ struct UserList: View {
                                 VStack {
                                     UserProfileCell(user: owner)
                                     HStack {
-                                        Text(owner.username)
+                                        Text(owner.username.subString(count: 5))
                                             .customFontStyle(.gray1_R12)
                                         Image(.crownIcon)
                                     }
@@ -49,7 +49,7 @@ struct UserList: View {
                             VStack {
                                 UserProfileCell(user: user)
                                 HStack {
-                                    Text(user.username)
+                                    Text(user.username.subString(count: 5))
                                         .customFontStyle(.gray1_R12)
                                 }
                             }
