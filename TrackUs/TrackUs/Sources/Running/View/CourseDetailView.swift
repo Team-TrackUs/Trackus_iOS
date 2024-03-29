@@ -41,7 +41,7 @@ struct CourseDetailView: View {
     
     var body: some View {
         VStack {
-            PathPreviewMap(
+            MapboxMapView(
                 mapStyle: .numberd,
                 coordinates: courseViewModel.course.coordinates
             )

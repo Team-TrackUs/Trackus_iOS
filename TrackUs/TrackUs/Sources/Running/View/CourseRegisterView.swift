@@ -59,7 +59,7 @@ extension CourseRegisterView {
     var body: some View {
         VStack {
             ScrollView {
-                PathPreviewMap(
+                MapboxMapView(
                     mapStyle: .numberd,
                     isUserInteractionEnabled: false,
                     coordinates: courseViewModel.course.coordinates
