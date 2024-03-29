@@ -13,9 +13,11 @@ struct RunningResultView: View {
     @ObservedObject var trackingViewModel: TrackingViewModel
     @ObservedObject private var settingViewModel = SettingPopupViewModel()
     private let exerciseManager: ExerciseManager!
+    private let mapView: MapboxMapView
     
     @State private var showingPopup = false
     @State private var showingAlert = false
+    @State private var number = 0
     
     init(trackingViewModel: TrackingViewModel, settingViewModel: SettingPopupViewModel = SettingPopupViewModel(), showingPopup: Bool = false, showingAlert: Bool = false) {
         
@@ -29,6 +31,10 @@ struct RunningResultView: View {
             target: trackingViewModel.goalDistance,
             elapsedTime: trackingViewModel.elapsedTime
         )
+        
+        self.mapView = MapboxMapView(
+            coordinates: trackingViewModel.coordinates,
+            trackingViewModel: trackingViewModel)
     }
 }
 
@@ -36,13 +42,11 @@ extension RunningResultView {
     
     var body: some View {
         VStack {
-            PathPreviewMap(
-                coordinates: trackingViewModel.coordinates
-            )
+            mapView
             
             VStack {
                 VStack(spacing: 20) {
-                    
+                    Text("\(number)")
                     RoundedRectangle(cornerRadius: 27)
                         .fill(.indicator)
                         .frame(
@@ -159,6 +163,7 @@ extension RunningResultView {
             SaveDataPopup(showingPopup: $showingPopup, title: $trackingViewModel.title) {
                     self.hideKeyboard()
                     self.showingPopup = false
+                
                     trackingViewModel.addRecord { result in
                         switch result {
                         case .success(let _):

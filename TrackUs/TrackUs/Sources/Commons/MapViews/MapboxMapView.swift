@@ -1,53 +1,60 @@
 //
-//  PathPreviewMapView.swift
+//  MapboxMapView.swift
 //  TrackUs
 //
-//  Created by 석기권 on 2024/02/22.
+//  Created by 석기권 on 3/27/24.
 //
+// TODO: - 맵뷰 스냅샷 기능구현
+// 러닝기록 저장시 UIImage를 전달
 
 import SwiftUI
 import MapboxMaps
 
-// MapStyle
-enum MapStyle {
-    case standard
-    case numberd
-}
-
 /**
- 러닝경로 프리뷰
+ 기본맵뷰
  */
-struct PathPreviewMap: UIViewControllerRepresentable {
+struct MapboxMapView: UIViewControllerRepresentable {
+    enum MapStyle {
+        case standard
+        case numberd
+    }
     
-    
-    var mapStyle: MapStyle = .standard
+    var mapStyle: MapboxMapView.MapStyle = .standard
     var isUserInteractionEnabled: Bool = true
     let coordinates: [CLLocationCoordinate2D]
+    var trackingViewModel: TrackingViewModel?
     
     func makeUIViewController(context: Context) -> UIViewController {
-        return PathPreviewMapViewController(coordinates: coordinates, mapStyle: mapStyle, isUserInteractionEnabled: isUserInteractionEnabled)
+        return MapboxMapViewController(coordinates: coordinates,
+                                       mapStyle: mapStyle, isUserInteractionEnabled: isUserInteractionEnabled,
+                                       trackingViewModel: trackingViewModel)
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
     }
     
-    func makeCoordinator() -> PathPreviewMapViewController {
-        return PathPreviewMapViewController(coordinates: coordinates, mapStyle: mapStyle, isUserInteractionEnabled: isUserInteractionEnabled)
+    func makeCoordinator() -> MapboxMapViewController {
+        return MapboxMapViewController(coordinates: coordinates,
+                                       mapStyle: mapStyle, isUserInteractionEnabled: isUserInteractionEnabled,
+                                       trackingViewModel: trackingViewModel)
     }
     
 }
 
 // MARK: - Init ViewController
-final class PathPreviewMapViewController: UIViewController, GestureManagerDelegate {
+final class MapboxMapViewController: UIViewController, GestureManagerDelegate {
     private var mapView: MapView!
-    private var  mapStyle: MapStyle = .standard
+    private var  mapStyle: MapboxMapView.MapStyle = .standard
     private let coordinates: [CLLocationCoordinate2D]
     private let isUserInteractionEnabled: Bool
+    private var uiImage: UIImage?
+    private var trackingViewModel: TrackingViewModel?
     
-    init(coordinates: [CLLocationCoordinate2D], mapStyle: MapStyle = .standard, isUserInteractionEnabled: Bool) {
+    init(coordinates: [CLLocationCoordinate2D], mapStyle: MapboxMapView.MapStyle = .standard, isUserInteractionEnabled: Bool, trackingViewModel: TrackingViewModel? = nil) {
         self.isUserInteractionEnabled = isUserInteractionEnabled
         self.mapStyle = mapStyle
         self.coordinates = coordinates
+        self.trackingViewModel = trackingViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -62,7 +69,7 @@ final class PathPreviewMapViewController: UIViewController, GestureManagerDelega
         setBoundsOnCenter()
         
     }
-
+    
     func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didBegin gestureType: MapboxMaps.GestureType) {
         
     }
@@ -77,7 +84,7 @@ final class PathPreviewMapViewController: UIViewController, GestureManagerDelega
 }
 
 // MARK: - UI Method
-extension PathPreviewMapViewController {
+extension MapboxMapViewController {
     /// 맵뷰 스타일 설정
     private func setupMapType() {
         switch self.mapStyle {
@@ -151,8 +158,16 @@ extension PathPreviewMapViewController {
             
             self.mapView.camera.ease (
                 to: camera!,
-                duration: 0
-            )
+                duration: 0) { _ in
+                    self.takeSnapshotAndProceed()
+                }
+        }
+    }
+    
+    private func takeSnapshotAndProceed() {
+        if let viewModel = trackingViewModel, let image = UIImage.imageFromView(view: self.mapView) {
+            self.trackingViewModel?.snapshot = image
         }
     }
 }
+

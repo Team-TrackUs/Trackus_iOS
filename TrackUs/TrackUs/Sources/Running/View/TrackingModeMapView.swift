@@ -49,7 +49,7 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
     private var locationTrackingCancellation: AnyCancelable?
     private var cancellation = Set<AnyCancelable>()
     private var puckConfiguration = Puck2DConfiguration.makeDefault(showBearing: true)
-    private var snapshotter: Snapshotter!
+    
     
     // UI
     private let buttonWidth = 86.0
@@ -346,13 +346,6 @@ extension TrackingModeMapViewController {
         self.mapView.mapboxMap.styleURI = .init(rawValue: "mapbox://styles/seokki/clslt5i0700m901r64bli645z")
         self.puckConfiguration.topImage = UIImage(named: "puck_icon")
         self.mapView.location.options.puckType = .puck2D(puckConfiguration)
-        
-        /// 스냅셔터
-        let snapshotterOption = MapSnapshotOptions(size: CGSize(width: self.view.bounds.width, height: self.view.bounds.height) , pixelRatio: UIScreen.main.scale)
-        let snapshotterCameraOptions = CameraOptions(cameraState: self.mapView.mapboxMap.cameraState)
-        self.snapshotter = Snapshotter(options: snapshotterOption)
-        self.snapshotter.setCamera(to: snapshotterCameraOptions)
-        self.snapshotter.styleURI = .init(rawValue: "mapbox://styles/seokki/clslt5i0700m901r64bli645z")
     }
     
     
@@ -439,46 +432,6 @@ extension TrackingModeMapViewController {
     private func stopTracking() {
         locationTrackingCancellation?.cancel()
     }
-    
-    // 스냅샷을 찍기전 위치조정
-    private func cameraMoveBeforeCapture(completion: (() -> ())? = nil) {
-        // 시작마커 생성
-        guard let first = self.trackingViewModel.coordinates.first else { return }
-        self.mapView.makeMarkerWithUIImage(coordinate: first, imageName: "start_icon")
-        
-        
-        // 2. 적당한 줌레벨 설정
-        // 현재 경로를 기반으로 줌레벨 설정
-        let camera = try? self.mapView.mapboxMap.camera(
-            for: self.trackingViewModel.coordinates,
-            camera: self.mapView.mapboxMap.styleDefaultCamera,
-            coordinatesPadding: UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20),
-            maxZoom: nil,
-            offset: nil
-        )
-        
-        // 3. 카메라 이동(애니메이션 x)
-        self.mapView.camera.ease (
-            to: camera!,
-            duration: 0
-        ) { _ in
-            completion?()
-        }
-    }
-    
-    // 스냅샵 생성후 저장
-    private func takeSnapshotAndProceed() {
-        // 맵뷰의 렌더링이 정확히 끝나는 시점을 알기위해 스냅셔터 completion 이용
-        // 이미지 캡쳐는 UIKit 내장기능 이용
-        snapshotter.start { _ in
-            
-        } completion: { _ in
-            if let image = UIImage.imageFromView(view: self.mapView) {
-                self.trackingViewModel.snapshot = image
-                self.router.push(.runningResult(self.trackingViewModel))
-            }
-        }
-    }
 }
 
 // MARK: - Objc-C Methods
@@ -500,9 +453,7 @@ extension TrackingModeMapViewController {
     
     // 중지버튼 롱프레스
     @objc func stopButtonLongPressed() {
-        cameraMoveBeforeCapture {
-            self.takeSnapshotAndProceed()
-        }
+        router.push(.runningResult(trackingViewModel))
     }
 }
 

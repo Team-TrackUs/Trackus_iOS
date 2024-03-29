@@ -34,7 +34,7 @@ struct MyRecordDetailView: View {
         
         ZStack {
             GeometryReader { geometry in
-                PathPreviewMap(coordinates: runningLog.coordinates?.toCLLocationCoordinate2D() ?? [])
+                MapboxMapView(coordinates: runningLog.coordinates?.toCLLocationCoordinate2D() ?? [])
                     .onTapGesture {
                         withAnimation {
                             isOpen = false
