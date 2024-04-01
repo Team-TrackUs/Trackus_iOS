@@ -231,6 +231,7 @@ class ChatViewModel: ObservableObject {
         // 마지막 메세지 수정
         ref.document(currentChatID)
             .updateData(["latestMessage" : latestMessageData])
+        PushNotificationServiece.shared.sendPushNotificationTo(chatRoom: self.chatRoom, body: chatText, chatRoomId: chatRoom.id)
     }
     
     // 사용자 메세지 확인 후 초기화 - 채팅방 들어올때
@@ -264,8 +265,10 @@ extension ChatViewModel {
                 //let nextMessageExists = messages[$0.offset + 1] != nil
                 let prevMessageIsSameUser = $0.offset != 0 ? messages[$0.offset - 1].sendMember.uid == $0.element.sendMember.uid : false
                 let sameDate = $0.offset != 0 ? messages[$0.offset - 1].date == $0.element.date : false
+                let nextMessageIsSameUser = $0.offset != messages.count - 1 ? messages[$0.offset + 1].sendMember.uid != $0.element.sendMember.uid : true
+                let sameTime = $0.offset != messages.count - 1 && $0.offset != 0  ? messages[$0.offset + 1].time != $0.element.time : true
                 
-                return MessageMap(message: $0.element, sameUser: prevMessageIsSameUser, sameDate: sameDate)
+                return MessageMap(message: $0.element, sameUser: prevMessageIsSameUser, sameDate: sameDate, sameTime: nextMessageIsSameUser || sameTime)
             }
     }
 }
@@ -274,11 +277,13 @@ struct MessageMap: Hashable {
     let message: Message
     let sameUser: Bool
     let sameDate: Bool
+    let sameTime: Bool
     
-    init(message: Message, sameUser: Bool, sameDate: Bool) {
+    init(message: Message, sameUser: Bool, sameDate: Bool, sameTime: Bool) {
         self.message = message
         self.sameUser = sameUser
         self.sameDate = sameDate
+        self.sameTime = sameTime
     }
     
 //    func hash(into hasher: inout Hasher) {

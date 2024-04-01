@@ -204,7 +204,7 @@ extension RunningHomeView {
                                 Button(action: {
                                     router.push(.courseDetail(CourseViewModel(course: course)))
                                 }, label: {
-                                    RunningCell(course: course, user: userSearchViewModel.filterdUserData(uid: [course.ownerUid])[0])
+                                    //RunningCell(course: course, user: userSearchViewModel.filterdUserData(uid: [course.ownerUid])[0])
                                 })
                             }
                         }
