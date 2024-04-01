@@ -127,7 +127,7 @@ extension TrackingViewModel {
                     "pace": self.pace,
                     "calorie": self.calorie,
                     "elapsedTime": self.elapsedTime,
-                    "coordinates": self.coordinates.toGeoPoint(),
+                    "coordinates": self.coordinates.toGeoPoint,
                     "targetDistance": self.goalDistance,
                     "isGroup": self.isGroup,
                     "groupID": self.groupID ?? "",

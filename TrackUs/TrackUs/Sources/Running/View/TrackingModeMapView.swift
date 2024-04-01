@@ -229,7 +229,7 @@ extension TrackingModeMapViewController: CLLocationManagerDelegate {
             return
         }
         
-        self.trackingViewModel.addPath(with: location.asCLLocationCoordinate2D())
+        self.trackingViewModel.addPath(with: location.asCLLocationCoordinate2D)
     }
     
     @objc func enterBackground() {
@@ -434,7 +434,7 @@ extension TrackingModeMapViewController {
     }
 }
 
-// MARK: - Objc-C Methods
+// MARK: - 버튼동작 관련
 extension TrackingModeMapViewController {
     // 일시중지 버튼이 눌렸을때
     @objc func pauseButtonTapped() {

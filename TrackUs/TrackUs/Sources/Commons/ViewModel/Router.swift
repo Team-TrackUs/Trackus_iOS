@@ -69,11 +69,22 @@ enum Sheet: Hashable, Identifiable {
 }
 
 enum Tab {
-    case running, recruitment, chat, report, profile
+    case running, chat, report, profile
+    var tabName: String {
+        switch self {
+        case .chat:
+            "채팅"
+        case .profile:
+            "프로필"
+        case .report:
+            "리포트"
+        case .running:
+            "러닝"
+        }
+    }
 }
 
-final class Router: ObservableObject {
-    
+final class Router: ObservableObject {    
     @Published var path = NavigationPath()
     @Published var selectedIndex: Tab = .running
     @Published var sheet: Sheet?
@@ -90,28 +101,34 @@ final class Router: ObservableObject {
         path.append(page)
     }
     
+    @MainActor
     func pop() {
         if path.count != 0 {
             path.removeLast()
         }
     }
     
+    @MainActor
     func popToRoot() {
         path.removeLast(path.count)
     }
     
+    @MainActor
     func present(sheet: Sheet) {
         self.sheet = sheet
     }
     
+    @MainActor
     func present(fullScreenCover: FullScreenCover) {
         self.fullScreenCover = fullScreenCover
     }
     
+    @MainActor
     func dismissSheet() {
         self.sheet = nil
     }
     
+    @MainActor
     func dismissFullScreenCover() {
         self.fullScreenCover = nil
     }

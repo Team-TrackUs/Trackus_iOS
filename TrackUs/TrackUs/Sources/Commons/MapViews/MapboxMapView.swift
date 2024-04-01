@@ -97,7 +97,7 @@ extension MapboxMapViewController {
     
     /// 맵뷰 초기화
     private func setupCamera() {
-        guard let centerPosition = self.coordinates.calculateCenterCoordinate() else {
+        guard let centerPosition = self.coordinates.centerCoordinate else {
             return
         }
         // TODO: - 줌레벨을 거리에 따라서 설정하도록 구현하기

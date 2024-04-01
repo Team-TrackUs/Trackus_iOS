@@ -52,7 +52,7 @@ struct CourseDetailView: View {
                     RunningStats(
                         estimatedTime: courseViewModel.course.estimatedTime,
                         calories: courseViewModel.course.estimatedCalorie,
-                        distance: courseViewModel.course.coordinates.caculateTotalDistance()
+                        distance: courseViewModel.course.coordinates.totalDistance
                     )
                         .padding(.top, 20)
                         .padding(.horizontal, 16)

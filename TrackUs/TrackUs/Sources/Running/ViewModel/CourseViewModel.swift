@@ -69,7 +69,7 @@ extension CourseViewModel {
     func updateInfoWithPath() {
         course.estimatedTime = ExerciseManager.calculateEstimatedTime(distance: course.distance, style: .init(rawValue: course.runningStyle))
         course.estimatedCalorie = ExerciseManager.calculatedCaloriesBurned(distance: course.distance)
-        course.distance = course.courseRoutes.toCLLocationCoordinate2D().caculateTotalDistance()
+        course.distance = course.courseRoutes.toCLLocationCoordinate2D.totalDistance
     }
 }
 
