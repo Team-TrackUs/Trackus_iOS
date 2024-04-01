@@ -20,13 +20,12 @@ import MapboxMaps
  */
 struct TrackingModeMapView: UIViewControllerRepresentable {
     @ObservedObject var router: Router
-    @ObservedObject var trackingViewModel: TrackingViewModel
+    @ObservedObject var healthKitViewModel: HealthKitViewModel
     
     func makeUIViewController(context: Context) -> UIViewController {
         return TrackingModeMapViewController(
             router: router,
-            trackingViewModel: trackingViewModel
-        )
+            healthKitViewModel: healthKitViewModel)
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
@@ -35,21 +34,19 @@ struct TrackingModeMapView: UIViewControllerRepresentable {
     func makeCoordinator() -> TrackingModeMapViewController {
         return TrackingModeMapViewController(
             router: router,
-            trackingViewModel: trackingViewModel
-        )
+            healthKitViewModel: healthKitViewModel)
     }
 }
 
 
 final class TrackingModeMapViewController: UIViewController, GestureManagerDelegate {
     private let router: Router
+    private let healthKitViewModel: HealthKitViewModel!
     private var mapView: MapView!
-    private let locationManager = LocationManager.shared
-    private let trackingViewModel: TrackingViewModel
+    private let locationService = LocationService.shared
     private var locationTrackingCancellation: AnyCancelable?
     private var cancellation = Set<AnyCancelable>()
     private var puckConfiguration = Puck2DConfiguration.makeDefault(showBearing: true)
-    
     
     // UI
     private let buttonWidth = 86.0
@@ -178,9 +175,9 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
         return label
     }()
     
-    init(router: Router, trackingViewModel: TrackingViewModel) {
+    init(router: Router, healthKitViewModel: HealthKitViewModel) {
         self.router = router
-        self.trackingViewModel = trackingViewModel
+        self.healthKitViewModel = healthKitViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -193,7 +190,7 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
         setupCamera()
         setupUI()
         bind()
-        trackingViewModel.initTimer()
+        healthKitViewModel.start()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -228,16 +225,14 @@ extension TrackingModeMapViewController: CLLocationManagerDelegate {
         guard let location = locations.last else {
             return
         }
-        
-        self.trackingViewModel.addPath(with: location.asCLLocationCoordinate2D)
     }
     
     @objc func enterBackground() {
-        locationManager.locationManager.delegate = self
+        locationService.locationManager.delegate = self
     }
     
     @objc func enterForeground() {
-        locationManager.locationManager.delegate = nil
+        locationService.locationManager.delegate = nil
     }
 }
 
@@ -331,7 +326,7 @@ extension TrackingModeMapViewController {
     /// 맵뷰 설정 & 초기 카메라 셋팅
     private func setupCamera() {
         /// 초기위치 및 카메라
-        guard let location = locationManager.currentLocation?.coordinate else { return }
+        guard let location = locationService.currentLocation?.coordinate else { return }
         
         let cameraOptions = CameraOptions(center: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude), zoom: 16)
         let options = MapInitOptions(cameraOptions: cameraOptions)
@@ -352,37 +347,20 @@ extension TrackingModeMapViewController {
     
     // 뷰에 갱신될 값들을 바인딩
     private func bind() {
-        self.trackingViewModel.$count.receive(on: DispatchQueue.main).sink { [weak self] count in
+        healthKitViewModel.$count.receive(on: DispatchQueue.main).sink { [weak self] count in
             guard let self = self else { return }
             self.countLabel.text = "\(count)"
             if count == 0 { updatedOnStart() }
         }.store(in: &cancellation)
         
-        
-        self.trackingViewModel.$isPause.receive(on: DispatchQueue.main).sink { [weak self] isPause in
+        healthKitViewModel.$isPause.receive(on: DispatchQueue.main).sink { [weak self] isPause in
             guard let self = self else { return }
-            isPause ? self.updatedOnPause() : self.updatedOnPlay()
+            isPause ? updatedOnPause() : updatedOnPlay()
         }.store(in: &cancellation)
         
-        self.trackingViewModel.$distance.receive(on: DispatchQueue.main).sink { [weak self] distance in
+        healthKitViewModel.$seconds.receive(on: DispatchQueue.main).sink { [weak self] seconds in
             guard let self = self else { return }
-            
-            self.kilometerLabel.text = "\(distance.asString(unit: .kilometer))/\(trackingViewModel.goalDistance.asString(unit: .kilometer))"
-        }.store(in: &cancellation)
-        
-        self.trackingViewModel.$elapsedTime.receive(on: DispatchQueue.main).receive(on: DispatchQueue.main).sink { [weak self] time in
-            guard let self = self else { return }
-            self.timeLabel.text = time.asString(style: .positional)
-        }.store(in: &cancellation)
-        
-        self.trackingViewModel.$calorie.receive(on: DispatchQueue.main).sink { [weak self] calorie in
-            guard let self = self else { return }
-            self.calorieLable.text = String(format: "%.1f", calorie)
-        }.store(in: &cancellation)
-        
-        self.trackingViewModel.$pace.receive(on: DispatchQueue.main).sink { [weak self] pace in
-            guard let self = self else { return }
-            self.paceLabel.text = pace.asString(unit: .pace)
+            self.timeLabel.text = seconds.asString(style: .positional)
         }.store(in: &cancellation)
     }
     
@@ -393,7 +371,7 @@ extension TrackingModeMapViewController {
         self.overlayView.isHidden = true
         self.roundedVStackView.isHidden = false
         self.circleHStackView.isHidden = false
-        self.trackingViewModel.startRecord()
+        self.healthKitViewModel.play()
     }
     
     // 일시중지 됬을때
@@ -401,9 +379,10 @@ extension TrackingModeMapViewController {
         self.stopTracking()
         self.overlayView.isHidden = false
         self.pauseButton.isHidden = true
-        if trackingViewModel.count == 0 {
-            self.buttonStackView.isHidden = false
-        }
+        self.buttonStackView.isHidden = false
+        if healthKitViewModel.count == 0 {
+                    self.buttonStackView.isHidden = false
+                }
     }
     
     // 기록중일떄
@@ -420,8 +399,7 @@ extension TrackingModeMapViewController {
         locationTrackingCancellation = mapView.location.onLocationChange.observe { [weak mapView] newLocation in
             // 새로받아온 위치
             guard let location = newLocation.last, let mapView else { return }
-            
-            self.trackingViewModel.addPath(with: location.coordinate)
+
             mapView.camera.ease(
                 to: CameraOptions(center: location.coordinate, zoom: 15),
                 duration: 1.3)
@@ -438,12 +416,12 @@ extension TrackingModeMapViewController {
 extension TrackingModeMapViewController {
     // 일시중지 버튼이 눌렸을때
     @objc func pauseButtonTapped() {
-        self.trackingViewModel.stopRecord()
+        healthKitViewModel.pause()
     }
     
     // 플레이 버튼이 눌렸을때
     @objc func playButtonTapped() {
-        self.trackingViewModel.startRecord()
+        healthKitViewModel.play()
     }
     
     // 중지 버튼이 눌렸을때
@@ -453,7 +431,7 @@ extension TrackingModeMapViewController {
     
     // 중지버튼 롱프레스
     @objc func stopButtonLongPressed() {
-        router.push(.runningResult(trackingViewModel))
+        healthKitViewModel.stop()
     }
 }
 

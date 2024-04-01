@@ -116,7 +116,7 @@ extension CourseDrawingMapViewController {
     // 맵뷰 초기화
     private func setupMapView() {
         // 현재위치가 없는경우 정해진 위치(광화문)로 카메라 세팅
-        let center = LocationManager.shared.currentLocation?.asCLLocationCoordinate2D ?? Constants.DEFAULT_LOCATION
+        let center = LocationService.shared.currentLocation?.asCLLocationCoordinate2D ?? Constants.DEFAULT_LOCATION
         
         let cameraOptions = CameraOptions(center: center, zoom: 17)
         let myMapInitOptions = MapInitOptions(cameraOptions: cameraOptions)

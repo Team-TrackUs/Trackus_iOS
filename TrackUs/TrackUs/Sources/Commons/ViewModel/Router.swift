@@ -22,8 +22,8 @@ enum Page: Hashable, Identifiable {
     case withDrawal
     // Home
     case runningSelect(CourseListViewModel, UserSearchViewModel)
-    case runningStart(TrackingViewModel)
-    case runningResult(TrackingViewModel)
+    case runningStart
+    case runningResult
     case courseDrawing
     case courseDetail(CourseViewModel)
     case courseRegister(CourseViewModel)
@@ -163,10 +163,10 @@ final class Router: ObservableObject {
             Withdrawal()
         case .runningSelect(let courseListViewModel, let userSearchViewModel):
             RunningSelectView(courseListViewModel: courseListViewModel, userSearchViewModel: userSearchViewModel)
-        case .runningStart(let trackingViewModel):
-            RunningStartView(trackingViewModel: trackingViewModel)
-        case .runningResult(let trackingViewModel):
-            RunningResultView(trackingViewModel: trackingViewModel)
+        case .runningStart:
+            RunningStartView()
+        case .runningResult:
+            RunningResultView()
         case .recordDetail(let myRecord):
             MyRecordDetailView(runningLog: myRecord)
         case .userProfile(let userId):

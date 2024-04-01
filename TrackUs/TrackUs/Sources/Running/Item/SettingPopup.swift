@@ -108,10 +108,9 @@ struct SettingPopup: View {
     }
     
     func startButtonTapped() {
+        hideKeyboard()
         showingPopup = false
         settingVM.saveSettings()
-        router.push(.runningStart(
-            TrackingViewModel(goalDistance: settingVM.goalMinValue)
-        ))
+        router.push(.runningStart)
     }
 }

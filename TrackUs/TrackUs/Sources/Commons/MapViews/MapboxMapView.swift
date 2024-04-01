@@ -22,12 +22,11 @@ struct MapboxMapView: UIViewControllerRepresentable {
     var mapStyle: MapboxMapView.MapStyle = .standard
     var isUserInteractionEnabled: Bool = true
     let coordinates: [CLLocationCoordinate2D]
-    var trackingViewModel: TrackingViewModel?
+
     
     func makeUIViewController(context: Context) -> UIViewController {
         return MapboxMapViewController(coordinates: coordinates,
-                                       mapStyle: mapStyle, isUserInteractionEnabled: isUserInteractionEnabled,
-                                       trackingViewModel: trackingViewModel)
+                                       mapStyle: mapStyle, isUserInteractionEnabled: isUserInteractionEnabled)
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
@@ -35,8 +34,7 @@ struct MapboxMapView: UIViewControllerRepresentable {
     
     func makeCoordinator() -> MapboxMapViewController {
         return MapboxMapViewController(coordinates: coordinates,
-                                       mapStyle: mapStyle, isUserInteractionEnabled: isUserInteractionEnabled,
-                                       trackingViewModel: trackingViewModel)
+                                       mapStyle: mapStyle, isUserInteractionEnabled: isUserInteractionEnabled)
     }
     
 }
@@ -48,13 +46,12 @@ final class MapboxMapViewController: UIViewController, GestureManagerDelegate {
     private let coordinates: [CLLocationCoordinate2D]
     private let isUserInteractionEnabled: Bool
     private var uiImage: UIImage?
-    private var trackingViewModel: TrackingViewModel?
     
-    init(coordinates: [CLLocationCoordinate2D], mapStyle: MapboxMapView.MapStyle = .standard, isUserInteractionEnabled: Bool, trackingViewModel: TrackingViewModel? = nil) {
+    init(coordinates: [CLLocationCoordinate2D], mapStyle: MapboxMapView.MapStyle = .standard, isUserInteractionEnabled: Bool) {
         self.isUserInteractionEnabled = isUserInteractionEnabled
         self.mapStyle = mapStyle
         self.coordinates = coordinates
-        self.trackingViewModel = trackingViewModel
+     
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -158,15 +155,7 @@ extension MapboxMapViewController {
             
             self.mapView.camera.ease (
                 to: camera!,
-                duration: 0) { _ in
-                    self.takeSnapshotAndProceed()
-                }
-        }
-    }
-    
-    private func takeSnapshotAndProceed() {
-        if let viewModel = trackingViewModel, let image = UIImage.imageFromView(view: self.mapView) {
-            self.trackingViewModel?.snapshot = image
+                duration: 0)
         }
     }
 }

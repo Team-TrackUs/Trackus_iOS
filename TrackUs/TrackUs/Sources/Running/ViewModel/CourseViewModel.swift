@@ -17,7 +17,7 @@ class CourseViewModel: ObservableObject {
     let id = UUID()
     private let authViewModel = AuthenticationViewModel.shared
     private let chatViewModel = ChatListViewModel.shared
-    private let locationManager = LocationManager.shared
+    private let locationManager = LocationService.shared
     
     @Published var course: Course
     @Published var uiImage: UIImage?

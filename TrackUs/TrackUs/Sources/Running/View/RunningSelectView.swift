@@ -11,8 +11,8 @@ import PopupView
 
 struct RunningSelectView: View {
     @State var isSelect: Int?
-    @State var seletedGroupID: String = ""
-    @State private var isPersonalRunning: Bool = false
+    @State var seletedID: String = ""
+    @State private var isPersonal: Bool = false
     @State private var showingPopup: Bool = false
     
     @EnvironmentObject var router: Router
@@ -22,7 +22,7 @@ struct RunningSelectView: View {
     var vGridItems = [GridItem()]
     
     var buttonEnabled: Bool {
-        isPersonalRunning || !seletedGroupID.isEmpty
+        isPersonal || !seletedID.isEmpty
     }
     
     var body: some View {
@@ -51,16 +51,16 @@ struct RunningSelectView: View {
                             LazyVGrid(columns: vGridItems, spacing: 8) {
                                 ForEach(myCourse, id: \.self) { course in
                                     Button {
-                                        let isSeletedSameItem = seletedGroupID == course.uid
+                                        let isSeletedSameItem = seletedID == course.uid
                                         if isSeletedSameItem {
-                                            seletedGroupID = ""
+                                            seletedID = ""
                                         } else {
-                                            seletedGroupID = course.uid
+                                            seletedID = course.uid
                                         }
                                         
                                     } label: {
-                                        let isSelectedNow = !seletedGroupID.isEmpty
-                                        let seleted = seletedGroupID == course.uid
+                                        let isSelectedNow = !seletedID.isEmpty
+                                        let seleted = seletedID == course.uid
                                         if let user = userSearchViewModel.findUserWithUID(course.ownerUid) {
                                             selectedCell(isSelect: isSelectedNow ? seleted : false, course: course, user: user)
                                         }
@@ -77,22 +77,19 @@ struct RunningSelectView: View {
                         )
                     }
                 }
-                .padding(.horizontal, 16)
-                
-                if isPersonalRunning {
-                    Color.black.opacity(0.3)
-                        .blur(radius: 1)
-                }
+                .padding(16)
+                .blur(radius: isPersonal ? 3 : 0)
+                .disabled(isPersonal ? true : false)
             }
             
             VStack {
                 Button {
-                    isPersonalRunning.toggle()
+                    isPersonal.toggle()
                 } label: {
                     HStack(spacing: 8){
                         Circle()
                             .frame(width: 8, height: 8)
-                            .foregroundStyle(.main.opacity(isPersonalRunning ? 1 : 0))
+                            .foregroundStyle(.main.opacity(isPersonal ? 1 : 0))
                             .padding(4)
                             .overlay(
                                 Circle()
@@ -101,23 +98,16 @@ struct RunningSelectView: View {
                         Text("개인 러닝 모드")
                             .customFontStyle(.gray1_R12)
                     }
-                    .animation(.easeIn(duration: 0.3), value: isPersonalRunning)
+                    .animation(.easeIn(duration: 0.3), value: isPersonal)
                 }
                 .padding(.vertical, 8)
                 
                 MainButton(active: buttonEnabled, buttonText: "러닝 시작") {
-                    if isPersonalRunning {
+                    if isPersonal {
                         showingPopup.toggle()
-                    } else if !seletedGroupID.isEmpty {
-                        if let seletedItem = courseListViewModel.findCourseWithUID(seletedGroupID) {
-                            
-                            router.push(.runningStart(
-                                TrackingViewModel(
-                                    goalDistance: seletedItem.distance,
-                                    groupID: seletedItem.uid,
-                                    isGroup: true
-                                )
-                            ))
+                    } else if !seletedID.isEmpty {
+                        if let seletedItem = courseListViewModel.findCourseWithUID(seletedID) {
+                            router.push(.runningStart)
                         }
                         
                     }
@@ -220,3 +210,4 @@ struct selectedCell: View {
         
     }
 }
+

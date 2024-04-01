@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Kingfisher
+import PopupView
 @_spi(Experimental) import MapboxMaps
 
 struct RunningHomeView: View {
@@ -19,7 +20,6 @@ struct RunningHomeView: View {
     @State private var viewport: Viewport = .followPuck(zoom: 13, bearing: .constant(0))
     @State private var isOpen: Bool = false
     @State private var showingPopup: Bool = false
-    @State private var showingFloater: Bool = true
     @State private var showingAlert: Bool = false
     @State private var offset: CGFloat = 0
     @State private var deltaY: CGFloat = 0
@@ -162,6 +162,14 @@ extension RunningHomeView {
                         )
                     )
                 }
+                .popup(isPresented: $showingPopup) {
+                    HealthSettingPopup()
+                } customize: {
+                    $0
+                        .isOpaque(true)
+                        .dragToDismiss(false)
+                        .closeOnTap(false)
+                }
             }
             .padding(.vertical, 10)
             Divider()
@@ -253,12 +261,28 @@ extension RunningHomeView {
 // MARK: - Method's
 extension RunningHomeView {
    private func startButtonTapped() {
-        LocationManager.shared.checkLocationServicesEnabled { authrionzationStatus in
+       LocationService.shared.checkLocationServicesEnabled { authrionzationStatus in
             if authrionzationStatus == .authorizedWhenInUse {
-                router.push(.runningSelect(courseListViewModel, userSearchViewModel))
+                HealthKitService.authorizeHealthKit { isPermission, error in
+                    HealthKitService.getAuthorizeStatus { status in
+                        if status == .notDetermined {
+                            showingPopup = true
+                        } else {
+                            router.push(.runningSelect(courseListViewModel, userSearchViewModel))
+                        }
+                    }
+                }
             } else {
                 showingAlert = true
             }
+        }
+    }
+}
+
+struct HealthSettingPopup: View {
+    var body: some View {
+        VStack {
+            Text("Test!!!")
         }
     }
 }

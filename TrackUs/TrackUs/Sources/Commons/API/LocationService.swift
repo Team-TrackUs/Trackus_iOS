@@ -1,8 +1,8 @@
 //
-//  LocationManager.swift
+//  LocationService.swift
 //  TrackUs
 //
-//  Created by 석기권 on 2024/02/05.
+//  Created by 석기권 on 4/2/24.
 //
 
 import Foundation
@@ -12,13 +12,11 @@ import MapboxMaps
 /**
  위치작업 관련 클래스
  */
-final class LocationManager: NSObject, ObservableObject {
-    static let shared = LocationManager()
-    
+final class LocationService: NSObject, ObservableObject {
+    static let shared = LocationService()
     let locationManager = CLLocationManager()
     
     @Published var currentLocation: CLLocation?
-    @Published var isUpdatingLocation: Bool = false
     
     
     override private init() {
@@ -27,6 +25,7 @@ final class LocationManager: NSObject, ObservableObject {
         getCurrentLocation()
     }
     
+    /// 위치관련 설정
     func setLocationSettings() {
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
@@ -34,6 +33,7 @@ final class LocationManager: NSObject, ObservableObject {
         locationManager.allowsBackgroundLocationUpdates = true
     }
     
+    /// 현재위치 업데이트
     func getCurrentLocation() {
         locationManager.startUpdatingLocation()
         currentLocation = locationManager.location
@@ -80,9 +80,10 @@ final class LocationManager: NSObject, ObservableObject {
                 } else {
                     completion("위치정보 없음")
                 }
-                
             }
         }
     }
+    
 }
+
 

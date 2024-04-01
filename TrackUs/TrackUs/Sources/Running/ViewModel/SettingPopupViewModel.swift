@@ -42,7 +42,7 @@ class SettingPopupViewModel: ObservableObject {
     
     @MainActor 
     func updateEstimatedTime() {
-        self.estimatedTime = ExerciseManager.calculateEstimatedTime(distance: self.goalMinValue)
+      
     }
     
     

@@ -9,12 +9,12 @@ import SwiftUI
 
 struct RunningStartView: View {
     @EnvironmentObject var router: Router
-    @ObservedObject var trackingViewModel: TrackingViewModel
+    @StateObject var healthKitViewModel = HealthKitViewModel()
     
     var body: some View {
         TrackingModeMapView(
             router: router,
-            trackingViewModel: trackingViewModel
+            healthKitViewModel: healthKitViewModel
         )
         .edgesIgnoringSafeArea(.all)
         .navigationBarHidden(true)

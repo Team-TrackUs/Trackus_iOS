@@ -10,31 +10,25 @@ import SwiftUI
 struct RunningResultView: View {
     @EnvironmentObject var router: Router
     
-    @ObservedObject var trackingViewModel: TrackingViewModel
+    
     @ObservedObject private var settingViewModel = SettingPopupViewModel()
-    private let exerciseManager: ExerciseManager!
     private let mapView: MapboxMapView
     
     @State private var showingPopup = false
     @State private var showingAlert = false
     @State private var number = 0
     
-    init(trackingViewModel: TrackingViewModel, settingViewModel: SettingPopupViewModel = SettingPopupViewModel(), showingPopup: Bool = false, showingAlert: Bool = false) {
+    init(settingViewModel: SettingPopupViewModel = SettingPopupViewModel(), showingPopup: Bool = false, showingAlert: Bool = false) {
         
-        self.trackingViewModel = trackingViewModel
+     
         self.settingViewModel = settingViewModel
         self.showingPopup = showingPopup
         self.showingAlert = showingAlert
         
-        self.exerciseManager = ExerciseManager(
-            distance: trackingViewModel.distance,
-            target: trackingViewModel.goalDistance,
-            elapsedTime: trackingViewModel.elapsedTime
-        )
+       
         
         self.mapView = MapboxMapView(
-            coordinates: trackingViewModel.coordinates,
-            trackingViewModel: trackingViewModel)
+            coordinates: [])
     }
 }
 
@@ -65,11 +59,11 @@ extension RunningResultView {
                             Image(.distanceIcon)
                             VStack(alignment: .leading) {
                                 Text("킬로미터")
-                                Text(exerciseManager.compareKilometers)
+                                Text("")
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
-                            Text(exerciseManager.compareKilometersLabel)
+                            Text("")
                                 .customFontStyle(.gray1_R12)
                         }
                         
@@ -77,11 +71,11 @@ extension RunningResultView {
                             Image(.fireIcon)
                             VStack(alignment: .leading) {
                                 Text("소모 칼로리")
-                                Text(exerciseManager.compareCalories)
+                                Text("")
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
-                            Text(exerciseManager.compareCaloriesLabel)
+                            Text("")
                                 .customFontStyle(.gray1_R12)
                         }
                         
@@ -89,11 +83,11 @@ extension RunningResultView {
                             Image(.timeImg)
                             VStack(alignment: .leading) {
                                 Text("러닝 타임")
-                                Text(exerciseManager.compareEstimatedTime)
+                                Text("")
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
-                            Text(exerciseManager.compareEstimatedTimeLabel)
+                            Text("")
                                 .customFontStyle(.gray1_R12)
                         }
                         
@@ -101,7 +95,7 @@ extension RunningResultView {
                             Image(.paceIcon)
                             VStack(alignment: .leading) {
                                 Text("페이스")
-                                Text(trackingViewModel.pace.asString(unit: .pace))
+                                Text("")
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
@@ -111,7 +105,7 @@ extension RunningResultView {
                     }
                     
                     HStack {
-                        Text(exerciseManager.feedbackMessageLabel)
+                        Text("")
                             .customFontStyle(.gray1_R14)
                             .multilineTextAlignment(.leading)
                             .lineLimit(3)
@@ -160,20 +154,7 @@ extension RunningResultView {
             )
         }
         .popup(isPresented: $showingPopup) {
-            SaveDataPopup(showingPopup: $showingPopup, title: $trackingViewModel.title) {
-                    self.hideKeyboard()
-                    self.showingPopup = false
-                
-                    trackingViewModel.addRecord { result in
-                        switch result {
-                        case .success(let _):
-                            router.popToRoot()
-                        case .failure(let error):
-                            print(error.errorMessage)
-                        }
-                    }
-                
-            }
+            Text("Test")
         } customize: {
             $0
                 .backgroundColor(.black.opacity(0.3))
@@ -184,12 +165,66 @@ extension RunningResultView {
         .navigationBarHidden(true)
         .edgesIgnoringSafeArea(.top)
         .ignoresSafeArea(.keyboard)
-        .presentLoadingView(status: trackingViewModel.isLoading)
         .preventGesture()
     }
 }
 
 
+struct SaveDataPopup: View {
+    @Binding var showingPopup: Bool
+    @Binding var title: String
+    @EnvironmentObject var router: Router
+    @FocusState private var titleTextFieldFocused: Bool
+    
+    let confirmAction: () -> ()
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("러닝 기록 저장")
+                    .customFontStyle(.gray1_B16)
+                
+                Text("러닝기록 저장을 위해\n러닝의 이름을 설정해주세요.")
+                    .customFontStyle(.gray1_R14)
+                    .padding(.top, 8)
+                
+                VStack {
+                    TextField("저장할 러닝 이름을 입력해주세요.", text: $title)
+                        .customFontStyle(.gray1_R12)
+                        .padding(8)
+                        .frame(height: 32)
+                        .textFieldStyle(PlainTextFieldStyle())
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(titleTextFieldFocused ? .main : .gray2))
+                        .focused($titleTextFieldFocused)
+                }
+                .padding(.top, 16)
+                
+                HStack {
+                    Button(action: {
+                        showingPopup = false
+                    }, label: {
+                        Text("취소")
+                            .customFontStyle(.main_R16)
+                            .frame(minHeight: 40)
+                            .padding(.horizontal, 20)
+                            .overlay(Capsule().stroke(.main))
+                    })
+                    
+                    MainButton(active: true, buttonText: "확인", minHeight: 40) {
+                        confirmAction()
+                    }
+                }
+                .padding(.top, 20)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 20)
+        }
+        
+        .frame(width: 290, alignment: .leading)
+        .background(.white)
+        .cornerRadius(12)
+    }
+}
 
 
 
