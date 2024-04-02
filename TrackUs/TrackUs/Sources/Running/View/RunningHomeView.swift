@@ -261,21 +261,21 @@ extension RunningHomeView {
 // MARK: - Method's
 extension RunningHomeView {
    private func startButtonTapped() {
-       LocationService.shared.checkLocationServicesEnabled { authrionzationStatus in
-            if authrionzationStatus == .authorizedWhenInUse {
-                HealthKitService.authorizeHealthKit { isPermission, error in
-                    HealthKitService.getAuthorizeStatus { status in
-                        if status == .notDetermined {
-                            showingPopup = true
-                        } else {
-                            router.push(.runningSelect(courseListViewModel, userSearchViewModel))
-                        }
-                    }
-                }
-            } else {
-                showingAlert = true
-            }
-        }
+       let locationService = LocationService.shared
+       
+       Task {
+           let locationAuthorizationStatus = await locationService.checkLocationServicesEnabled()
+           let HKAuthorizationStatus = await HealthKitService.requestAuthorization()
+           
+           if HKAuthorizationStatus == .notAvailableOnDevice {
+               showingPopup = true
+           }
+           else if locationAuthorizationStatus != .authorizedWhenInUse {
+               showingAlert = true
+           } else {
+               router.push(.runningSelect(courseListViewModel, userSearchViewModel))
+           }
+       }
     }
 }
 

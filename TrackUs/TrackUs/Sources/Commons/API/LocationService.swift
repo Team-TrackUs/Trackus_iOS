@@ -40,18 +40,18 @@ final class LocationService: NSObject, ObservableObject {
     }
     
     /// 위치정보 상태 확인
-    func checkLocationServicesEnabled(_ completion: @escaping (CLAuthorizationStatus) -> Void) {
+    func checkLocationServicesEnabled() async -> CLAuthorizationStatus {
         switch self.locationManager.authorizationStatus {
         case .authorizedAlways:
-            completion(.authorizedAlways)
+            return CLAuthorizationStatus.authorizedAlways
         case .notDetermined:
-            completion(.notDetermined)
+            return CLAuthorizationStatus.notDetermined
         case .authorizedWhenInUse:
-            completion(.authorizedWhenInUse)
+            return CLAuthorizationStatus.authorizedWhenInUse
         case .restricted:
-            completion(.restricted)
+            return CLAuthorizationStatus.restricted
         case .denied:
-            completion(.denied)
+            return CLAuthorizationStatus.denied
         @unknown default:
             fatalError("Unable to check location permission information")
         }
