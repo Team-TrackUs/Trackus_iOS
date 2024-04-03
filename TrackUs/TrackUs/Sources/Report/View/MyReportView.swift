@@ -53,10 +53,6 @@ struct MyReportView: View {
             .padding(.vertical, 20)
             .padding(.horizontal, 16)
         }
-        //        .onAppear {
-        //            viewModel.fetchUserLog()
-        //            viewModel.fetchUserAgeLog()
-        //        }
     }
 }
 

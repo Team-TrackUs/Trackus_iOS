@@ -116,9 +116,6 @@ class ReportViewModel : ObservableObject {
             print("error uid is nil")
             return
         }
-        
-//        let db = Firestore.firestore()
-//        db.collection("users").document(uid).collection("runningRecords").getDocuments() { (snapshot, error) in
         db.collection("users").document(uid).collection("records").getDocuments() { (snapshot, error) in
             if let error = error {
                 print("error fetching runningRecords: \(error.localizedDescription)")
@@ -149,7 +146,6 @@ class ReportViewModel : ObservableObject {
                     if !self.runningLog.contains(log) {
                         self.runningLog.append(log)
                     }
-//                    self.runningLog.append(log)
                 }
             }
             
@@ -180,7 +176,6 @@ class ReportViewModel : ObservableObject {
             
             for document in snapshot!.documents {
                 let userID = document.documentID
-//                db.collection("users").document(userID).collection("runningRecords").getDocuments() { (snapshot, error) in
                 db.collection("users").document(userID).collection("records").getDocuments() { (snapshot, error) in
                     if let error = error {
                         print("Error fetching SameAgeUser Running Log")
@@ -231,7 +226,6 @@ class ReportViewModel : ObservableObject {
             return
         }
         
-//        let docRef = db.collection("users").document(uid).collection("runningRecords").document(documentID)
         let docRef = db.collection("users").document(uid).collection("records").document(documentID)
         docRef.delete() { error in
             if let error = error {
@@ -243,33 +237,6 @@ class ReportViewModel : ObservableObject {
     }
     
     //MARK: - BarGraphView에서 사용하는 함수들 월별
-    
-//    func updateMonthMyAvgData(selectedDate: Date) { // 월별 데이터
-////        guard let selectedDate = selectedDate else { return }
-//        
-//        let calendar = Calendar.current
-//        guard let startDateOfYear = calendar.date(from: calendar.dateComponents([.year], from: selectedDate)),
-//              let endDateOfYear = calendar.date(byAdding: DateComponents(year: 1, day: -1), to: startDateOfYear) else {
-//            return
-//        }
-//        
-//        var monthIndex = 0
-//        var currentDate = startDateOfYear
-//        
-//        while currentDate <= endDateOfYear {
-//            guard let endDateOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: currentDate) else {
-//                return
-//            }
-//            
-//            let dataForThisMonth = getDataForMonth(startDate: currentDate, endDate: endDateOfMonth)
-//            let averageDistanceForMonth = dataForThisMonth.reduce(0.0) { $0 + $1.data } / Double(dataForThisMonth.count)
-//            
-//            monthMyAvgData[monthIndex].data = averageDistanceForMonth
-//            
-//            monthIndex += 1
-//            currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate)!
-//        }
-//    }
     
     func updateMonthMyAvgData(selectedDate: Date) {
         let calendar = Calendar.current

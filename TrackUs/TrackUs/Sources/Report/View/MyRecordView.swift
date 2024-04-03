@@ -187,10 +187,6 @@ struct MyRecordView: View {
                 if let selectedRunningLog = selectedRunningLog {
                     
                     deleteRunningLog(selectedRunningLog: selectedRunningLog)
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { // 팝업이 없어지면 화면 새로고침
-                        viewModel.fetchUserLog(selectedDate: selectedDate!)
-                    }
                 }
             }
             Button("취소", role: .cancel) {}
@@ -208,10 +204,11 @@ struct MyRecordView: View {
     }
     
     func deleteRunningLog(selectedRunningLog: Runninglog) {
-        print("삭제 함수 시작")
-        if let documentID = selectedRunningLog.documentID {
-            print(documentID)
+        if let documentID = selectedRunningLog.documentID,
+           let index = viewModel.runningLog.firstIndex(where: { $0.documentID == documentID }) {
             viewModel.deleteRunningLog(documentID)
+            
+            viewModel.runningLog.remove(at: index)
         }
     }
     
