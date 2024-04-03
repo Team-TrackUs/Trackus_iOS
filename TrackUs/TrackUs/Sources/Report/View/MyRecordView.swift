@@ -35,7 +35,6 @@ struct MyRecordView: View {
                 VStack(alignment: .leading) {
                     
                     VStack(alignment: .leading) {
-                        //                        152.asString(unit: .pace)
                         Text("러닝 기록")
                             .customFontStyle(.gray1_B24)
                             .padding(.top, 24)
@@ -84,7 +83,6 @@ struct MyRecordView: View {
                         }
                     }
                     LazyVGrid(columns: vGridItems, spacing: 0) {
-                        //                        ForEach(viewModel.runningLog, id: \.documentID) { item in
                         ForEach(filteredRunningLog, id: \.documentID) { item in
                             VStack {
                                 ZStack {
@@ -122,7 +120,6 @@ struct MyRecordView: View {
                                             isMenuOpen = true
                                         }
                                     }
-                                    //                                    }
                                 }
                                 
                                 Divider()
@@ -180,7 +177,6 @@ struct MyRecordView: View {
             
         }, content: {
             CustomDateFilter(selectedDate: $selectedDate, isPickerPresented: $calendarButton)
-//                .presentationDetents([.height(450)])
                 .presentationDetents([.height(390)])
                 .presentationDragIndicator(.hidden)
         })
@@ -201,11 +197,6 @@ struct MyRecordView: View {
         } message: {
             Text("러닝 기록을 삭제하시겠습니까? \n 삭제한 러닝기록은 복구할 수 없습니다.")
         }
-        //        .refreshable {
-        //            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-        //                viewModel.fetchUserLog()
-        //            }
-        //        }
     }
     
     func isRecordAvailableOnDate(runningLog: Runninglog, selectedDate: Date?) -> Bool {
@@ -284,7 +275,6 @@ struct RecordCell: View {
                         Spacer()
                     }
                     
-                    //                    Text("광명시 러닝 메이트 구합니다")
                     Text(runningLog.title ?? "러닝")
                         .lineLimit(1)
                         .customFontStyle(.gray1_B16)
@@ -292,24 +282,16 @@ struct RecordCell: View {
                     HStack(spacing: 10) {
                         HStack {
                             Image(.pinIcon)
-                            //                            Text("서울숲카페거리")
                             Text(runningLog.address ?? "대한민국 서울시")
-                            //                                .customFontStyle(.gray1_R12)
                                 .customFontStyle(.gray1_R9)
                                 .lineLimit(1)
                         }
                         
-                        //                        Spacer()
-                        
                         HStack {
                             Image(.timeIcon)
-                            //                            Text("10:02 AM")
                             Text(formatTime(runningLog.timestamp))
-                            //                                .customFontStyle(.gray1_R12)
                                 .customFontStyle(.gray1_R9)
                         }
-                        
-                        //                        Spacer()
                         
                         HStack {
                             Image(.arrowBothIcon)
@@ -321,22 +303,8 @@ struct RecordCell: View {
                     HStack {
                         Text(formatDate(runningLog.timestamp))
                             .customFontStyle(.gray1_SB12)
-//                        HStack {
-//                            Image(systemName: "person.2.fill")
-//                                .resizable()
-//                                .frame(width: 15, height: 12)
-//                                .foregroundColor(.gray1)
-//                            
-//                            Text("1")
-//                            //                            Text(" ")
-//                                .customFontStyle(.gray1_M16)
-//                        }
                         
                         Spacer()
-                        
-                        //                        Text("2024년 2월 12일")
-//                        Text(formatDate(runningLog.timestamp))
-//                            .customFontStyle(.gray1_SB12)
                     }
                 }
             }
@@ -384,11 +352,8 @@ struct CustomDateFilter: View {
                     Spacer()
                     
                     Button {
-//                        withAnimation{
                             currentMonth -= 1
-//                        }
                     } label: {
-//                        Image(systemName: "arrowtriangle.left.fill")
                         Image(systemName: "chevron.left")
                             .foregroundColor(.white)
                     }
@@ -400,11 +365,8 @@ struct CustomDateFilter: View {
                     }
                     
                     Button {
-//                        withAnimation{
                             currentMonth += 1
-//                        }
                     } label: {
-//                        Image(systemName: "arrowtriangle.right.fill")
                         Image(systemName: "chevron.right")
                             .foregroundColor(.white)
                     }

@@ -20,6 +20,7 @@ enum Page: Hashable, Identifiable {
     case faq
     case setting
     case withDrawal
+    case trackusIntro
     // Home
     case runningSelect(CourseListViewModel, UserSearchViewModel)
     case runningStart(TrackingViewModel)
@@ -158,6 +159,8 @@ final class Router: ObservableObject {
             ChattingView(chatViewModel: chatViewModel)
         case .userReport(let userId):
             UserReportView(userUid: userId)
+        case .trackusIntro:
+            TeamIntroView()
         }
     }
     

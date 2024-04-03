@@ -147,7 +147,7 @@
     {
       "identity" : "mapbox-maps-ios",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mapbox/mapbox-maps-ios",
+      "location" : "https://github.com/mapbox/mapbox-maps-ios/",
       "state" : {
         "branch" : "main",
         "revision" : "29db5634dbcc5aa82afca600c6fc98d2d394c642"
