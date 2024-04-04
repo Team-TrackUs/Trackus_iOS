@@ -9,7 +9,7 @@ import SwiftUI
 import MapboxMaps
 
 struct MyRecordDetailView: View {
-    let settingViewModel = SettingPopupViewModel()
+    
     let runningLog: Runninglog
     private let exerciseManager: ExerciseManager!
     

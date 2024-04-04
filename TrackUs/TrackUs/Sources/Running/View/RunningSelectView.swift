@@ -16,6 +16,7 @@ struct RunningSelectView: View {
     @State private var showingPopup: Bool = false
     
     @EnvironmentObject var router: Router
+    @StateObject private var settingViewModel = SettingViewModel()
     @ObservedObject var courseListViewModel: CourseListViewModel
     @ObservedObject var userSearchViewModel: UserSearchViewModel
     
@@ -105,7 +106,7 @@ struct RunningSelectView: View {
                 MainButton(active: buttonEnabled, buttonText: "러닝 시작") {
                     if isPersonal {
                         showingPopup.toggle()
-                    } else if !seletedID.isEmpty {
+                    } else {
                         if let seletedItem = courseListViewModel.findCourseWithUID(seletedID) {
                             router.push(.runningStart)
                         }
@@ -117,9 +118,11 @@ struct RunningSelectView: View {
         }
         .popup(isPresented: $showingPopup) {
             SettingPopup(
-                showingPopup: $showingPopup,
-                settingVM: SettingPopupViewModel()
-            )
+                settingViewModel: settingViewModel,
+                isShowing: $showingPopup) {
+                settingViewModel.save()
+                
+            }
         } customize: {
             $0
                 .backgroundColor(.black.opacity(0.3))
@@ -207,7 +210,6 @@ struct selectedCell: View {
                 .stroke(isSelect ? .main : .gray3, lineWidth: 4)
         )
         .cornerRadius(12)
-        
     }
 }
 

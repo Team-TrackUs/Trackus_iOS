@@ -347,20 +347,37 @@ extension TrackingModeMapViewController {
     
     // 뷰에 갱신될 값들을 바인딩
     private func bind() {
+        // 카운트다운
         healthKitViewModel.$count.receive(on: DispatchQueue.main).sink { [weak self] count in
             guard let self = self else { return }
             self.countLabel.text = "\(count)"
-            if count == 0 { updatedOnStart() }
+            if count == 0 {
+                updatedOnStart()
+            }
         }.store(in: &cancellation)
         
+        // 운동상태
         healthKitViewModel.$isPause.receive(on: DispatchQueue.main).sink { [weak self] isPause in
             guard let self = self else { return }
             isPause ? updatedOnPause() : updatedOnPlay()
         }.store(in: &cancellation)
         
+        // 운동시간
         healthKitViewModel.$seconds.receive(on: DispatchQueue.main).sink { [weak self] seconds in
             guard let self = self else { return }
             self.timeLabel.text = seconds.asString(style: .positional)
+        }.store(in: &cancellation)
+        
+        // 이동거리
+        healthKitViewModel.$distance.receive(on: DispatchQueue.main).sink { [weak self] distance in
+            guard let self = self else { return }
+            self.kilometerLabel.text = "\(distance.asString(unit: .kilometer))"
+        }.store(in: &cancellation)
+        
+        // 칼로리
+        healthKitViewModel.$calorie.receive(on: DispatchQueue.main).sink { [weak self] calorie in
+            guard let self = self else { return }
+            self.calorieLable.text = String(format: "%.1f", calorie)
         }.store(in: &cancellation)
     }
     
@@ -393,7 +410,7 @@ extension TrackingModeMapViewController {
         self.pauseButton.isHidden = false
     }
     
-    // 트래킹 시작
+    // 위치받아오기 시작
     private func startTracking() {
         // 맵뷰에서 컴바인 형식으로 새로운 위치를 받아옴(사용자가 이동할떄마다 값을 방출)
         locationTrackingCancellation = mapView.location.onLocationChange.observe { [weak mapView] newLocation in
@@ -406,7 +423,7 @@ extension TrackingModeMapViewController {
         }
     }
     
-    // 트래킹 종료
+    // 위치받아오기 종료
     private func stopTracking() {
         locationTrackingCancellation?.cancel()
     }

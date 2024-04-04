@@ -9,19 +9,16 @@ import SwiftUI
 
 struct RunningResultView: View {
     @EnvironmentObject var router: Router
-    
-    
-    @ObservedObject private var settingViewModel = SettingPopupViewModel()
     private let mapView: MapboxMapView
     
     @State private var showingPopup = false
     @State private var showingAlert = false
     @State private var number = 0
     
-    init(settingViewModel: SettingPopupViewModel = SettingPopupViewModel(), showingPopup: Bool = false, showingAlert: Bool = false) {
+    init(showingPopup: Bool = false, showingAlert: Bool = false) {
         
      
-        self.settingViewModel = settingViewModel
+        
         self.showingPopup = showingPopup
         self.showingAlert = showingAlert
         
