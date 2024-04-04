@@ -1110,10 +1110,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = TrackUs/TrackUs.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TrackUs/Resources/Preview Content\"";
-				DEVELOPMENT_TEAM = 4N3558QY8F;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 4N3558QY8F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TrackUs/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자의 정확한 운동정보를 추적하기 위해서 러닝중에는 백그라운드에서 위치를 추적합니다.";
@@ -1132,6 +1134,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.TrackUs.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = TrackUs_Development;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1149,10 +1152,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = TrackUs/TrackUs.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"TrackUs/Resources/Preview Content\"";
-				DEVELOPMENT_TEAM = 4N3558QY8F;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 4N3558QY8F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TrackUs/Info.plist;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자의 정확한 운동정보를 추적하기 위해서 러닝중에는 백그라운드에서 위치를 추적합니다.";
@@ -1171,6 +1176,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.TrackUs.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = TrackUs_Development;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;

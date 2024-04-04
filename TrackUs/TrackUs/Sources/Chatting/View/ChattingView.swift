@@ -44,19 +44,13 @@ struct ChattingView: View {
                 // 채팅 내용 표기
                 ScrollViewReader{ proxy in
                     ScrollView{
-                        VStack(spacing: 6) {
+                        VStack(spacing: 2 ) {
                             ForEach(chatViewModel.messageMap, id: \.message) { messageMap in
                                 ChatMessageView(messageMap: messageMap,
                                                 myUid: authViewModel.userInfo.uid)
                                 .padding(.horizontal, 16)
                                 .id(messageMap)
                             }
-                            //                            ForEach(chatViewModel.messageMap, id: \.self.id) { messageMap in
-                            //                                ChatMessageView(messageMap: messageMap,
-                            //                                                myUid: authViewModel.userInfo.uid)
-                            //                                //.id(messageMap)
-                            //                                .padding(.horizontal, 16)
-                            //
                         }
                     }
                     .onChange(of: chatViewModel.messageMap.count) { _ in // 새 메시지가 추가될 때마다 호출
@@ -68,25 +62,25 @@ struct ChattingView: View {
                         proxy.scrollTo(chatViewModel.messageMap.last?.message, anchor: .top)
                     }
                     // 아래 내리기
-                    .overlay(
-                        VStack {
-                            if !scrollToBottom {
-                                Button("신규 메세지") {
-                                    scrollToBottom(proxy)
-                                    scrollToBottom = true
-                                }
-                                .padding()
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                                .padding()
-                                .onTapGesture {
-                                    scrollToBottom = true
-                                }
-                            }
-                        }
-                        , alignment: .bottom
-                    )
+//                    .overlay(
+//                        VStack {
+//                            if !scrollToBottom {
+//                                Button("신규 메세지") {
+//                                    scrollToBottom(proxy)
+//                                    scrollToBottom = true
+//                                }
+//                                .padding()
+//                                .background(Color.blue)
+//                                .foregroundColor(.white)
+//                                .cornerRadius(10)
+//                                .padding()
+//                                .onTapGesture {
+//                                    scrollToBottom = true
+//                                }
+//                            }
+//                        }
+//                        , alignment: .bottom
+//                    )
                     .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
                         scrollToBottom = false
                     }
@@ -296,10 +290,6 @@ struct ChatMessageView: View {
     }
     
     var body: some View {
-//        if previousdate {
-//            Text(message.date)
-//                .customFontStyle(.gray1_R12)
-//        }
         HStack{
             if !messageMap.sameDate{
                 Text(messageMap.message.date)
@@ -315,17 +305,19 @@ struct ChatMessageView: View {
                 } label: {
                     HStack{
                         ProfileImage(ImageUrl: messageMap.message.sendMember.profileImageUrl, size: 40)
+                            .padding(.top, 8)
                     }
                 }
             }else{
                 Spacer(minLength: 47)
             }
             
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 if !mymessge && (!messageMap.sameUser || !messageMap.sameDate) {
                     let userName = messageMap.message.sendMember.userName
                     Text(userName.isEmpty ? "탈퇴 회원" : userName) // 상대방 이름
                         .customFontStyle(.gray1_R12)
+                        .padding(.top, 8)
                 }
                 HStack(alignment: .bottom){
                     if mymessge && messageMap.sameTime {

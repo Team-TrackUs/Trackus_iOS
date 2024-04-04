@@ -154,7 +154,7 @@ class ChatListViewModel: ObservableObject {
             guard let document = documentSnapshot else { return }
             do {
                 let userInfo = try document.data(as: UserInfo.self)
-                self.users[uid] = Member(uid: uid, userName: userInfo.username, profileImageUrl: userInfo.profileImageUrl)
+                self.users[uid] = Member(uid: uid, userName: userInfo.username, profileImageUrl: userInfo.profileImageUrl, token: userInfo.token)
             } catch {
                 print("Error decoding document: \(error)")
             }

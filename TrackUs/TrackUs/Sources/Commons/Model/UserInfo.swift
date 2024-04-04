@@ -7,6 +7,8 @@
 
 import Foundation
 import SwiftUI
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
 enum RunningStyle: String, Codable, CaseIterable, Identifiable  {
     case walking = "walking"
@@ -41,12 +43,14 @@ struct UserInfo : Codable {
     var profileImageUrl: String?
     var setDailyGoal: Double?
     var runningStyle: RunningStyle?
+    var token: String
     
     init(){
         self.uid = ""
         self.username = ""
         self.isProfilePublic = false
         self.isProSubscriber = false
+        self.token = ""
     }
     
     enum CodingKeys:String, CodingKey {
@@ -61,6 +65,21 @@ struct UserInfo : Codable {
         case profileImageUrl = "profileImageUrl"
         case setDailyGoal = "setDailyGoal"
         case runningStyle = "runningStyle"
-        //case image = "image"
+        case token = "token"
     }
+}
+
+public struct FirestoreUserInfo: Codable, Hashable {
+    @DocumentID public var uid: String?
+    public let username: String
+    public let weight: Int?
+    public let height: Int?
+    public let age: Int?
+    public let gender: Bool?
+    public let isProfilePublic: Bool
+    public let isProSubscriber: Bool
+    public let profileImageUrl: String?
+    public let setDailyGoal: Double?
+    public var runningStyle: String?
+    public let token: String
 }

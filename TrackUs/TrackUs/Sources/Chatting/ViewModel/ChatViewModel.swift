@@ -15,9 +15,6 @@ class ChatViewModel: ObservableObject {
     
     @Published var currentChatID: String
     @Published var members: [String : Member] = [:]
-    //@Published var messages: [Message] = []
-    //@Published var chatRoom: ChatRoom
-    
     @Published var messageMap: [MessageMap] = []
     
     var chatRoom: ChatRoom {
@@ -34,7 +31,6 @@ class ChatViewModel: ObservableObject {
     }
     
     var newChat: Bool = false
-    // 뭐지
     var lock = NSRecursiveLock()
     
     private let ref = FirebaseManger().firestore.collection("chatRoom")
@@ -43,14 +39,11 @@ class ChatViewModel: ObservableObject {
     init(currentChatID: String, members: [String : Member], messages: [Message], chatRoom: ChatRoom) {
         self.currentChatID = currentChatID
         self.members = members
-        //self.messages = messages
-        //self.chatRoom = chatRoom
     }
     
     /// 기존 채팅방 생성자
     init(chatRoom: ChatRoom, users: [String: Member]){
         self.currentChatID = chatRoom.id
-        //self.chatRoom = chatRoom
         self.members = chatRoom.members.reduce(into: [String: Member]()) { result, uid in
             if let member = users[uid] {
                 result[uid] = member
@@ -62,18 +55,15 @@ class ChatViewModel: ObservableObject {
     /// 1대1 채팅 생성자
     init(myInfo: UserInfo, opponentInfo: UserInfo){
         // 기존 채팅 있는지 확인
-//        self.chatRoom = ChatRoom(id: UUID().uuidString,
-//                                 title: "",
-//                                 members: [myInfo.uid, opponentInfo.uid],
-//                                 nonSelfMembers: [opponentInfo.uid],
-//                                 group: false)
         self.currentChatID = ""
         self.members = [myInfo.uid: Member(uid: myInfo.uid ,
-                                          userName: myInfo.username,
-                                          profileImageUrl: myInfo.profileImageUrl),
+                                           userName: myInfo.username,
+                                           profileImageUrl: myInfo.profileImageUrl,
+                                           token: myInfo.token),
                         opponentInfo.uid: Member(uid: opponentInfo.uid,
-                                               userName: opponentInfo.username,
-                                               profileImageUrl: opponentInfo.profileImageUrl)]
+                                                 userName: opponentInfo.username,
+                                                 profileImageUrl: opponentInfo.profileImageUrl,
+                                                 token: opponentInfo.token)]
         createChatRoom(myInfo: myInfo, opponentInfo: opponentInfo)
     }
     // 채팅방 삭제
@@ -171,10 +161,6 @@ class ChatViewModel: ObservableObject {
                 
             }
     }
-    // 신규 메세지 갯수 리스너
-//    func subscribeToUnreadCount() {
-//
-//    }
     
     // 채팅방 리스너 종료 -> 이전 페이지
     
@@ -231,7 +217,7 @@ class ChatViewModel: ObservableObject {
         // 마지막 메세지 수정
         ref.document(currentChatID)
             .updateData(["latestMessage" : latestMessageData])
-        PushNotificationServiece.shared.sendPushNotificationTo(chatRoom: self.chatRoom, body: chatText, chatRoomId: chatRoom.id)
+        PushNotificationServiece.shared.sendPushNotificationTo(chatRoom: self.chatRoom, members: self.members, body: chatText)
     }
     
     // 사용자 메세지 확인 후 초기화 - 채팅방 들어올때
@@ -250,10 +236,7 @@ class ChatViewModel: ObservableObject {
     }
     
     // 마지막 메세지 변경
-    
 }
-
-// =========================
 
 extension ChatViewModel {
     func messageMapping(_ messages: [Message]) -> [MessageMap] {
@@ -273,21 +256,5 @@ extension ChatViewModel {
     }
 }
 
-struct MessageMap: Hashable {
-    let message: Message
-    let sameUser: Bool
-    let sameDate: Bool
-    let sameTime: Bool
-    
-    init(message: Message, sameUser: Bool, sameDate: Bool, sameTime: Bool) {
-        self.message = message
-        self.sameUser = sameUser
-        self.sameDate = sameDate
-        self.sameTime = sameTime
-    }
-    
-//    func hash(into hasher: inout Hasher) {
-//        hasher.combine(message)
-//    }
-}
+
 
