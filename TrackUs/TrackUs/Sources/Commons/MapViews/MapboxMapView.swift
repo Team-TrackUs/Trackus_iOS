@@ -36,6 +36,7 @@ struct MapboxMapView: UIViewControllerRepresentable {
         return MapboxMapViewController(coordinates: coordinates,
                                        mapStyle: mapStyle, isUserInteractionEnabled: isUserInteractionEnabled)
     }
+    
 }
 
 // MARK: - Init ViewController
@@ -60,11 +61,10 @@ final class MapboxMapViewController: UIViewController, GestureManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupCamera()
-        if !coordinates.isEmpty {
-            setupMapType()
-            setBoundsOnCenter()
-        }
+        setupMapType()
+        setBoundsOnCenter()
     }
     
     func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didBegin gestureType: MapboxMaps.GestureType) {

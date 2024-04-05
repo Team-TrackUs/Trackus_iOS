@@ -9,35 +9,18 @@ import SwiftUI
 
 struct RunningResultView: View {
     @EnvironmentObject var router: Router
-    private let mapView: MapboxMapView
-    
-    @State private var showingPopup = false
+    @ObservedObject var runViewModel: RunActivityViewModel
+    @State private var showingModal = false
     @State private var showingAlert = false
-    @State private var number = 0
-    
-    init(showingPopup: Bool = false, showingAlert: Bool = false) {
-        
-     
-        
-        self.showingPopup = showingPopup
-        self.showingAlert = showingAlert
-        
-       
-        
-        self.mapView = MapboxMapView(
-            coordinates: [])
-    }
 }
 
 extension RunningResultView {
-    
     var body: some View {
         VStack {
-            mapView
+            MainMapVCHosting()
             
             VStack {
                 VStack(spacing: 20) {
-                    Text("\(number)")
                     RoundedRectangle(cornerRadius: 27)
                         .fill(.indicator)
                         .frame(
@@ -116,7 +99,7 @@ extension RunningResultView {
                         }
                         
                         MainButton(active: true, buttonText: "러닝 기록 저장", buttonColor: .main, minHeight: 45) {
-                            showingPopup = true
+                            showingModal = true
                         }
                         
                     }
@@ -150,8 +133,22 @@ extension RunningResultView {
                 )
             )
         }
-        .popup(isPresented: $showingPopup) {
-            Text("Test")
+        .popup(isPresented: $showingModal) {
+            SaveDataModal {
+                showingModal = false
+                
+                Task {
+                    do {
+                        try await runViewModel.saveRunDataToFirestore()
+                    } catch {
+                        
+                    }
+                }
+            } cancle: {
+                self.showingModal = false
+            }
+            
+            
         } customize: {
             $0
                 .backgroundColor(.black.opacity(0.3))
@@ -167,13 +164,11 @@ extension RunningResultView {
 }
 
 
-struct SaveDataPopup: View {
-    @Binding var showingPopup: Bool
-    @Binding var title: String
-    @EnvironmentObject var router: Router
+struct SaveDataModal: View {
     @FocusState private var titleTextFieldFocused: Bool
     
-    let confirmAction: () -> ()
+    let action: () -> ()
+    let cancle: () -> ()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -186,7 +181,7 @@ struct SaveDataPopup: View {
                     .padding(.top, 8)
                 
                 VStack {
-                    TextField("저장할 러닝 이름을 입력해주세요.", text: $title)
+                    TextField("저장할 러닝 이름을 입력해주세요.", text: .constant("테스트"))
                         .customFontStyle(.gray1_R12)
                         .padding(8)
                         .frame(height: 32)
@@ -197,9 +192,8 @@ struct SaveDataPopup: View {
                 .padding(.top, 16)
                 
                 HStack {
-                    Button(action: {
-                        showingPopup = false
-                    }, label: {
+                    Spacer()
+                    Button(action: cancle, label: {
                         Text("취소")
                             .customFontStyle(.main_R16)
                             .frame(minHeight: 40)
@@ -207,9 +201,17 @@ struct SaveDataPopup: View {
                             .overlay(Capsule().stroke(.main))
                     })
                     
-                    MainButton(active: true, buttonText: "확인", minHeight: 40) {
-                        confirmAction()
-                    }
+                    Spacer()
+                    
+                    Button(action: action, label: {
+                        Text("확인")
+                            .customFontStyle(.white_B16)
+                            .frame(minHeight: 40)
+                            .padding(.horizontal, 20)
+                            .background(.main)
+                            .clipShape(Capsule())
+                    })
+                    Spacer()
                 }
                 .padding(.top, 20)
             }

@@ -16,6 +16,7 @@
 
 import HealthKit
 import MapboxMaps
+import Firebase
 
 final class RunActivityViewModel: ObservableObject {
     private let id = UUID()
@@ -24,13 +25,24 @@ final class RunActivityViewModel: ObservableObject {
     private let healthStore = HKHealthStore()
     private var anchor: HKQueryAnchor!
     private var startDate: Date?
+    private let groupId: String
     
+    @MainActor
+    private var userUid: String {
+        AuthenticationViewModel.shared.userInfo.uid
+    }
+    
+    private var isGroup: Bool {
+        !groupId.isEmpty
+    }
     
     // 뷰에서 사용
     @Published var count = 3
     @Published var isPause = true
+    @Published var isLoading = false
     
     // DB에 올라가는 데이터
+    @Published var title = ""
     @Published var calorie = 0.0
     @Published var distance = 0.0
     @Published var seconds = 0.0
@@ -39,8 +51,13 @@ final class RunActivityViewModel: ObservableObject {
     @Published var coordinates = [CLLocationCoordinate2D]()
     
     // 그룹러닝
-    init(targetDistance target: Double) {
+    init(targetDistance target: Double, groupId: String) {
         self.target = target
+        self.groupId = groupId
+    }
+    
+    convenience init(targetDistance target: Double) {
+        self.init(targetDistance: target, groupId: "")
     }
     
     /// 시작
@@ -140,6 +157,34 @@ final class RunActivityViewModel: ObservableObject {
         isPause = true
         timer?.invalidate()
         healthStore.stop(observeQuery)
+    }
+    
+    /// 러닝데이터 추가(DB)
+    func saveRunDataToFirestore() async throws {
+        
+        let uid = await userUid
+        
+        let data: [String : Any] = [
+            "title": title,
+            "distance": distance,
+            "pace": pace,
+            "calorie": calorie,
+            "seconds": seconds,
+            "target": target,
+            "coordinates": coordinates.toGeoPoint,
+            "isGroup": isGroup,
+            "routeImageUrl": "",
+            "address": "",
+            "timestamp": Timestamp(date: Date())
+        ]
+        
+        do {
+            try await Firestore.firestore().collection("users").document(uid).collection("records").addDocument(data: data)
+            
+        } catch {
+            debugPrint(error.localizedDescription)
+            throw ErrorType.firebaseError
+        }
     }
 }
 

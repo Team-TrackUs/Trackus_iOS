@@ -467,7 +467,7 @@ extension RunningActivityVC {
         runViewModel.stop()
         cancellation.removeAll()
         locationTrackingCancellation?.cancel()
-        router.push(.runningResult)
+        router.push(.runningResult(runViewModel))
     }
 }
 
