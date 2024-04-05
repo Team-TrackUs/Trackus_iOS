@@ -75,7 +75,6 @@ final class RunActivityViewModel: ObservableObject {
         let distanceDescriptor = HKQueryDescriptor(sampleType: distanceType, predicate: nil)
         let activeEnergyDescriptor = HKQueryDescriptor(sampleType: activeEnergyType, predicate: nil)
         
-        
         // 거리변화 감지시 호출됨
         observeQuery = HKObserverQuery(queryDescriptors: [distanceDescriptor, activeEnergyDescriptor])
         { query, updatedSampleTypes, completionHandler, error in

@@ -459,12 +459,15 @@ extension RunningActivityVC {
     
     // 중지 버튼이 눌렸을때
     @objc func stopButtonTapped() {
-        
+        self.showToast(message: "종료 버튼을 2초간 탭하면 운동이 종료됩니다.")
     }
     
     // 중지버튼 롱프레스
     @objc func stopButtonLongPressed() {
         runViewModel.stop()
+        cancellation.removeAll()
+        locationTrackingCancellation?.cancel()
+        router.push(.runningResult)
     }
 }
 
@@ -520,4 +523,22 @@ extension RunningActivityVC {
         }
         return label
     }
+    
+    func showToast(message : String, font: UIFont = UIFont.systemFont(ofSize: 14.0)) {
+            let toastLabel = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - 135, y: self.view.frame.size.height-230, width: 270, height: 45))
+            toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+            toastLabel.textColor = UIColor.white
+            toastLabel.font = font
+            toastLabel.textAlignment = .center;
+            toastLabel.text = message
+            toastLabel.alpha = 1.0
+            toastLabel.layer.cornerRadius = 10;
+            toastLabel.clipsToBounds  =  true
+            self.view.addSubview(toastLabel)
+            UIView.animate(withDuration: 4.0, delay: 0.1, options: .curveEaseOut, animations: {
+                 toastLabel.alpha = 0.0
+            }, completion: {(isCompleted) in
+                toastLabel.removeFromSuperview()
+            })
+        }
 }
