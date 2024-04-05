@@ -36,16 +36,6 @@ enum Page: Hashable, Identifiable {
     case userReport(String)
 }
 
-extension Page {
-    static func == (lhs: Page, rhs: Page) -> Bool {
-        return lhs.hashValue == rhs.hashValue
-    }
-    
-    var id: String {
-        String(describing: self)
-    }
-}
-
 // MARK: - FULL SCREEN
 enum FullScreenCover: String, Identifiable {
     case payment
@@ -199,4 +189,13 @@ extension Page {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
+    
+    static func == (lhs: Page, rhs: Page) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+    
+    var id: String {
+        String(describing: self)
+    }
 }
+

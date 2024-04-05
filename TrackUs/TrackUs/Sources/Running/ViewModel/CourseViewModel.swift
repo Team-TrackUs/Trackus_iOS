@@ -10,11 +10,11 @@ import MapboxMaps
 /**
   코스데이터에 대한 개별적인 뷰모델
  */
-class CourseViewModel: ObservableObject {
+class CourseViewModel: ObservableObject, HashableObject {
     enum ErrorType: Error {
         case fetchError
     }
-    let id = UUID()
+    
     private let authViewModel = AuthenticationViewModel.shared
     private let chatViewModel = ChatListViewModel.shared
     private let locationManager = LocationService.shared
@@ -162,15 +162,5 @@ extension CourseViewModel {
             print(#function + "Failed upload data")
             completion(.failure(.fetchError))
         }
-    }
-}
-
-extension CourseViewModel: Hashable {
-    static func == (lhs: CourseViewModel, rhs: CourseViewModel) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
     }
 }

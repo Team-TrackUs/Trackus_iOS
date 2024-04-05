@@ -18,8 +18,7 @@ import HealthKit
 import MapboxMaps
 import Firebase
 
-final class RunActivityViewModel: ObservableObject {
-    private let id = UUID()
+final class RunActivityViewModel: ObservableObject, HashableObject {
     private var timer: Timer?
     private var observeQuery: HKObserverQuery!
     private let healthStore = HKHealthStore()
@@ -187,14 +186,3 @@ final class RunActivityViewModel: ObservableObject {
         }
     }
 }
-
-extension RunActivityViewModel: Hashable {
-    static func == (lhs: RunActivityViewModel, rhs: RunActivityViewModel) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-}
-

@@ -7,8 +7,7 @@
 
 import Foundation
 
-class CourseListViewModel: ObservableObject {
-    let id = UUID()
+class CourseListViewModel: ObservableObject, HashableObject {
     private let authViewModel = AuthenticationViewModel.shared
     
     @Published var courseList = [Course]()
@@ -35,15 +34,5 @@ class CourseListViewModel: ObservableObject {
     /// 코스데이터 찾기
     func findCourseWithUID(_ uid: String) -> Course? {
         return courseList.filter { $0.uid == uid }.first
-    }
-}
-
-extension CourseListViewModel: Hashable {
-    static func == (lhs: CourseListViewModel, rhs: CourseListViewModel) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
     }
 }
