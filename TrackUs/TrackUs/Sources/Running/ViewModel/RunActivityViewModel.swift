@@ -6,7 +6,7 @@
 //
 // TODO: - 운동정보 계산시 HealthKit으로 리펙토링
 // * 러닝시작
-// - 거리, 소모칼로리, 페이스 구하기(시작 -> 현재)
+// - 거리, 소모칼로리, 페이스 구하기(시작 -> 현재의 최근데이터 누적)
 // - 거리, 소모칼로리, 페이스 업데이트
 // * 러닝중지
 // - 추적중지
@@ -17,7 +17,7 @@
 import HealthKit
 import MapboxMaps
 
-final class HealthKitViewModel: ObservableObject {
+final class RunActivityViewModel: ObservableObject {
     private let id = UUID()
     private var timer: Timer?
     private var observeQuery: HKObserverQuery!
@@ -37,6 +37,11 @@ final class HealthKitViewModel: ObservableObject {
     @Published var target = 0.0
     @Published var pace = 0.0
     @Published var coordinates = [CLLocationCoordinate2D]()
+    
+    // 그룹러닝
+    init(targetDistance target: Double) {
+        self.target = target
+    }
     
     /// 시작
     @MainActor
@@ -64,8 +69,7 @@ final class HealthKitViewModel: ObservableObject {
         let distanceType = HKQuantityType(.distanceWalkingRunning)
         let activeEnergyType = HKQuantityType(.activeEnergyBurned)
         
-        // 속성지정
-        let predicate = HKQuery.predicateForSamples(withStart: self.startDate, end: Date(), options: .strictEndDate)
+        
         
         // 샘플유형 지정
         let distanceDescriptor = HKQueryDescriptor(sampleType: distanceType, predicate: nil)
@@ -73,21 +77,23 @@ final class HealthKitViewModel: ObservableObject {
         
         
         // 거리변화 감지시 호출됨
-        observeQuery = HKObserverQuery(queryDescriptors: [distanceDescriptor, activeEnergyDescriptor]) 
+        observeQuery = HKObserverQuery(queryDescriptors: [distanceDescriptor, activeEnergyDescriptor])
         { query, updatedSampleTypes, completionHandler, error in
             
             if let error = error {
                 debugPrint(#function + " HKObserverQuery " + error.localizedDescription)
                 return
             }
+            // 속성지정
+            let predicate = HKQuery.predicateForSamples(withStart: self.startDate, end: Date(), options: .strictStartDate)
             
             if let types = updatedSampleTypes {
-
+                // distanceWalkingRunning, activeEnergyBurned 샘플데이터 변경시
                 let descriptors = types.map { type in
-                          HKQueryDescriptor(sampleType: type, predicate: nil)
+                    HKQueryDescriptor(sampleType: type, predicate: predicate)
                 }
                 
-                let anchorQuery = HKAnchoredObjectQuery(queryDescriptors: descriptors, 
+                let anchorQuery = HKAnchoredObjectQuery(queryDescriptors: descriptors,
                                                         anchor: self.anchor,
                                                         limit: HKObjectQueryNoLimit)
                 { anchorQuery, samples, deleted, newAnchor, error in
@@ -98,18 +104,22 @@ final class HealthKitViewModel: ObservableObject {
                     DispatchQueue.main.async {
                         // Update the anchor.
                         self.anchor = newAnchor
-                                    
-                        // Process the samples and deleted objects here.
                         
-                        let addedDistanceSample = samples?.filter { $0.sampleType == distanceType }.last as? HKQuantitySample
-                        let addedActiveSample = samples?.filter { $0.sampleType == activeEnergyType }.last as? HKQuantitySample
-                        if let addedDistanceSample = addedDistanceSample {
-                            self.distance += addedDistanceSample.quantity.doubleValue(for: .meter())
+                        // 가장 최근에 추가된 데이터 확인
+                        guard let samples = samples,
+                              let sample = samples.last,
+                              let sampleQuantity = sample as? HKQuantitySample
+                        else {  return }
+                        
+                        DispatchQueue.main.async {
+                            if sampleQuantity.sampleType == distanceType {
+                                self.distance += sampleQuantity.quantity.doubleValue(for: .meter())
+                            } else if sampleQuantity.sampleType == activeEnergyType {
+                                self.calorie += sampleQuantity.quantity.doubleValue(for: .kilocalorie())
+                            }
+                            self.pace = WorkoutService.calcPace(second: self.seconds, meter: self.distance)
                         }
-                        if let addedActiveSample = addedActiveSample {
-                            self.calorie += addedActiveSample.quantity.doubleValue(for: .kilocalorie())
-                        }
-                        // Call the observer's completion handler.
+                        
                         completionHandler()
                     }
                 }
@@ -134,8 +144,8 @@ final class HealthKitViewModel: ObservableObject {
     }
 }
 
-extension HealthKitViewModel: Hashable {
-    static func == (lhs: HealthKitViewModel, rhs: HealthKitViewModel) -> Bool {
+extension RunActivityViewModel: Hashable {
+    static func == (lhs: RunActivityViewModel, rhs: RunActivityViewModel) -> Bool {
         lhs.id == rhs.id
     }
     

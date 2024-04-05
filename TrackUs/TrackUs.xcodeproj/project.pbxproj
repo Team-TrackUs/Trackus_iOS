@@ -51,7 +51,6 @@
 		61B914C32B89A506008CAC92 /* RunningSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61B914C22B89A506008CAC92 /* RunningSelectView.swift */; };
 		820330D82B70127800CB97F7 /* SettingPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 820330D72B70127800CB97F7 /* SettingPopup.swift */; };
 		821CD24D2B72C82900CE6D42 /* PreventionGestureModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821CD24C2B72C82900CE6D42 /* PreventionGestureModifier.swift */; };
-		821EC86F2BBB1800008A7BE8 /* HealthKitViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821EC86E2BBB1800008A7BE8 /* HealthKitViewModel.swift */; };
 		821EC8712BBB1BB3008A7BE8 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821EC8702BBB1BB3008A7BE8 /* LocationService.swift */; };
 		821EC8732BBB240B008A7BE8 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 821EC8722BBB240B008A7BE8 /* HealthKitService.swift */; };
 		8224637D2B68E7F6008D3DAA /* MyProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8224637C2B68E7F6008D3DAA /* MyProfileView.swift */; };
@@ -72,9 +71,11 @@
 		824B844C2BB2CA910016B7FA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 824B844B2BB2CA910016B7FA /* GoogleService-Info.plist */; };
 		824DA8982B6FB92200B15B89 /* RunningHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824DA8972B6FB92200B15B89 /* RunningHomeView.swift */; };
 		824DA89A2B6FB95100B15B89 /* BottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824DA8992B6FB95100B15B89 /* BottomSheet.swift */; };
-		824F4DF12B83CDEA00EFDF42 /* TrackingModeMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824F4DF02B83CDEA00EFDF42 /* TrackingModeMapView.swift */; };
 		824F4DF32B83D73600EFDF42 /* ExerciseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824F4DF22B83D73500EFDF42 /* ExerciseManager.swift */; };
 		8252D51C2B6CCD27006B4FE5 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8252D51B2B6CCD27006B4FE5 /* HapticManager.swift */; };
+		8259D0242BBFF6DF00BD69D4 /* RunningActivityVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8259D0232BBFF6DF00BD69D4 /* RunningActivityVC.swift */; };
+		8259D0262BBFF79F00BD69D4 /* WorkoutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8259D0252BBFF79F00BD69D4 /* WorkoutService.swift */; };
+		8259D02A2BBFF81900BD69D4 /* RunActivityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8259D0292BBFF81900BD69D4 /* RunActivityViewModel.swift */; };
 		825A49BE2B8598ED0090D27E /* UIImage+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 825A49BD2B8598ED0090D27E /* UIImage+.swift */; };
 		825A49C42B85B2DC0090D27E /* LoadingModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 825A49C32B85B2DC0090D27E /* LoadingModifier.swift */; };
 		825A49C62B85B55B0090D27E /* View+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 825A49C52B85B55B0090D27E /* View+.swift */; };
@@ -101,7 +102,6 @@
 		82B434BF2B8BC20100E96FEA /* CourseListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B434BE2B8BC20100E96FEA /* CourseListViewModel.swift */; };
 		82B434C12B8BC27F00E96FEA /* CourseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82B434C02B8BC27F00E96FEA /* CourseViewModel.swift */; };
 		82BDEA122BBF06DC00D97B7B /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82BDEA112BBF06DC00D97B7B /* Debug.swift */; };
-		82BDEA142BBF1B4700D97B7B /* backup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82BDEA132BBF1B4700D97B7B /* backup.swift */; };
 		82CB5F952B87251200406FBF /* CourseDrawingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CB5F942B87251200406FBF /* CourseDrawingView.swift */; };
 		82CB5F972B87296A00406FBF /* CLLocation+.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CB5F962B87296A00406FBF /* CLLocation+.swift */; };
 		82CB5F992B8737A200406FBF /* CourseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CB5F982B8737A200406FBF /* CourseDetailView.swift */; };
@@ -180,7 +180,6 @@
 		61B914C22B89A506008CAC92 /* RunningSelectView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RunningSelectView.swift; sourceTree = "<group>"; };
 		820330D72B70127800CB97F7 /* SettingPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingPopup.swift; sourceTree = "<group>"; };
 		821CD24C2B72C82900CE6D42 /* PreventionGestureModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreventionGestureModifier.swift; sourceTree = "<group>"; };
-		821EC86E2BBB1800008A7BE8 /* HealthKitViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitViewModel.swift; sourceTree = "<group>"; };
 		821EC8702BBB1BB3008A7BE8 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		821EC8722BBB240B008A7BE8 /* HealthKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitService.swift; sourceTree = "<group>"; };
 		8224637C2B68E7F6008D3DAA /* MyProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyProfileView.swift; sourceTree = "<group>"; };
@@ -201,9 +200,11 @@
 		824B844B2BB2CA910016B7FA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		824DA8972B6FB92200B15B89 /* RunningHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningHomeView.swift; sourceTree = "<group>"; };
 		824DA8992B6FB95100B15B89 /* BottomSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheet.swift; sourceTree = "<group>"; };
-		824F4DF02B83CDEA00EFDF42 /* TrackingModeMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingModeMapView.swift; sourceTree = "<group>"; };
 		824F4DF22B83D73500EFDF42 /* ExerciseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseManager.swift; sourceTree = "<group>"; };
 		8252D51B2B6CCD27006B4FE5 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
+		8259D0232BBFF6DF00BD69D4 /* RunningActivityVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningActivityVC.swift; sourceTree = "<group>"; };
+		8259D0252BBFF79F00BD69D4 /* WorkoutService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutService.swift; sourceTree = "<group>"; };
+		8259D0292BBFF81900BD69D4 /* RunActivityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunActivityViewModel.swift; sourceTree = "<group>"; };
 		825A49BD2B8598ED0090D27E /* UIImage+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+.swift"; sourceTree = "<group>"; };
 		825A49C32B85B2DC0090D27E /* LoadingModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingModifier.swift; sourceTree = "<group>"; };
 		825A49C52B85B55B0090D27E /* View+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+.swift"; sourceTree = "<group>"; };
@@ -225,7 +226,6 @@
 		82B434BE2B8BC20100E96FEA /* CourseListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseListViewModel.swift; sourceTree = "<group>"; };
 		82B434C02B8BC27F00E96FEA /* CourseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseViewModel.swift; sourceTree = "<group>"; };
 		82BDEA112BBF06DC00D97B7B /* Debug.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
-		82BDEA132BBF1B4700D97B7B /* backup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = backup.swift; sourceTree = "<group>"; };
 		82CB5F942B87251200406FBF /* CourseDrawingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseDrawingView.swift; sourceTree = "<group>"; };
 		82CB5F962B87296A00406FBF /* CLLocation+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CLLocation+.swift"; sourceTree = "<group>"; };
 		82CB5F982B8737A200406FBF /* CourseDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseDetailView.swift; sourceTree = "<group>"; };
@@ -377,6 +377,7 @@
 			children = (
 				824F4DF22B83D73500EFDF42 /* ExerciseManager.swift */,
 				8252D51B2B6CCD27006B4FE5 /* HapticManager.swift */,
+				8259D0252BBFF79F00BD69D4 /* WorkoutService.swift */,
 				821EC8702BBB1BB3008A7BE8 /* LocationService.swift */,
 				821EC8722BBB240B008A7BE8 /* HealthKitService.swift */,
 				82494DD72B7AD67400FB3EB8 /* ImageUploader.swift */,
@@ -531,7 +532,7 @@
 		82ECF0A52B67A03C002CFD00 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				824F4DF02B83CDEA00EFDF42 /* TrackingModeMapView.swift */,
+				8259D0232BBFF6DF00BD69D4 /* RunningActivityVC.swift */,
 				824DA8972B6FB92200B15B89 /* RunningHomeView.swift */,
 				823F27A42B827917005333F8 /* RunningStartView.swift */,
 				61B914C22B89A506008CAC92 /* RunningSelectView.swift */,
@@ -548,8 +549,7 @@
 			isa = PBXGroup;
 			children = (
 				82629AEF2BBEA5AD00F4D6AD /* SettingViewModel.swift */,
-				821EC86E2BBB1800008A7BE8 /* HealthKitViewModel.swift */,
-				82BDEA132BBF1B4700D97B7B /* backup.swift */,
+				8259D0292BBFF81900BD69D4 /* RunActivityViewModel.swift */,
 				82B434BE2B8BC20100E96FEA /* CourseListViewModel.swift */,
 				82B434C02B8BC27F00E96FEA /* CourseViewModel.swift */,
 			);
@@ -862,7 +862,6 @@
 				822AE5F02B704AA500D90264 /* PreparingService.swift in Sources */,
 				981492D12B8C5DFE0018BDA8 /* ChatInfo.swift in Sources */,
 				82AB28BB2B6B531B00D7734D /* PremiumPaymentView.swift in Sources */,
-				821EC86F2BBB1800008A7BE8 /* HealthKitViewModel.swift in Sources */,
 				FEEAEA0B2B8276E3001F1888 /* UserProfileView.swift in Sources */,
 				610F88222B74D01E00FB12A1 /* NetworkManager.swift in Sources */,
 				8EDEF7CB2BA9903F000A05E1 /* RunningCell.swift in Sources */,
@@ -882,10 +881,13 @@
 				825A49C42B85B2DC0090D27E /* LoadingModifier.swift in Sources */,
 				98F1C2EE2B6A191A009382B1 /* SignUpView.swift in Sources */,
 				822AE5EE2B70370700D90264 /* RunningResultView.swift in Sources */,
+				8259D0262BBFF79F00BD69D4 /* WorkoutService.swift in Sources */,
 				8252D51C2B6CCD27006B4FE5 /* HapticManager.swift in Sources */,
+				8259D02A2BBFF81900BD69D4 /* RunActivityViewModel.swift in Sources */,
 				823B9AE42B681A5900C9F772 /* MainTabView.swift in Sources */,
 				610F882E2B77AC1800FB12A1 /* HorizontalGraph.swift in Sources */,
 				82CB5FAE2B87CE6300406FBF /* NavigationDismissButton.swift in Sources */,
+				8259D0242BBFF6DF00BD69D4 /* RunningActivityVC.swift in Sources */,
 				98F1C2F42B6A2386009382B1 /* PhysicalView.swift in Sources */,
 				823B9AD02B6807BF00C9F772 /* ReportView.swift in Sources */,
 				82ECF0B52B67A101002CFD00 /* LoginView.swift in Sources */,
@@ -923,7 +925,6 @@
 				821CD24D2B72C82900CE6D42 /* PreventionGestureModifier.swift in Sources */,
 				989D12DE2B68237E004F41CF /* ProfilePicker.swift in Sources */,
 				98F1C2F62B6A23A5009382B1 /* AgeGenderView.swift in Sources */,
-				824F4DF12B83CDEA00EFDF42 /* TrackingModeMapView.swift in Sources */,
 				82AB28B12B6B4DC200D7734D /* MenuItems.swift in Sources */,
 				824038CA2B6FD040000BADD5 /* MaxBoxMapView.swift in Sources */,
 				61B914C32B89A506008CAC92 /* RunningSelectView.swift in Sources */,
@@ -949,7 +950,6 @@
 				82B434C12B8BC27F00E96FEA /* CourseViewModel.swift in Sources */,
 				82629AF02BBEA5AD00F4D6AD /* SettingViewModel.swift in Sources */,
 				82DD119B2B79262B00467761 /* Double+.swift in Sources */,
-				82BDEA142BBF1B4700D97B7B /* backup.swift in Sources */,
 				981492CD2B8C5D1D0018BDA8 /* ChatListView.swift in Sources */,
 				82BDEA122BBF06DC00D97B7B /* Debug.swift in Sources */,
 				824DA8982B6FB92200B15B89 /* RunningHomeView.swift in Sources */,

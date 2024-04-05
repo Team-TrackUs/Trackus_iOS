@@ -18,30 +18,30 @@ import MapboxMaps
 /**
  라이브트래킹 맵뷰
  */
-struct TrackingModeMapView: UIViewControllerRepresentable {
+struct RunningActivityVCHosting: UIViewControllerRepresentable {
     @ObservedObject var router: Router
-    @ObservedObject var healthKitViewModel: HealthKitViewModel
+    @ObservedObject var runViewModel: RunActivityViewModel
     
     func makeUIViewController(context: Context) -> UIViewController {
-        return TrackingModeMapViewController(
+        return RunningActivityVC(
             router: router,
-            healthKitViewModel: healthKitViewModel)
+            runViewModel: runViewModel)
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
     }
     
-    func makeCoordinator() -> TrackingModeMapViewController {
-        return TrackingModeMapViewController(
+    func makeCoordinator() -> RunningActivityVC {
+        return RunningActivityVC(
             router: router,
-            healthKitViewModel: healthKitViewModel)
+            runViewModel: runViewModel)
     }
 }
 
 
-final class TrackingModeMapViewController: UIViewController, GestureManagerDelegate {
+final class RunningActivityVC: UIViewController, GestureManagerDelegate {
     private let router: Router
-    private let healthKitViewModel: HealthKitViewModel!
+    private let runViewModel: RunActivityViewModel!
     private var mapView: MapView!
     private let locationService = LocationService.shared
     private var locationTrackingCancellation: AnyCancelable?
@@ -135,10 +135,10 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
         let label = UILabel()
         label.text = "0.0km"
         label.textColor = .gray1
-        if let descriptor = UIFont.systemFont(ofSize: 20.0, weight: .bold).fontDescriptor.withSymbolicTraits([.traitBold, .traitItalic]) {
+        if let descriptor = UIFont.systemFont(ofSize: 16.0, weight: .bold).fontDescriptor.withSymbolicTraits([.traitBold, .traitItalic]) {
             label.font = UIFont(descriptor: descriptor, size: 0)
         } else {
-            label.font = UIFont.systemFont(ofSize: 20.0, weight: .bold)
+            label.font = UIFont.systemFont(ofSize: 16.0, weight: .bold)
         }
         return label
     }()
@@ -166,7 +166,7 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
     }()
     
     private lazy var paceLabel: UILabel = {
-        let label = makeBigTextLabel(text: "-'--''")
+        let label = makeBigTextLabel(text: "_'__''")
         return label
     }()
     
@@ -175,9 +175,9 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
         return label
     }()
     
-    init(router: Router, healthKitViewModel: HealthKitViewModel) {
+    init(router: Router, runViewModel: RunActivityViewModel) {
         self.router = router
-        self.healthKitViewModel = healthKitViewModel
+        self.runViewModel = runViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -190,7 +190,7 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
         setupCamera()
         setupUI()
         bind()
-        healthKitViewModel.start()
+        runViewModel.start()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -219,7 +219,7 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
 }
 
 // MARK: - BackgroundTask 관련
-extension TrackingModeMapViewController: CLLocationManagerDelegate {
+extension RunningActivityVC: CLLocationManagerDelegate {
     // 위치업데이트
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else {
@@ -237,7 +237,7 @@ extension TrackingModeMapViewController: CLLocationManagerDelegate {
 }
 
 // MARK: - Setup UI
-extension TrackingModeMapViewController {
+extension RunningActivityVC {
     /// UI 설정
     private func setupUI() {
         // setup UI
@@ -322,7 +322,7 @@ extension TrackingModeMapViewController {
 }
 
 // MARK: - Interaction with combine
-extension TrackingModeMapViewController {
+extension RunningActivityVC {
     /// 맵뷰 설정 & 초기 카메라 셋팅
     private func setupCamera() {
         /// 초기위치 및 카메라
@@ -348,7 +348,7 @@ extension TrackingModeMapViewController {
     // 뷰에 갱신될 값들을 바인딩
     private func bind() {
         // 카운트다운
-        healthKitViewModel.$count.receive(on: DispatchQueue.main).sink { [weak self] count in
+        runViewModel.$count.receive(on: DispatchQueue.main).sink { [weak self] count in
             guard let self = self else { return }
             self.countLabel.text = "\(count)"
             if count == 0 {
@@ -357,27 +357,43 @@ extension TrackingModeMapViewController {
         }.store(in: &cancellation)
         
         // 운동상태
-        healthKitViewModel.$isPause.receive(on: DispatchQueue.main).sink { [weak self] isPause in
+        runViewModel.$isPause.receive(on: DispatchQueue.main).sink { [weak self] isPause in
             guard let self = self else { return }
             isPause ? updatedOnPause() : updatedOnPlay()
         }.store(in: &cancellation)
         
         // 운동시간
-        healthKitViewModel.$seconds.receive(on: DispatchQueue.main).sink { [weak self] seconds in
+        runViewModel.$seconds.receive(on: DispatchQueue.main).sink { [weak self] seconds in
             guard let self = self else { return }
             self.timeLabel.text = seconds.asString(style: .positional)
         }.store(in: &cancellation)
         
         // 이동거리
-        healthKitViewModel.$distance.receive(on: DispatchQueue.main).sink { [weak self] distance in
+        runViewModel.$distance.receive(on: DispatchQueue.main).sink { [weak self] distance in
             guard let self = self else { return }
-            self.kilometerLabel.text = "\(distance.asString(unit: .kilometer))"
+            
+            self.kilometerLabel.text = "\(distance.asString(unit: .kilometer)) / \(runViewModel.target.asString(unit: .kilometer))"
         }.store(in: &cancellation)
         
         // 칼로리
-        healthKitViewModel.$calorie.receive(on: DispatchQueue.main).sink { [weak self] calorie in
+        runViewModel.$calorie.receive(on: DispatchQueue.main).sink { [weak self] calorie in
             guard let self = self else { return }
             self.calorieLable.text = String(format: "%.1f", calorie)
+        }.store(in: &cancellation)
+        
+        // 페이스
+        runViewModel.$pace.receive(on: DispatchQueue.main).sink { [weak self] pace in
+            guard let self = self else { return }
+            let paceInt = Int(pace)
+            let pace1 = Int(paceInt / 60)
+            let pace2 = Int(paceInt % 60)
+            
+            if pace1 == 0 && pace2 == 0 {
+                self.paceLabel.text = "_'__''"
+            } else {
+                self.paceLabel.text =  String(pace1) + "'" + String(pace2) + "''"
+            }
+            
         }.store(in: &cancellation)
     }
     
@@ -388,7 +404,7 @@ extension TrackingModeMapViewController {
         self.overlayView.isHidden = true
         self.roundedVStackView.isHidden = false
         self.circleHStackView.isHidden = false
-        self.healthKitViewModel.play()
+        self.runViewModel.play()
     }
     
     // 일시중지 됬을때
@@ -397,7 +413,7 @@ extension TrackingModeMapViewController {
         self.overlayView.isHidden = false
         self.pauseButton.isHidden = true
         self.buttonStackView.isHidden = false
-        if healthKitViewModel.count == 0 {
+        if runViewModel.count == 0 {
                     self.buttonStackView.isHidden = false
                 }
     }
@@ -430,15 +446,15 @@ extension TrackingModeMapViewController {
 }
 
 // MARK: - 버튼동작 관련
-extension TrackingModeMapViewController {
+extension RunningActivityVC {
     // 일시중지 버튼이 눌렸을때
     @objc func pauseButtonTapped() {
-        healthKitViewModel.pause()
+        runViewModel.pause()
     }
     
     // 플레이 버튼이 눌렸을때
     @objc func playButtonTapped() {
-        healthKitViewModel.play()
+        runViewModel.play()
     }
     
     // 중지 버튼이 눌렸을때
@@ -448,12 +464,12 @@ extension TrackingModeMapViewController {
     
     // 중지버튼 롱프레스
     @objc func stopButtonLongPressed() {
-        healthKitViewModel.stop()
+        runViewModel.stop()
     }
 }
 
 // MARK: - UI Generator
-extension TrackingModeMapViewController {
+extension RunningActivityVC {
     
     private func makeCircleStackView() -> UIStackView {
         let circleDiameter: CGFloat = 98.0
