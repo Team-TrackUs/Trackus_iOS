@@ -384,15 +384,7 @@ extension RunningActivityVC {
         // 페이스
         runViewModel.$pace.receive(on: DispatchQueue.main).sink { [weak self] pace in
             guard let self = self else { return }
-            let paceInt = Int(pace)
-            let pace1 = Int(paceInt / 60)
-            let pace2 = Int(paceInt % 60)
-            
-            if pace1 == 0 && pace2 == 0 {
-                self.paceLabel.text = "_'__''"
-            } else {
-                self.paceLabel.text =  String(pace1) + "'" + String(pace2) + "''"
-            }
+            self.paceLabel.text = pace.asString(unit: .pace)
             
         }.store(in: &cancellation)
     }
@@ -432,7 +424,8 @@ extension RunningActivityVC {
         locationTrackingCancellation = mapView.location.onLocationChange.observe { [weak mapView] newLocation in
             // 새로받아온 위치
             guard let location = newLocation.last, let mapView else { return }
-
+            
+            self.runViewModel.addPath(withCoordinate: location.coordinate)
             mapView.camera.ease(
                 to: CameraOptions(center: location.coordinate, zoom: 15),
                 duration: 1.3)
@@ -465,8 +458,6 @@ extension RunningActivityVC {
     // 중지버튼 롱프레스
     @objc func stopButtonLongPressed() {
         runViewModel.stop()
-        cancellation.removeAll()
-        locationTrackingCancellation?.cancel()
         router.push(.runningResult(runViewModel))
     }
 }

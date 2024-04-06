@@ -106,6 +106,13 @@ extension RunningHomeView {
         }
         .onAppear {
             courseListViewModel.fetchCourseData()
+            Task {
+                let HKAuthorizationStatus = await RunActivityViewModel.requestAuthorization()
+                
+                if HKAuthorizationStatus == .notAvailableOnDevice {
+                    showingPopup = true
+                }
+            }
         }
         .edgesIgnoringSafeArea(.top)
     }
@@ -265,12 +272,8 @@ extension RunningHomeView {
        
        Task {
            let locationAuthorizationStatus = await locationService.checkLocationServicesEnabled()
-           let HKAuthorizationStatus = await HealthKitService.requestAuthorization()
-           
-           if HKAuthorizationStatus == .notAvailableOnDevice {
-               showingPopup = true
-           }
-           else if locationAuthorizationStatus != .authorizedWhenInUse {
+          
+           if locationAuthorizationStatus != .authorizedWhenInUse {
                showingAlert = true
            } else {
                router.push(.runningSelect(courseListViewModel, userSearchViewModel))

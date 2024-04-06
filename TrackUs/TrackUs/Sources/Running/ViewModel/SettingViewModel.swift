@@ -10,11 +10,10 @@ import Foundation
 final class SettingViewModel: ObservableObject {
     let userDefaults = UserDefaults.standard
     
-    
     @Published var distance: Double {
         didSet {
             DispatchQueue.main.async { [self] in
-                estimatedTime = ExerciseManager.calculateEstimatedTime(distance: distance)
+                estimatedTime = WorkoutService.calculateEstimatedTime(distance: distance)
             }
         }
     }

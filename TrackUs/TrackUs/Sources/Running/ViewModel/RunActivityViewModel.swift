@@ -13,6 +13,11 @@
 // * 재시작
 // - 시작시간을 현재시간으로 업데이트
 // - 러닝시작 단계 반복
+// TODO: - 20240406
+// - 칼로리 받아오지 않는문제
+// - 페이스값 오류
+// - 스크린샷 저장
+// - 러닝결과
 
 import HealthKit
 import MapboxMaps
@@ -20,11 +25,11 @@ import Firebase
 
 final class RunActivityViewModel: ObservableObject, HashableObject {
     private var timer: Timer?
+    private var startDate: Date?
+    private let groupId: String
     private var observeQuery: HKObserverQuery!
     private let healthStore = HKHealthStore()
     private var anchor: HKQueryAnchor!
-    private var startDate: Date?
-    private let groupId: String
     
     @MainActor
     private var userUid: String {
@@ -55,12 +60,12 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
         self.groupId = groupId
     }
     
+    // 개인러닝
     convenience init(targetDistance target: Double) {
         self.init(targetDistance: target, groupId: "")
     }
     
     /// 시작
-    @MainActor
     func start() {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] _ in
             guard let self = self else { return }
@@ -94,7 +99,6 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
         // 거리변화 감지시 호출됨
         observeQuery = HKObserverQuery(queryDescriptors: [distanceDescriptor, activeEnergyDescriptor])
         { query, updatedSampleTypes, completionHandler, error in
-            
             if let error = error {
                 debugPrint(#function + " HKObserverQuery " + error.localizedDescription)
                 return
@@ -127,6 +131,7 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
                         else {  return }
                         
                         DispatchQueue.main.async {
+                            print("\(sampleQuantity.sampleType) 업뎃됨!")
                             if sampleQuantity.sampleType == distanceType {
                                 self.distance += sampleQuantity.quantity.doubleValue(for: .meter())
                             } else if sampleQuantity.sampleType == activeEnergyType {
@@ -158,6 +163,11 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
         healthStore.stop(observeQuery)
     }
     
+    /// 경로추가
+    func addPath(withCoordinate coordinate: CLLocationCoordinate2D) {
+        coordinates.append(coordinate)
+    }
+    
     /// 러닝데이터 추가(DB)
     func saveRunDataToFirestore() async throws {
         
@@ -184,5 +194,38 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
             debugPrint(error.localizedDescription)
             throw ErrorType.firebaseError
         }
+    }
+}
+
+extension RunActivityViewModel {
+    enum HKAuthorizationStatus {
+        case notAvailableOnDevice
+        case availableOnDevice
+    }
+    
+    
+    static let typesToShare: Set<HKSampleType> = [
+        HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!,
+        HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!
+    ]
+    
+    static let typesToRead: Set = [
+        HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
+        HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning)!,
+    ]
+    
+    
+     static func requestAuthorization() async -> HKAuthorizationStatus {
+        guard HKHealthStore.isHealthDataAvailable() else {
+            return .notAvailableOnDevice
+        }
+        
+        do {
+            try await HKHealthStore().requestAuthorization(toShare: typesToShare, read: typesToRead)
+        } catch {
+            return .notAvailableOnDevice
+        }
+        
+        return .availableOnDevice
     }
 }

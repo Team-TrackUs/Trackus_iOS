@@ -12,6 +12,17 @@ struct RunningResultView: View {
     @ObservedObject var runViewModel: RunActivityViewModel
     @State private var showingModal = false
     @State private var showingAlert = false
+    private let workoutService: WorkoutService!
+    
+    init(runViewModel: RunActivityViewModel) {
+        self.runViewModel = runViewModel
+        self.workoutService = WorkoutService(
+            distance: runViewModel.distance,
+            target: runViewModel.target,
+            seconds: runViewModel.seconds,
+            calorie: runViewModel.calorie
+        )
+    }
 }
 
 extension RunningResultView {
@@ -39,11 +50,11 @@ extension RunningResultView {
                             Image(.distanceIcon)
                             VStack(alignment: .leading) {
                                 Text("킬로미터")
-                                Text("")
+                                Text(workoutService.compKilometerLabel)
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
-                            Text("")
+                            Text(workoutService.compKilometerLabel)
                                 .customFontStyle(.gray1_R12)
                         }
                         
@@ -51,11 +62,11 @@ extension RunningResultView {
                             Image(.fireIcon)
                             VStack(alignment: .leading) {
                                 Text("소모 칼로리")
-                                Text("")
+                                Text(workoutService.compCaloriesLabel)
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
-                            Text("")
+                            Text(workoutService.compCaloriesLabel)
                                 .customFontStyle(.gray1_R12)
                         }
                         
@@ -63,11 +74,11 @@ extension RunningResultView {
                             Image(.timeImg)
                             VStack(alignment: .leading) {
                                 Text("러닝 타임")
-                                Text("")
+                                Text(workoutService.compElapsedTimeLabel)
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
-                            Text("")
+                            Text(workoutService.compElapsedTimeLabel)
                                 .customFontStyle(.gray1_R12)
                         }
                         
@@ -75,7 +86,7 @@ extension RunningResultView {
                             Image(.paceIcon)
                             VStack(alignment: .leading) {
                                 Text("페이스")
-                                Text("")
+                                Text(runViewModel.pace.asString(unit: .pace))
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
@@ -85,7 +96,7 @@ extension RunningResultView {
                     }
                     
                     HStack {
-                        Text("")
+                        Text(workoutService.feedbackMessageLabel)
                             .customFontStyle(.gray1_R14)
                             .multilineTextAlignment(.leading)
                             .lineLimit(3)
