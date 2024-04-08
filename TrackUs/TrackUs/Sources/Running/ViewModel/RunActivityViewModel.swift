@@ -18,7 +18,12 @@
 // - 페이스값 오류
 // - 스크린샷 저장
 // - 러닝결과
+// TODO: - 20240408
+// - 화면넘어가는 오류
+// - 스크린샷 저장 오류
 
+
+import UIKit
 import HealthKit
 import MapboxMaps
 import Firebase
@@ -30,20 +35,12 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
     private var observeQuery: HKObserverQuery!
     private let healthStore = HKHealthStore()
     private var anchor: HKQueryAnchor!
-    
-    @MainActor
-    private var userUid: String {
-        AuthenticationViewModel.shared.userInfo.uid
-    }
-    
-    private var isGroup: Bool {
-        !groupId.isEmpty
-    }
-    
+    private var snapshot: UIImage?
     // 뷰에서 사용
     @Published var count = 3
     @Published var isPause = true
     @Published var isLoading = false
+    
     
     // DB에 올라가는 데이터
     @Published var title = ""
@@ -65,6 +62,10 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
         self.init(targetDistance: target, groupId: "")
     }
     
+    func addSnapshot(withImage snapshot: UIImage) {
+        self.snapshot = snapshot
+    }
+    
     /// 시작
     func start() {
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] _ in
@@ -72,11 +73,29 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
             self.count -= 1
             if self.count == 0 {
                 self.timer?.invalidate()
-                
             }
         })
     }
     
+    /// 일시중지
+    func pause() {
+        isPause = true
+        timer?.invalidate()
+        healthStore.stop(observeQuery)
+    }
+    
+    /// 중지
+    func stop() {
+        isPause = true
+        timer?.invalidate()
+        healthStore.stop(observeQuery)
+    }
+    
+    /// 경로추가
+    func addPath(withCoordinate coordinate: CLLocationCoordinate2D) {
+        coordinates.append(coordinate)
+    }
+
     /// 기록
     func play() {
         self.startDate = Date()
@@ -149,50 +168,37 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
         healthStore.execute(observeQuery)
     }
     
-    /// 일시중지
-    func pause() {
-        isPause = true
-        timer?.invalidate()
-        healthStore.stop(observeQuery)
-    }
-    
-    /// 중지
-    func stop() {
-        isPause = true
-        timer?.invalidate()
-        healthStore.stop(observeQuery)
-    }
-    
-    /// 경로추가
-    func addPath(withCoordinate coordinate: CLLocationCoordinate2D) {
-        coordinates.append(coordinate)
-    }
-    
     /// 러닝데이터 추가(DB)
     func saveRunDataToFirestore() async throws {
-        
-        let uid = await userUid
-        
-        let data: [String : Any] = [
-            "title": title,
-            "distance": distance,
-            "pace": pace,
-            "calorie": calorie,
-            "seconds": seconds,
-            "target": target,
-            "coordinates": coordinates.toGeoPoint,
-            "isGroup": isGroup,
-            "routeImageUrl": "",
-            "address": "",
-            "timestamp": Timestamp(date: Date())
-        ]
+        let uid = await AuthenticationViewModel.shared.userInfo.uid
+        guard let image = snapshot else { return }
+        let coordinate = coordinates.first ?? CLLocationCoordinate2D(latitude: 37.570946308046466, longitude: 126.97893407434964)
         
         do {
+            let imageUrl = try await ImageUploader.uploadImageAsync(image: image, type: .map)
+            let address = try await LocationService.convertToAddressAsync(coordinate: coordinate.asCLLocation)
+            
+            let title = title.isEmpty ? "\(address)에서 러닝" : title
+            
+            let data: [String : Any] = [
+                "title": title,
+                "distance": distance,
+                "pace": pace,
+                "calorie": calorie,
+                "seconds": seconds,
+                "target": target,
+                "coordinates": coordinates.toGeoPoint,
+//                "isGroup": isGroup,
+                "routeImageUrl": imageUrl,
+                "address": address,
+                "timestamp": Timestamp(date: Date())
+            ]
+            
             try await Firestore.firestore().collection("users").document(uid).collection("records").addDocument(data: data)
             
         } catch {
-            debugPrint(error.localizedDescription)
-            throw ErrorType.firebaseError
+            debugPrint(#function + error.localizedDescription)
+            throw error
         }
     }
 }

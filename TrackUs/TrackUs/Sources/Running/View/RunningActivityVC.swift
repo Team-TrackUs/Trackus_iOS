@@ -347,7 +347,6 @@ extension RunningActivityVC {
     
     // 뷰에 갱신될 값들을 바인딩
     private func bind() {
-        // 카운트다운
         runViewModel.$count.receive(on: DispatchQueue.main).sink { [weak self] count in
             guard let self = self else { return }
             self.countLabel.text = "\(count)"
@@ -404,7 +403,6 @@ extension RunningActivityVC {
         self.stopTracking()
         self.overlayView.isHidden = false
         self.pauseButton.isHidden = true
-        self.buttonStackView.isHidden = false
         if runViewModel.count == 0 {
                     self.buttonStackView.isHidden = false
                 }

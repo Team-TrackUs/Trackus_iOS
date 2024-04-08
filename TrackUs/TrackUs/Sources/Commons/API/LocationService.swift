@@ -60,7 +60,6 @@ final class LocationService: NSObject, ObservableObject {
     /// 위도, 경도를 받아서 한글주소로 반환
     func convertToAddressWith(coordinate: CLLocation, completion: @escaping (String) -> ()) {
         let geoCoder = CLGeocoder()
-        
         geoCoder.reverseGeocodeLocation(coordinate) { placemarks, error in
             if error != nil {
                 completion("위치정보 없음")
@@ -84,6 +83,26 @@ final class LocationService: NSObject, ObservableObject {
         }
     }
     
+    static func convertToAddressAsync(coordinate: CLLocation) async throws -> String {
+        let geoCoder = CLGeocoder()
+        
+        do {
+            let address = try await geoCoder.reverseGeocodeLocation(coordinate)
+            let city = address.last?.administrativeArea
+            let state = address.last?.subLocality
+            if let city = city, let state = state {
+                return "\(city) \(state)"
+            } else if let city = city {
+                return city
+            } else if let state = state {
+                return state
+            } else {
+                return "위치정보 없음"
+            }
+        } catch {
+            throw ErrorType.geocoderError
+        }
+    }
 }
 
 

@@ -13,7 +13,7 @@ final class SettingViewModel: ObservableObject {
     @Published var distance: Double {
         didSet {
             DispatchQueue.main.async { [self] in
-                estimatedTime = WorkoutService.calculateEstimatedTime(distance: distance)
+                estimatedTime = WorkoutService.calcEstimatedTime(distance: distance)
             }
         }
     }

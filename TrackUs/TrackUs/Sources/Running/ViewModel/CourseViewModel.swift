@@ -67,7 +67,7 @@ extension CourseViewModel {
     /// 경로추가 -> 시간, 칼로리, 거리 업데이트
     @MainActor
     func updateInfoWithPath() {
-        course.estimatedTime = WorkoutService.calculateEstimatedTime(distance: course.distance, style: .init(rawValue: course.runningStyle))
+        course.estimatedTime = WorkoutService.calcEstimatedTime(distance: course.distance, style: .init(rawValue: course.runningStyle))
         course.estimatedCalorie = WorkoutService.calcCaloriesBurned(distance: course.distance)
         course.distance = course.courseRoutes.toCLLocationCoordinate2D.totalDistance
     }

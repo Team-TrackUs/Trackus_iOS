@@ -108,8 +108,10 @@ struct RunningSelectView: View {
                         showingPopup.toggle()
                     } else {
                         if let seletedItem = courseListViewModel.findCourseWithUID(seletedID) {
+
                             router.push(.runningStart(RunActivityViewModel(
-                                targetDistance: seletedItem.distance))
+                                targetDistance: seletedItem.distance,
+                                groupId: seletedID))
                             )
                         }
                         
@@ -189,7 +191,7 @@ struct selectedCell: View {
                             .frame(width: 24, height: 24)
                             .padding(.vertical, 12)
                             .clipShape(Circle())
-                        Text(user.username)
+                        Text(user.username.subString(count: 7))
                             .customFontStyle(.gray2_R12)
                         Image(.crownIcon)
                     }

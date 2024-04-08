@@ -123,7 +123,6 @@ final class Router: ObservableObject {
         self.fullScreenCover = nil
     }
     
-    
     @ViewBuilder
     func buildScreen(page: Page) -> some View {
         switch page {

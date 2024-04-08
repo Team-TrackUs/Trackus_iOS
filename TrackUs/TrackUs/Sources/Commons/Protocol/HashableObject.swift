@@ -22,6 +22,6 @@ extension HashableObject {
     }
     
     var id: String {
-        String(describing: self)
+        UUID().uuidString
     }
 }

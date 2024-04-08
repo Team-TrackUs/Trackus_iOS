@@ -9,11 +9,6 @@ import Foundation
 
 enum ErrorType: Error {
     case firebaseError
-    
-    var message: String {
-        switch self {
-        case .firebaseError:
-            "firebase 에러"
-        }
-    }
+    case imageError
+    case geocoderError
 }
