@@ -36,9 +36,9 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
     private let healthStore = HKHealthStore()
     private var anchor: HKQueryAnchor!
     private var snapshot: UIImage?
+    
     // 뷰에서 사용
     @Published var count = 3
-    @Published var isPause = true
     @Published var isLoading = false
     
     
@@ -49,7 +49,7 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
     @Published var seconds = 0.0
     @Published var target = 0.0
     @Published var pace = 0.0
-    @Published var coordinates = [CLLocationCoordinate2D]()
+    var coordinates = [CLLocationCoordinate2D]()
     
     // 그룹러닝
     init(targetDistance target: Double, groupId: String) {
@@ -79,14 +79,12 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
     
     /// 일시중지
     func pause() {
-        isPause = true
         timer?.invalidate()
         healthStore.stop(observeQuery)
     }
     
     /// 중지
     func stop() {
-        isPause = true
         timer?.invalidate()
         healthStore.stop(observeQuery)
     }
@@ -99,7 +97,6 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
     /// 기록
     func play() {
         self.startDate = Date()
-        self.isPause = false
         self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] _ in
             guard let self = self else { return }
             seconds += 1

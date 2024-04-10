@@ -59,7 +59,7 @@ struct MainTabView: View {
                         }
                         .tag(Tab.profile)
                 }
-                .navigationDestination(for: Page.self, destination: { page in
+                .navigationDestination(for: Router.Page.self, destination: { page in
                     router.buildScreen(page: page)
                 })
                 .sheet(item: $router.sheet, content: { sheet in
@@ -95,6 +95,6 @@ struct MainTabView: View {
     }
 }
 
-#Preview {
-    MainTabView()
-}
+//#Preview {
+//    MainTabView()
+//}

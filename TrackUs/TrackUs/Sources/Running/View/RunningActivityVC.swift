@@ -19,8 +19,8 @@ import MapboxMaps
  라이브트래킹 맵뷰
  */
 struct RunningActivityVCHosting: UIViewControllerRepresentable {
-    @ObservedObject var router: Router
-    @ObservedObject var runViewModel: RunActivityViewModel
+    @EnvironmentObject var router: Router
+    public var runViewModel: RunActivityViewModel
     
     func makeUIViewController(context: Context) -> UIViewController {
         return RunningActivityVC(
@@ -54,6 +54,7 @@ final class RunningActivityVC: UIViewController, GestureManagerDelegate {
     private lazy var pauseButton: UIButton = {
         let button = makeCircleButton(systemImageName: "pause.fill")
         button.addTarget(self, action: #selector(pauseButtonTapped), for: .touchUpInside)
+        button.isHidden = true
         return button
     }()
     
@@ -69,7 +70,6 @@ final class RunningActivityVC: UIViewController, GestureManagerDelegate {
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(stopButtonLongPressed))
         button.addGestureRecognizer(tapGesture)
         button.addGestureRecognizer(longPressGesture)
-        button.addTarget(self, action: #selector(pauseButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -212,10 +212,10 @@ final class RunningActivityVC: UIViewController, GestureManagerDelegate {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-           super.viewWillDisappear(true)
-           
-           NotificationCenter.default.removeObserver(self)
-       }
+        super.viewWillDisappear(true)
+        NotificationCenter.default.removeObserver(self)
+    }
+    
 }
 
 // MARK: - BackgroundTask 관련
@@ -343,22 +343,13 @@ extension RunningActivityVC {
         self.mapView.location.options.puckType = .puck2D(puckConfiguration)
     }
     
-    
-    
     // 뷰에 갱신될 값들을 바인딩
     private func bind() {
         runViewModel.$count.receive(on: DispatchQueue.main).sink { [weak self] count in
-            guard let self = self else { return }
-            self.countLabel.text = "\(count)"
+            self?.countLabel.text = "\(count)"
             if count == 0 {
-                updatedOnStart()
+                self?.updatedOnStart()
             }
-        }.store(in: &cancellation)
-        
-        // 운동상태
-        runViewModel.$isPause.receive(on: DispatchQueue.main).sink { [weak self] isPause in
-            guard let self = self else { return }
-            isPause ? updatedOnPause() : updatedOnPlay()
         }.store(in: &cancellation)
         
         // 운동시간
@@ -390,30 +381,32 @@ extension RunningActivityVC {
     
     // 카운트다운 종료시
     private func updatedOnStart() {
-        self.countLabel.removeFromSuperview()
-        self.countTextLabel.removeFromSuperview()
-        self.overlayView.isHidden = true
         self.roundedVStackView.isHidden = false
         self.circleHStackView.isHidden = false
+        self.overlayView.isHidden = true
+        self.countLabel.isHidden = true
+        self.countTextLabel.isHidden = true
+        self.pauseButton.isHidden = false
         self.runViewModel.play()
+        self.startTracking()
     }
     
     // 일시중지 됬을때
     private func updatedOnPause() {
-        self.stopTracking()
+        self.buttonStackView.isHidden = false
         self.overlayView.isHidden = false
         self.pauseButton.isHidden = true
-        if runViewModel.count == 0 {
-                    self.buttonStackView.isHidden = false
-                }
+        self.runViewModel.stop()
+        self.stopTracking()
     }
     
     // 기록중일떄
     private func updatedOnPlay() {
-        self.startTracking()
-        self.overlayView.isHidden = true
         self.buttonStackView.isHidden = true
+        self.overlayView.isHidden = true
         self.pauseButton.isHidden = false
+        self.runViewModel.play()
+        self.startTracking()
     }
     
     // 위치받아오기 시작
@@ -424,6 +417,7 @@ extension RunningActivityVC {
             guard let location = newLocation.last, let mapView else { return }
             
             self.runViewModel.addPath(withCoordinate: location.coordinate)
+            
             mapView.camera.ease(
                 to: CameraOptions(center: location.coordinate, zoom: 15),
                 duration: 1.3)
@@ -440,12 +434,12 @@ extension RunningActivityVC {
 extension RunningActivityVC {
     // 일시중지 버튼이 눌렸을때
     @objc func pauseButtonTapped() {
-        runViewModel.pause()
+        updatedOnPause()
     }
     
     // 플레이 버튼이 눌렸을때
     @objc func playButtonTapped() {
-        runViewModel.play()
+        updatedOnPlay()
     }
     
     // 중지 버튼이 눌렸을때
@@ -454,9 +448,12 @@ extension RunningActivityVC {
     }
     
     // 중지버튼 롱프레스
-    @objc func stopButtonLongPressed() {
-        runViewModel.stop()
-        router.push(.runningResult(runViewModel))
+    @objc func stopButtonLongPressed(_ recognizer: UILongPressGestureRecognizer) {
+        if recognizer.state == .began {
+            self.stopTracking()
+            self.runViewModel.stop()
+            self.router.push(.runningResult(runViewModel))
+        }
     }
 }
 
@@ -514,20 +511,20 @@ extension RunningActivityVC {
     }
     
     func showToast(message : String, font: UIFont = UIFont.systemFont(ofSize: 14.0)) {
-            let toastLabel = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - 135, y: self.view.frame.size.height-230, width: 270, height: 45))
-            toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.6)
-            toastLabel.textColor = UIColor.white
-            toastLabel.font = font
-            toastLabel.textAlignment = .center;
-            toastLabel.text = message
-            toastLabel.alpha = 1.0
-            toastLabel.layer.cornerRadius = 10;
-            toastLabel.clipsToBounds  =  true
-            self.view.addSubview(toastLabel)
-            UIView.animate(withDuration: 4.0, delay: 0.1, options: .curveEaseOut, animations: {
-                 toastLabel.alpha = 0.0
-            }, completion: {(isCompleted) in
-                toastLabel.removeFromSuperview()
-            })
-        }
+        let toastLabel = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - 135, y: self.view.frame.size.height-230, width: 270, height: 45))
+        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        toastLabel.textColor = UIColor.white
+        toastLabel.font = font
+        toastLabel.textAlignment = .center;
+        toastLabel.text = message
+        toastLabel.alpha = 1.0
+        toastLabel.layer.cornerRadius = 10;
+        toastLabel.clipsToBounds  =  true
+        self.view.addSubview(toastLabel)
+        UIView.animate(withDuration: 4.0, delay: 0.1, options: .curveEaseOut, animations: {
+            toastLabel.alpha = 0.0
+        }, completion: {(isCompleted) in
+            toastLabel.removeFromSuperview()
+        })
+    }
 }

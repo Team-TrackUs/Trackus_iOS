@@ -7,56 +7,7 @@
 
 import SwiftUI
 
-// MARK: - PAGE
-enum Page: Hashable, Identifiable {
-    // Root
-    case running
-    case chat
-    case report
-    case profile
-    // Profile
-    case profileEdit
-    case runningRecorded
-    case faq
-    case setting
-    case withDrawal
-    // Home
-    case runningSelect(CourseListViewModel, UserSearchViewModel)
-    case runningStart(RunActivityViewModel)
-    case runningResult(RunActivityViewModel)
-    case courseDrawing
-    case courseDetail(CourseViewModel)
-    case courseRegister(CourseViewModel)
-    // Chat
-    case chatting(ChatViewModel)
-    // Report
-    case recordDetail(Runninglog)
-    // UserProfileView
-    case userProfile(String)
-    case userReport(String)
-}
 
-// MARK: - FULL SCREEN
-enum FullScreenCover: String, Identifiable {
-    case payment
-    
-    var id: String {
-        self.rawValue
-    }
-}
-
-// MARK: - SHEET
-enum Sheet: Hashable, Identifiable {
-    static func == (lhs: Sheet, rhs: Sheet) -> Bool {
-        return lhs.hashValue == rhs.hashValue
-    }
-    
-    case webView(url: String)
-    
-    var id: String {
-        String(describing: self)
-    }
-}
 
 enum Tab {
     case running, chat, report, profile
@@ -74,7 +25,58 @@ enum Tab {
     }
 }
 
-final class Router: ObservableObject {    
+final class Router: ObservableObject {
+    // MARK: - PAGE
+    enum Page: Hashable {
+        // Root
+        case running
+        case chat
+        case report
+        case profile
+        // Profile
+        case profileEdit
+        case runningRecorded
+        case faq
+        case setting
+        case withDrawal
+        // Home
+        case runningSelect(CourseListViewModel, UserSearchViewModel)
+        case runningStart(RunActivityViewModel)
+        case runningResult(RunActivityViewModel)
+        case courseDrawing
+        case courseDetail(CourseViewModel)
+        case courseRegister(CourseViewModel)
+        // Chat
+        case chatting(ChatViewModel)
+        // Report
+        case recordDetail(Runninglog)
+        // UserProfileView
+        case userProfile(String)
+        case userReport(String)
+    }
+
+    // MARK: - FULL SCREEN
+    enum FullScreenCover: String, Identifiable {
+        case payment
+        
+        var id: String {
+            self.rawValue
+        }
+    }
+
+    // MARK: - SHEET
+    enum Sheet: Hashable, Identifiable {
+        static func == (lhs: Sheet, rhs: Sheet) -> Bool {
+            return lhs.hashValue == rhs.hashValue
+        }
+        
+        case webView(url: String)
+        
+        var id: String {
+            String(describing: self)
+        }
+    }
+    
     @Published var path = NavigationPath()
     @Published var selectedIndex: Tab = .running
     @Published var sheet: Sheet?
@@ -184,12 +186,12 @@ final class Router: ObservableObject {
     }
 }
 
-extension Page {
+extension Router.Page {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
     
-    static func == (lhs: Page, rhs: Page) -> Bool {
+    static func == (lhs: Router.Page, rhs: Router.Page) -> Bool {
         return lhs.hashValue == rhs.hashValue
     }
     

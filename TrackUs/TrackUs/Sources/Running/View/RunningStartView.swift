@@ -8,12 +8,10 @@
 import SwiftUI
 
 struct RunningStartView: View {
-    @EnvironmentObject var router: Router
-    @ObservedObject var runViewModel: RunActivityViewModel
+    public var runViewModel: RunActivityViewModel
     
     var body: some View {
         RunningActivityVCHosting(
-            router: router,
             runViewModel: runViewModel
         )
         .edgesIgnoringSafeArea(.all)
