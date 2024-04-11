@@ -8,6 +8,7 @@
 import Foundation
 
 struct WorkoutService {
+    let isGroup: Bool
     let measuringDistance: Double
     let measuringMomentum: Double
     let measurementTime: Double

@@ -36,6 +36,9 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
     private let healthStore = HKHealthStore()
     private var anchor: HKQueryAnchor!
     private var snapshot: UIImage?
+    var isGroup: Bool {
+        !groupId.isEmpty
+    }
     
     // 뷰에서 사용
     @Published var count = 3
@@ -106,9 +109,8 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
         let distanceType = HKQuantityType(.distanceWalkingRunning)
         let activeEnergyType = HKQuantityType(.activeEnergyBurned)
         
-        
-        
         // 샘플유형 지정
+        
         let distanceDescriptor = HKQueryDescriptor(sampleType: distanceType, predicate: nil)
         let activeEnergyDescriptor = HKQueryDescriptor(sampleType: activeEnergyType, predicate: nil)
         
@@ -120,10 +122,11 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
                 return
             }
             // 속성지정
-            let predicate = HKQuery.predicateForSamples(withStart: self.startDate, end: Date(), options: .strictStartDate)
+            
+            let predicate = HKQuery.predicateForSamples(withStart: self.startDate, end: Date())
             
             if let types = updatedSampleTypes {
-                // distanceWalkingRunning, activeEnergyBurned 샘플데이터 변경시
+                
                 let descriptors = types.map { type in
                     HKQueryDescriptor(sampleType: type, predicate: predicate)
                 }
@@ -136,8 +139,6 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
                         debugPrint(#function + " HKAnchoredObjectQuery " + error.localizedDescription)
                     }
                     
-                    DispatchQueue.main.async {
-                        // Update the anchor.
                         self.anchor = newAnchor
                         
                         // 가장 최근에 추가된 데이터 확인
@@ -145,19 +146,20 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
                               let sample = samples.last,
                               let sampleQuantity = sample as? HKQuantitySample
                         else {  return }
-                        
+            
                         DispatchQueue.main.async {
-                            print("\(sampleQuantity.sampleType) 업뎃됨!")
-                            if sampleQuantity.sampleType == distanceType {
-                                self.distance += sampleQuantity.quantity.doubleValue(for: .meter())
-                            } else if sampleQuantity.sampleType == activeEnergyType {
+                            if sampleQuantity.sampleType == activeEnergyType {
                                 self.calorie += sampleQuantity.quantity.doubleValue(for: .kilocalorie())
                             }
+                            if sampleQuantity.sampleType == distanceType {
+                                self.distance += sampleQuantity.quantity.doubleValue(for: .meter())
+                            }
+                            
                             self.pace = WorkoutService.calcPace(second: self.seconds, meter: self.distance)
                         }
                         
                         completionHandler()
-                    }
+                    
                 }
                 self.healthStore.execute(anchorQuery)
             }
@@ -185,7 +187,7 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
                 "seconds": seconds,
                 "target": target,
                 "coordinates": coordinates.toGeoPoint,
-//                "isGroup": isGroup,
+                "isGroup": isGroup,
                 "routeImageUrl": imageUrl,
                 "address": address,
                 "timestamp": Timestamp(date: Date())
@@ -200,35 +202,3 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
     }
 }
 
-extension RunActivityViewModel {
-    enum HKAuthorizationStatus {
-        case notAvailableOnDevice
-        case availableOnDevice
-    }
-    
-    
-    static let typesToShare: Set<HKSampleType> = [
-        HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!,
-        HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!
-    ]
-    
-    static let typesToRead: Set = [
-        HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
-        HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning)!,
-    ]
-    
-    
-     static func requestAuthorization() async -> HKAuthorizationStatus {
-        guard HKHealthStore.isHealthDataAvailable() else {
-            return .notAvailableOnDevice
-        }
-        
-        do {
-            try await HKHealthStore().requestAuthorization(toShare: typesToShare, read: typesToRead)
-        } catch {
-            return .notAvailableOnDevice
-        }
-        
-        return .availableOnDevice
-    }
-}

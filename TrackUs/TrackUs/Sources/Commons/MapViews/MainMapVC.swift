@@ -62,11 +62,10 @@ final class MainMapVC: UIViewController, GestureManagerDelegate {
             return
         }
         
-        let cameraOptions = CameraOptions(center: centerPosition, zoom: 12)
+        let cameraOptions = CameraOptions(center: centerPosition, zoom: 17)
         let options = MapInitOptions(cameraOptions: cameraOptions)
         self.mapView = MapView(frame: view.bounds, mapInitOptions: options)
         self.mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        self.mapView.gestures.delegate = self
         self.mapView.ornaments.options.scaleBar.visibility = .hidden
         self.mapView.mapboxMap.styleURI = .init(rawValue: "mapbox://styles/seokki/clslt5i0700m901r64bli645z")
         
@@ -95,7 +94,7 @@ final class MainMapVC: UIViewController, GestureManagerDelegate {
         lineAnnotationManager.annotations = [lineAnnotation]
     }
     
-    private func setBoundsOnCenter() {
+    private func setBoundsOnCenter(completion: (() -> ())? = nil) {
         let camera = try? self.mapView.mapboxMap.camera(
             for: coordinates,
             camera: self.mapView.mapboxMap.styleDefaultCamera,
@@ -112,8 +111,10 @@ final class MainMapVC: UIViewController, GestureManagerDelegate {
     }
     
     private func takeSnapshot() {
-        if let image = UIImage.imageFromView(view: self.mapView), let screenshotHandler = screenshotHandler {
-            screenshotHandler(image)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            if let image = UIImage.imageFromView(view: self.mapView), let screenshotHandler = self.screenshotHandler {
+                screenshotHandler(image)
+            }
         }
     }
     

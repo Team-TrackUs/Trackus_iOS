@@ -13,15 +13,9 @@ struct RunningResultView: View {
     @ObservedObject var runViewModel: RunActivityViewModel
     @State private var showingModal = false
     @State private var showingAlert = false
-    private var workoutService: WorkoutService
     
     init(runViewModel: RunActivityViewModel) {
         self.runViewModel = runViewModel
-       
-        self.workoutService = WorkoutService(
-            measuringDistance: runViewModel.distance,
-            measuringMomentum: runViewModel.calorie,
-            measurementTime: runViewModel.seconds)
     }
 }
 
@@ -53,7 +47,7 @@ extension RunningResultView {
                             Image(.distanceIcon)
                             VStack(alignment: .leading) {
                                 Text("킬로미터")
-                                Text(workoutService.distanceCompString)
+                                Text(runViewModel.distance.asString(unit: .kilometer))
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
@@ -65,7 +59,7 @@ extension RunningResultView {
                             Image(.fireIcon)
                             VStack(alignment: .leading) {
                                 Text("소모 칼로리")
-                                Text(workoutService.calorieCompString)
+                                Text(runViewModel.calorie.asString(unit: .calorie))
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
@@ -77,7 +71,7 @@ extension RunningResultView {
                             Image(.timeImg)
                             VStack(alignment: .leading) {
                                 Text("러닝 타임")
-                                Text(workoutService.timeCompString)
+                                Text(runViewModel.seconds.asString(style: .positional))
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
