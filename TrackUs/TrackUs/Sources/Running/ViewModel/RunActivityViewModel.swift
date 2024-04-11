@@ -30,11 +30,12 @@ import Firebase
 
 final class RunActivityViewModel: ObservableObject, HashableObject {
     private var timer: Timer?
+    private var anchorDate: Date?
     private var startDate: Date?
     private let groupId: String
-    private var observeQuery: HKObserverQuery!
     private let healthStore = HKHealthStore()
-    private var anchor: HKQueryAnchor!
+    private var caloriesQuery: HKStatisticsCollectionQuery!
+    private var runningQuery: HKObserverQuery!
     private var snapshot: UIImage?
     var isGroup: Bool {
         !groupId.isEmpty
@@ -82,89 +83,97 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
     
     /// 일시중지
     func pause() {
-        timer?.invalidate()
-        healthStore.stop(observeQuery)
+        stopTimer()
+        healthStore.stop(caloriesQuery)
+        healthStore.stop(runningQuery)
     }
     
     /// 중지
     func stop() {
-        timer?.invalidate()
-        healthStore.stop(observeQuery)
+        stopTimer()
+        healthStore.stop(caloriesQuery)
+        healthStore.stop(runningQuery)
     }
     
     /// 경로추가
     func addPath(withCoordinate coordinate: CLLocationCoordinate2D) {
         coordinates.append(coordinate)
     }
-
-    /// 기록
-    func play() {
-        self.startDate = Date()
+    
+    func startTimer() {
         self.timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] _ in
             guard let self = self else { return }
             seconds += 1
         })
+    }
+    
+    func stopTimer() {
+        timer?.invalidate()
+    }
+    
+    /// 기록
+    func play() {
+        self.anchorDate = Date()
+        self.startDate = Date()
+        self.startTimer()
         
-        // 러닝거리 운동에너지에 대한 데이터타입
-        let distanceType = HKQuantityType(.distanceWalkingRunning)
-        let activeEnergyType = HKQuantityType(.activeEnergyBurned)
+        guard let activeEnergyBurnedType = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else {
+            fatalError("Unable to get the activeEnergyBurned type")
+        }
+        guard let distanceWalkingRunningType = HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning) else {
+            fatalError("Unable to get the distanceWalkingRunning type")
+        }
         
-        // 샘플유형 지정
+        // 시작시간으로부터 5초간
+        var interval = DateComponents()
+        interval.second = 5
+        /**
+         quantityType: 검색하려는 샘플 유형
+         quantitySamplePredicate: 반환되는 결과에 대한 조건자
+         options
+         anchorDate: 샘플을 계산하는 순간을 지정(기준날짜)
+         interval: 간격설정
+         */
+        caloriesQuery = HKStatisticsCollectionQuery.init(quantityType: activeEnergyBurnedType,
+                                                         quantitySamplePredicate: nil,
+                                                         options: .mostRecent,
+                                                         anchorDate: anchorDate!,
+                                                         intervalComponents: interval)
         
-        let distanceDescriptor = HKQueryDescriptor(sampleType: distanceType, predicate: nil)
-        let activeEnergyDescriptor = HKQueryDescriptor(sampleType: activeEnergyType, predicate: nil)
-        
-        // 거리변화 감지시 호출됨
-        observeQuery = HKObserverQuery(queryDescriptors: [distanceDescriptor, activeEnergyDescriptor])
-        { query, updatedSampleTypes, completionHandler, error in
-            if let error = error {
-                debugPrint(#function + " HKObserverQuery " + error.localizedDescription)
-                return
+        caloriesQuery.statisticsUpdateHandler = { query, statistics, collection, error in
+            guard let statisticsCollection = collection else {
+                fatalError("Unable to get the activeEnergyBurned type")
             }
-            // 속성지정
             
-            let predicate = HKQuery.predicateForSamples(withStart: self.startDate, end: Date())
-            
-            if let types = updatedSampleTypes {
-                
-                let descriptors = types.map { type in
-                    HKQueryDescriptor(sampleType: type, predicate: predicate)
-                }
-                
-                let anchorQuery = HKAnchoredObjectQuery(queryDescriptors: descriptors,
-                                                        anchor: self.anchor,
-                                                        limit: HKObjectQueryNoLimit)
-                { anchorQuery, samples, deleted, newAnchor, error in
-                    if let error = error {
-                        debugPrint(#function + " HKAnchoredObjectQuery " + error.localizedDescription)
+            statisticsCollection.enumerateStatistics(from: self.anchorDate!, to: Date()) { statistics, _ in
+                // 가장 최근의 업데이트 결과를 반환
+                if let calories = statistics.mostRecentQuantity() {
+                    DispatchQueue.main.async {
+                        self.calorie += calories.doubleValue(for: .kilocalorie())
                     }
-                    
-                        self.anchor = newAnchor
-                        
-                        // 가장 최근에 추가된 데이터 확인
-                        guard let samples = samples,
-                              let sample = samples.last,
-                              let sampleQuantity = sample as? HKQuantitySample
-                        else {  return }
-            
-                        DispatchQueue.main.async {
-                            if sampleQuantity.sampleType == activeEnergyType {
-                                self.calorie += sampleQuantity.quantity.doubleValue(for: .kilocalorie())
-                            }
-                            if sampleQuantity.sampleType == distanceType {
-                                self.distance += sampleQuantity.quantity.doubleValue(for: .meter())
-                            }
-                            
-                            self.pace = WorkoutService.calcPace(second: self.seconds, meter: self.distance)
-                        }
-                        
-                        completionHandler()
-                    
                 }
-                self.healthStore.execute(anchorQuery)
+                self.anchorDate = Date() // 기준시간을 현재로 업데이트
             }
         }
-        healthStore.execute(observeQuery)
+        
+        caloriesQuery.initialResultsHandler = { query, results, error in
+        }
+        
+        runningQuery = HKObserverQuery(sampleType: distanceWalkingRunningType, predicate: nil) { (query, completionHandler, errorOrNil) in
+            let predicate = HKQuery.predicateForSamples(withStart: self.startDate, end: Date(), options: .strictStartDate)
+            let distanceQuery = HKStatisticsQuery(quantityType: distanceWalkingRunningType, quantitySamplePredicate: predicate, options: .mostRecent) { (query, result, error) in
+                guard let result = result, let distance = result.mostRecentQuantity() else {
+                    return
+                }
+                DispatchQueue.main.async {
+                    self.distance += distance.doubleValue(for: .meter())
+                }
+            }
+            self.healthStore.execute(distanceQuery)
+        }
+        
+        healthStore.execute(caloriesQuery)
+        healthStore.execute(runningQuery)
     }
     
     /// 러닝데이터 추가(DB)
@@ -201,4 +210,3 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
         }
     }
 }
-
