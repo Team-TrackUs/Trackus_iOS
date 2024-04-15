@@ -8,23 +8,13 @@
 import SwiftUI
 
 struct HorizontalGraph: View {
-    @State var selectedBarIndex: Int? = nil
     @StateObject var authViewModel = AuthenticationViewModel.shared
     @ObservedObject var viewModel = ReportViewModel.shared
-    
-    let maxWidth: CGFloat = 130 // 최대 그래프 넓이
-    let distanceLigitValue: Double = 20.0 // 최대 한계 값 거리
-    let speedLimitValue: Double = 20.0 // 최대 한계 값 속도
     
     var selectedTab: CircleTab
     @Binding var selectedAge : AvgAge
     @Binding var selectedDate: Date?
     
-    var formattedCurrentDate: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM.dd"
-        return dateFormatter.string(from: Date())
-    }
     
     // 로그인한 유저의 날짜 확인
     var runningLogForSelectedDate: [Runninglog] {
@@ -188,20 +178,20 @@ struct HorizontalGraph: View {
     
     // 월별 페이스
     var allUserAveragePaceForSelectedMonth: Double {
-            let runningLogForSelectedMonth = viewModel.allUserRunningLog.filter { Calendar.current.isDate($0.timestamp, equalTo: firstDayOfSelectedMonth, toGranularity: .month) }
-            
-            // 수정된 부분: 평균 계산 전에 0 값을 제외합니다.
-            let nonZeroPaces = runningLogForSelectedMonth.filter { $0.pace != 0 }
-            
-            guard !nonZeroPaces.isEmpty else {
-                return 0.0
-            }
-            
-            let totalPace = nonZeroPaces.reduce(0.0) { $0 + $1.pace }
-            let averagePace = totalPace / Double(nonZeroPaces.count)
-            
-            return averagePace.isNaN ? 0.0 : averagePace
+        let runningLogForSelectedMonth = viewModel.allUserRunningLog.filter { Calendar.current.isDate($0.timestamp, equalTo: firstDayOfSelectedMonth, toGranularity: .month) }
+        
+        // 수정된 부분: 평균 계산 전에 0 값을 제외합니다.
+        let nonZeroPaces = runningLogForSelectedMonth.filter { $0.pace != 0 }
+        
+        guard !nonZeroPaces.isEmpty else {
+            return 0.0
         }
+        
+        let totalPace = nonZeroPaces.reduce(0.0) { $0 + $1.pace }
+        let averagePace = totalPace / Double(nonZeroPaces.count)
+        
+        return averagePace.isNaN ? 0.0 : averagePace
+    }
     
     // 월별 거리
     var allUserAverageDistanceForSelectedMonth: Double {
@@ -242,7 +232,7 @@ struct SpeedBar: View {
                     
                     Capsule()
                         .frame(width: minWidth + CGFloat(max(0, min((value / 10), Double(maxWidth - minWidth)))), height: 15)
-//                        .foregroundColor(.blue)
+                    //                        .foregroundColor(.blue)
                     
                     Text(speedValue.asString(unit: .pace))
                         .customFontStyle(.gray1_R9)

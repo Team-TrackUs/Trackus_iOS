@@ -20,7 +20,6 @@ struct MyRecordView: View {
     @EnvironmentObject var router: Router
     @ObservedObject var viewModel = ReportViewModel.shared
     var vGridItems = [GridItem()]
-    @State var filterSelect : RecordFilter = .all
     @State private var calendarButton = false
     @State private var selectedFilter: RecordFilter?
     @State private var gridDelete = false
@@ -90,7 +89,7 @@ struct MyRecordView: View {
                                         selectedRunningLog = item
                                         router.push(.recordDetail(selectedRunningLog!))
                                     } label: {
-                                        RecordCell(isDelete: $isDelete, gridDelete: $gridDelete, runningLog: item, isSelected: isRecordAvailableOnDate(runningLog: item, selectedDate: selectedDate))
+                                        RecordCell(runningLog: item)
                                     }
                                     HStack(alignment: .top) {
                                         Spacer()
@@ -195,14 +194,6 @@ struct MyRecordView: View {
         }
     }
     
-    func isRecordAvailableOnDate(runningLog: Runninglog, selectedDate: Date?) -> Bool {
-        guard let selectedDate = selectedDate else { return false }
-        let calendar = Calendar.current
-        let recordDate = calendar.startOfDay(for: runningLog.timestamp)
-        let selectedDateWithoutTime = calendar.startOfDay(for: selectedDate)
-        return recordDate == selectedDateWithoutTime
-    }
-    
     func deleteRunningLog(selectedRunningLog: Runninglog) {
         if let documentID = selectedRunningLog.documentID,
            let index = viewModel.runningLog.firstIndex(where: { $0.documentID == documentID }) {
@@ -233,11 +224,7 @@ extension MyRecordView {
 
 //MARK: - RecordCell
 struct RecordCell: View {
-    @ObservedObject var viewModel = ReportViewModel.shared
-    @Binding var isDelete: Bool
-    @Binding var gridDelete : Bool
     let runningLog : Runninglog
-    let isSelected: Bool
     
     var body: some View {
         VStack(spacing: 5) {
@@ -349,7 +336,7 @@ struct CustomDateFilter: View {
                     Spacer()
                     
                     Button {
-                            currentMonth -= 1
+                        currentMonth -= 1
                     } label: {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.white)
@@ -362,7 +349,7 @@ struct CustomDateFilter: View {
                     }
                     
                     Button {
-                            currentMonth += 1
+                        currentMonth += 1
                     } label: {
                         Image(systemName: "chevron.right")
                             .foregroundColor(.white)
@@ -460,11 +447,6 @@ struct CustomDateFilter: View {
         .background(value.day != -1 && isSelected ? .main : .white)
         .cornerRadius(30)
     }
-    var formattedDate: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd"
-        return dateFormatter.string(from: currentDate)
-    }
     
     func isSameDay(date1: Date, date2: Date)-> Bool{
         let calendar = Calendar.current
@@ -493,7 +475,6 @@ struct CustomDateFilter: View {
         return currentMonth
     }
     
-    //    func extractDate() ->[DateValue]{
     func extractDate() ->[DateValue]{
         
         let calendar = Calendar.current
@@ -521,16 +502,6 @@ struct CustomDateFilter: View {
         let components1 = calendar.dateComponents([.year, .month], from: date1)
         let components2 = calendar.dateComponents([.year, .month], from: date2)
         return components1 == components2
-    }
-    
-    func isMockDataAvailableOnDate(date: Date) -> Bool {
-        let calendar = Calendar.current
-        for record in viewModel.runningLog { // 임시
-            if calendar.isDate(record.timestamp, inSameDayAs: date) {
-                return true
-            }
-        }
-        return false
     }
     
 }

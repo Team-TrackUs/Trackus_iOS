@@ -149,9 +149,7 @@ struct BarGraphView: View {
 //MARK: - 일주일 그래프
 
 struct WeakGraphView: View {
-    @State private var shouldRefresh = false
     @State var selectedBarIndex: Int?
-    @State var avg = 20
     @Binding var selectedAge : AvgAge
     @ObservedObject var viewModel = ReportViewModel.shared
     @Binding var selectedDate: Date?
