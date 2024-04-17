@@ -66,6 +66,13 @@ class ChatViewModel: ObservableObject {
                                                  token: opponentInfo.token)]
         createChatRoom(myInfo: myInfo, opponentInfo: opponentInfo)
     }
+    
+    // notification용
+    init(chatRoomID: String){
+        self.currentChatID = chatRoomID
+        self.members = members
+    }
+    
     // 채팅방 삭제
     func deleteChatRoom(chatRoomID: String) {
         ref.document(chatRoomID).delete{ error in }
@@ -217,7 +224,7 @@ class ChatViewModel: ObservableObject {
         // 마지막 메세지 수정
         ref.document(currentChatID)
             .updateData(["latestMessage" : latestMessageData])
-        PushNotificationServiece.shared.sendPushNotificationTo(chatRoom: self.chatRoom, members: self.members, body: chatText)
+        PushNotificationServiece.shared.sendPushNotificationTo(accessToken: authViewModel.accessToken, chatRoom: self.chatRoom, members: self.members, body: chatText)
     }
     
     // 사용자 메세지 확인 후 초기화 - 채팅방 들어올때

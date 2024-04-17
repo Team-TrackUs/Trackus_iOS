@@ -16,6 +16,17 @@ class ChatListViewModel: ObservableObject {
     @Published var currentUId: String
     @Published var newMessage: Bool
     
+    // 신규 메세지 총 카운트 갯수
+    var messageCount: String? {
+        let count = chatRooms.reduce (0, { $0 + ($1.usersUnreadCountInfo[currentUId] ?? 0) })
+        UIApplication.shared.applicationIconBadgeNumber = count
+        switch count{
+            case 1...999: return String(count)
+            case 999...: return "999+"
+            default: return nil
+        }
+    }
+    
     init() {
         
         self.chatRooms = []
@@ -29,14 +40,6 @@ class ChatListViewModel: ObservableObject {
         }
     }
     
-    // 탭바 신규 메세지 확인
-    func updateNewMessage() -> Int{
-        // 채팅방들 중에서 현재 사용자의 unreadCount가 0이 아닌 경우를 확인
-        return chatRooms.reduce (0, { $0 + ($1.usersUnreadCountInfo[currentUId] ?? 0) })
-        
-//        // 새로운 메시지 여부를 newMessage에 반영
-//        self.newMessage = hasNewMessage
-    }
     // 변환 방식 -> chatRoom -> currentUId 포함된 맴버 목록(uid) 불러오기 -> 포함된 userInfo 리스너 추가?
     private let ref = FirebaseManger().firestore.collection("chatRoom")
     

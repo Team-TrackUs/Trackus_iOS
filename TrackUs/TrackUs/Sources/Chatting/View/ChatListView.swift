@@ -11,7 +11,7 @@ import Kingfisher
 struct ChatListView: View {
     @EnvironmentObject var router: Router
     @StateObject var authViewModel = AuthenticationViewModel.shared
-    @StateObject var chatViewModel = ChatListViewModel()
+    @StateObject var chatViewModel = ChatListViewModel.shared
     
     // 테스트 값 나중 대체
     private var numberChatroom = 5

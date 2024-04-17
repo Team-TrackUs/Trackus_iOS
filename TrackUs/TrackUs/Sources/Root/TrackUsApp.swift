@@ -83,15 +83,8 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         
         let userInfo = notification.request.content.userInfo
         
-        // 신규 추가
-        // Do Something With MSG Data...
-//            if let messageID = userInfo[gcmMessageIDKey] {
-//                print("Message ID: \(messageID)")
-//            }
-            
-            
-            print(userInfo)
-        // =====
+        // badge 숫자 추가
+        UIApplication.shared.applicationIconBadgeNumber +=  1
         
         completionHandler([.banner, .sound, .badge])
     }
@@ -108,7 +101,15 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
                     object: nil,
                     userInfo: userInfo
                 )
+        // badge 숫자 추가
+        UIApplication.shared.applicationIconBadgeNumber +=  1
         
+        // notification tap 했을때 실행
+        if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
+//            let chatRoomID = userInfo["chatRoomID"] as? String {
+//                router.push(.chatting(ChatViewModel(chatRoom: chatRoom, users: chatViewModel.users)))
+//            }
+        }
         
         completionHandler()
     }

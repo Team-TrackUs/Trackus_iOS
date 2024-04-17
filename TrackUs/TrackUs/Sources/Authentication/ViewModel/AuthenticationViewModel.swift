@@ -54,9 +54,10 @@ class AuthenticationViewModel: NSObject, ObservableObject {
     @Published var errorMessage: String = ""
     @Published var user: Firebase.User?
     @Published var userInfo: UserInfo = UserInfo()
+    @Published var accessToken: String?
     
     // 외부 공유용 사용
-    static var currentUId: String {
+    static var currentUid: String {
         shared.userInfo.uid
     }
     
@@ -89,6 +90,7 @@ class AuthenticationViewModel: NSObject, ObservableObject {
                             self.getMyInformation()
                             self.chatListViewModel.subscribeToUpdates()
                             self.authenticationState = .authenticated
+                            //self.accessToken = try await user?.getIDToken()
                         }
                     }
                 }
@@ -202,6 +204,7 @@ extension AuthenticationViewModel {
                                                            accessToken: accessToken.tokenString)
             let auth = try await Auth.auth().signIn(with: credential)
             self.userInfo.uid = auth.user.uid
+            self.accessToken = accessToken.tokenString
             return true
         }
         catch {
@@ -282,10 +285,15 @@ extension AuthenticationViewModel: ASAuthorizationControllerDelegate {
                                                            rawNonce: nonce,
                                                            fullName: appleIDCredential.fullName)
             // Sign in with Firebase.
+            
+            if let accessToken = credential.accessToken {}
             Task {
                 do {
                     let auth = try await Auth.auth().signIn(with: credential)
                     self.userInfo.uid = auth.user.uid
+                    if let accessToken = credential.accessToken {
+                        self.accessToken = accessToken
+                    }
                 }
                 catch {
                     print("Error authenticating: \(error.localizedDescription)")
@@ -383,11 +391,11 @@ extension AuthenticationViewModel {
     // MARK: - 사용자 본인 정보 불러오기
     func getMyInformation(){
         
-        guard let uid = FirebaseManger.shared.auth.currentUser?.uid else {
+        guard let user = FirebaseManger.shared.auth.currentUser else {
             print("error uid")
             return
         }
-        FirebaseManger.shared.firestore.collection("users").document(uid).getDocument { [self] (snapshot, error) in
+        FirebaseManger.shared.firestore.collection("users").document(user.uid).getDocument { [self] (snapshot, error) in
             
             if let error = error {
                 print("Error getting documents: \(error)")
@@ -402,10 +410,32 @@ extension AuthenticationViewModel {
                 } catch let err {
                     print("err: \(err)")
                 }
-                print(self.userInfo)
             }
         }
+        
+        if let accessToken = user.refreshToken {
+            self.accessToken = accessToken
+        }
+        getAccessToken { (token, error) in
+            if let token = token {
+                // AccessToken 사용
+                self.accessToken = token
+            } else if let error = error {
+                // 오류 처리
+                print("오류 발생: \(error.localizedDescription)")
+            }
+        }
+        
     }
+    
+    func getAccessToken(completion: @escaping (String?, Error?) -> Void) {
+        // Firebase에 로그인하여 AccessToken을 가져오는 코드
+        if let accessToken = Auth.auth().currentUser?.refreshToken {
+            self.accessToken = accessToken
+        }
+        
+    }
+
     
     func downloadImageFromStorage(uid: String) {
         guard let profileImageUrl = self.userInfo.profileImageUrl else {

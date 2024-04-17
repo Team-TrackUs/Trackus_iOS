@@ -141,6 +141,7 @@ struct ChattingView: View {
         }
         .onAppear {
             title = chatViewModel.chatRoom.group ? chatViewModel.chatRoom.title : chatViewModel.members[chatViewModel.chatRoom.nonSelfMembers.first!]?.userName ?? "러너"
+            chatViewModel.resetUnreadCounter(myuid: authViewModel.userInfo.uid)
             
         }
         .animation(.easeInOut, value: sideMenuPresented)
@@ -151,7 +152,7 @@ struct ChattingView: View {
         
 
     }
-    /// 메세지 바
+    // MARK: - 메세지 전송 바
     var messageBar: some View {
         // 하단 메세지 보내기
         HStack(alignment: .bottom, spacing: 12){
@@ -206,7 +207,7 @@ struct ChattingView: View {
                 .stroke(Color.gray3, lineWidth: 1)
         )
     }
-    /// 사이드 메뉴
+    // MARK: - 사이드 메뉴 View
     var SideMenuView: some View {
         VStack(alignment: .leading, spacing: 0) {
             // 제목부분
@@ -273,7 +274,7 @@ struct ChattingView: View {
         .transition(.move(edge: .trailing)) // 오른쪽에서 나오도록 애니메이션 적용
     }
 }
-
+// MARK: - 채팅 메세지
 struct ChatMessageView: View {
     @EnvironmentObject var router: Router
     //@Binding var previousUser: String

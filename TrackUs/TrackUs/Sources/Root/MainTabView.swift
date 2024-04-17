@@ -18,6 +18,13 @@ struct MainTabView: View {
         appearance.backgroundColor = UIColor.white
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
+    init(selectedTab: Tab) {
+        let appearance = UITabBarAppearance()
+        appearance.shadowColor = .divider
+        appearance.backgroundColor = UIColor.white
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+        self.selectedTab = selectedTab
+    }
     
     var body: some View {
         NavigationStack(path: $router.path) {
@@ -41,6 +48,7 @@ struct MainTabView: View {
                             Text("채팅")
                         }
                         .tag(Tab.chat)
+                        .badge(chatViewModel.messageCount)
                     
                     router.buildScreen(page: .report)
                         .tabItem {
@@ -71,24 +79,6 @@ struct MainTabView: View {
                 
                 .onChange(of: router.selectedIndex) { _ in
                     HapticManager.instance.impact(style: .light)
-                }
-                GeometryReader { geometry in
-                    if chatViewModel.updateNewMessage() != 0 {
-                        VStack{
-                            Spacer()
-                            Text(chatViewModel.updateNewMessage() < 1000 ? "\(chatViewModel.updateNewMessage())" : "999+")
-                                .foregroundStyle(.white)
-                                .font(.system(size: 10, weight: .regular))
-                                .padding(.vertical, 2)
-                                .padding(.horizontal, 4)
-                                .background(
-                                    Capsule()
-                                        .foregroundStyle(.caution)
-                                )
-                             //Text를 탭바 중간에서 오른쪽으로 2/4 위치에 배치
-                            .offset(x: geometry.size.width * 1.5 / 4, y: -30)
-                        }
-                    }
                 }
             }
         }
