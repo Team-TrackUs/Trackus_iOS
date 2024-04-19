@@ -15,18 +15,18 @@ struct PremiumPaymentView: View {
         ZStack {
             HStack {
                 Spacer()
-                Image(.proBackGround)
+                Image(.proBackgroundImg)
                     .resizable()
                     .frame(width: 200, height: 200)
             }
             
             VStack {
-                Image(.iconTrackUsPro)
+                Image(.trackusProIcon)
                     .padding()
                 
                 VStack(alignment: .leading) {
                     HStack {
-                        Image(.crown) // crown
+                        Image(.crownIcon)
                             .resizable()
                             .frame(width: 16, height: 16)
                         

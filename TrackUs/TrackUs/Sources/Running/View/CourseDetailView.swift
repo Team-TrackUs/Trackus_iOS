@@ -41,7 +41,7 @@ struct CourseDetailView: View {
     
     var body: some View {
         VStack {
-            PathPreviewMap(
+            MapboxMapView(
                 mapStyle: .numberd,
                 coordinates: courseViewModel.course.coordinates
             )
@@ -134,7 +134,7 @@ extension CourseDetailView {
                 
                 HStack(spacing: 10) {
                     HStack {
-                        Image(.pin)
+                        Image(.pinIcon)
                         
                         Text(courseViewModel.course.address)
                             .customFontStyle(.gray1_R12)
@@ -142,7 +142,7 @@ extension CourseDetailView {
                     }
                     
                     HStack {
-                        Image(.arrowBoth)
+                        Image(.arrowBothIcon)
                         Text(courseViewModel.course.distance.asString(unit: .kilometer))
                             .customFontStyle(.gray1_R12)
                     }
@@ -180,12 +180,13 @@ extension CourseDetailView {
                     }
                } label: {
                    Text(menu.rawValue)
-                       
+                      
                }
            }
         } label: {
             Image(systemName: "ellipsis")
                 .foregroundStyle(.black)
+                .padding(15)
         }
     }
 }

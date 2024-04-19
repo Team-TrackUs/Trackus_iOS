@@ -10,7 +10,6 @@ import SwiftUI
 struct SettingPopup: View {
     @Binding var showingPopup: Bool
     @EnvironmentObject var router: Router
-    //    @StateObject var trackingViewModel = TrackingViewModel(go)
     @ObservedObject var settingVM: SettingPopupViewModel
     
     var body: some View {
@@ -27,7 +26,7 @@ struct SettingPopup: View {
                 }
                 
                 VStack {
-                    Image(.dart)
+                    Image(.dart3DImg)
                     
                     Text("오늘은 얼마나 달리실건가요?")
                         .customFontStyle(.gray1_B16)

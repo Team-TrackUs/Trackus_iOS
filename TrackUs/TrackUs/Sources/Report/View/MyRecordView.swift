@@ -33,13 +33,6 @@ struct MyRecordView: View {
         ScrollView {
             ZStack(alignment: .top) {
                 VStack(alignment: .leading) {
-//                    Button {
-//                        router.present(fullScreenCover: .payment)
-//                    } label: {
-//                        GraphicTextCard(title: "TrackUs Pro", subTitle: "상세한 러닝 리포트를 통해 효율적인 러닝을 즐겨보세요.", resource: .iconTrackUsPro2)
-//                            .modifier(BorderLineModifier())
-//                            .multilineTextAlignment(.leading)
-//                    }
                     
                     VStack(alignment: .leading) {
                         //                        152.asString(unit: .pace)
@@ -87,7 +80,7 @@ struct MyRecordView: View {
                         Button {
                             calendarButton.toggle()
                         } label: {
-                            Image("Calendar")
+                            Image(.calendarIcon)
                         }
                     }
                     LazyVGrid(columns: vGridItems, spacing: 0) {
@@ -153,7 +146,7 @@ struct MyRecordView: View {
         }
         .popup(isPresented: $gridDelete) {
             HStack {
-                Image(.trashSlash)
+                Image(.trashSlashIcon)
                 
                 Spacer()
                 
@@ -298,7 +291,7 @@ struct RecordCell: View {
                     
                     HStack(spacing: 10) {
                         HStack {
-                            Image(.pin)
+                            Image(.pinIcon)
                             //                            Text("서울숲카페거리")
                             Text(runningLog.address ?? "대한민국 서울시")
                             //                                .customFontStyle(.gray1_R12)
@@ -309,7 +302,7 @@ struct RecordCell: View {
                         //                        Spacer()
                         
                         HStack {
-                            Image(.timerLine)
+                            Image(.timeIcon)
                             //                            Text("10:02 AM")
                             Text(formatTime(runningLog.timestamp))
                             //                                .customFontStyle(.gray1_R12)
@@ -319,7 +312,7 @@ struct RecordCell: View {
                         //                        Spacer()
                         
                         HStack {
-                            Image(.arrowBoth)
+                            Image(.arrowBothIcon)
                             Text("\((runningLog.distance).asString(unit: .kilometer))") // 수정된부분^^
                                 .customFontStyle(.gray1_R9)
                         }

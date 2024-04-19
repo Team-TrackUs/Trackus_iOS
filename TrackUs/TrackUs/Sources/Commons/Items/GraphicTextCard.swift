@@ -23,7 +23,7 @@ struct GraphicTextCard: View {
                         .customFontStyle(.gray1_R12)
                 }
                 Spacer()
-                Image("ChevronRight")
+                Image(.chevronRightIcon)
             }
             .padding(7)
         }

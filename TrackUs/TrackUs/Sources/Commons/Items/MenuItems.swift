@@ -28,7 +28,7 @@ struct MenuItems<Section, Content>: View where Content: View, Section: View {
             }
         }
         .padding(.vertical, 20)
-        .padding(.horizontal, Constants.ViewLayout.VIEW_STANDARD_HORIZONTAL_SPACING)
+        .padding(.horizontal, 16)
     }
 }
 

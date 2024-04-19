@@ -49,7 +49,7 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
     private var locationTrackingCancellation: AnyCancelable?
     private var cancellation = Set<AnyCancelable>()
     private var puckConfiguration = Puck2DConfiguration.makeDefault(showBearing: true)
-    private var snapshotter: Snapshotter!
+    
     
     // UI
     private let buttonWidth = 86.0
@@ -247,7 +247,7 @@ extension TrackingModeMapViewController {
     private func setupUI() {
         // setup UI
         let distanceToNowLabel = makeTextLabel(text: "현재까지 거리")
-        let distanceToNowImage = UIImageView(image: UIImage(named: "Distance"))
+        let distanceToNowImage = UIImageView(image: UIImage(named: "distance_icon"))
         
         [distanceToNowImage, distanceToNowLabel, kilometerLabel].forEach { roundedVStackView.addArrangedSubview($0) }
         
@@ -258,14 +258,13 @@ extension TrackingModeMapViewController {
         let paceStackView = makeCircleStackView()
         let timeStackView = makeCircleStackView()
         
-        let fireImage = UIImageView(image: UIImage(named: "Fire"))
-        let paceImage = UIImageView(image: UIImage(named: "Pace"))
-        let timeImage = UIImageView(image: UIImage(named: "Time"))
+        let fireImage = UIImageView(image: UIImage(named: "fire_icon"))
+        let paceImage = UIImageView(image: UIImage(named: "pace_icon"))
+        let timeImage = UIImageView(image: UIImage(named: "time_img"))
         
         let calorieTextLabel = makeTextLabel(text: "소모 칼로리")
         let paceTextLabel = makeTextLabel(text: "페이스")
         let timeTextLabel = makeTextLabel(text: "경과시간")
-        
         
         [fireImage, calorieTextLabel, calorieLable].forEach { calorieStackView.addArrangedSubview($0) }
         [paceImage, paceTextLabel, paceLabel].forEach { paceStackView.addArrangedSubview($0) }
@@ -345,15 +344,8 @@ extension TrackingModeMapViewController {
         self.mapView.location.options.puckBearingEnabled = true
         self.mapView.gestures.delegate = self
         self.mapView.mapboxMap.styleURI = .init(rawValue: "mapbox://styles/seokki/clslt5i0700m901r64bli645z")
-        self.puckConfiguration.topImage = UIImage(named: "Puck")
+        self.puckConfiguration.topImage = UIImage(named: "puck_icon")
         self.mapView.location.options.puckType = .puck2D(puckConfiguration)
-        
-        /// 스냅셔터
-        let snapshotterOption = MapSnapshotOptions(size: CGSize(width: self.view.bounds.width, height: self.view.bounds.height) , pixelRatio: UIScreen.main.scale)
-        let snapshotterCameraOptions = CameraOptions(cameraState: self.mapView.mapboxMap.cameraState)
-        self.snapshotter = Snapshotter(options: snapshotterOption)
-        self.snapshotter.setCamera(to: snapshotterCameraOptions)
-        self.snapshotter.styleURI = .init(rawValue: "mapbox://styles/seokki/clslt5i0700m901r64bli645z")
     }
     
     
@@ -440,46 +432,6 @@ extension TrackingModeMapViewController {
     private func stopTracking() {
         locationTrackingCancellation?.cancel()
     }
-    
-    // 스냅샷을 찍기전 위치조정
-    private func cameraMoveBeforeCapture(completion: (() -> ())? = nil) {
-        // 시작마커 생성
-        guard let first = self.trackingViewModel.coordinates.first else { return }
-        self.mapView.makeMarkerWithUIImage(coordinate: first, imageName: "StartPin")
-        
-        
-        // 2. 적당한 줌레벨 설정
-        // 현재 경로를 기반으로 줌레벨 설정
-        let camera = try? self.mapView.mapboxMap.camera(
-            for: self.trackingViewModel.coordinates,
-            camera: self.mapView.mapboxMap.styleDefaultCamera,
-            coordinatesPadding: UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20),
-            maxZoom: nil,
-            offset: nil
-        )
-        
-        // 3. 카메라 이동(애니메이션 x)
-        self.mapView.camera.ease (
-            to: camera!,
-            duration: 0
-        ) { _ in
-            completion?()
-        }
-    }
-    
-    // 스냅샵 생성후 저장
-    private func takeSnapshotAndProceed() {
-        // 맵뷰의 렌더링이 정확히 끝나는 시점을 알기위해 스냅셔터 completion 이용
-        // 이미지 캡쳐는 UIKit 내장기능 이용
-        snapshotter.start { _ in
-            
-        } completion: { _ in
-            if let image = UIImage.imageFromView(view: self.mapView) {
-                self.trackingViewModel.snapshot = image
-                self.router.push(.runningResult(self.trackingViewModel))
-            }
-        }
-    }
 }
 
 // MARK: - Objc-C Methods
@@ -501,9 +453,7 @@ extension TrackingModeMapViewController {
     
     // 중지버튼 롱프레스
     @objc func stopButtonLongPressed() {
-        cameraMoveBeforeCapture {
-            self.takeSnapshotAndProceed()
-        }
+        router.push(.runningResult(trackingViewModel))
     }
 }
 

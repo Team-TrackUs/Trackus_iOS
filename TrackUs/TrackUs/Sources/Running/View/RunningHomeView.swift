@@ -74,11 +74,6 @@ extension RunningHomeView {
                     
                     // 내주변 러닝메이트
                     runningAroundMe
-                    
-//                    // 러닝 리포트 확인하기
-//                    GraphicTextCard(title: "러닝 리포트 확인하기", subTitle: "러닝 거리, 통계, 달성 기록을 확인할 수 있습니다.", resource: .clipboard)
-//                        .modifier(BorderLineModifier())
-//                        .padding(.horizontal, 16)
                 }
             } onChanged: { gestureValue in
                 let newDeltaY = gestureValue.translation.height
@@ -124,14 +119,14 @@ extension RunningHomeView {
             HStack {
                 KFImage(URL(string: authViewModel.userInfo.profileImageUrl ?? ""))
                     .placeholder({ProgressView()})
-                    .onFailureImage(KFCrossPlatformImage(named: "ProfileDefault"))
+                    .onFailureImage(KFCrossPlatformImage(named: "profile_img"))
                     .resizable()
                     .scaledToFill()
                     .frame(width: 48, height: 48)
                     .clipShape(Circle())
                 
                 VStack(alignment: .leading) {
-                    Text("\(authViewModel.userInfo.username)님!")
+                    Text("\(authViewModel.userInfo.username.subString(count: 10))님!")
                         .customFontStyle(.gray1_B16)
                     
                     Text(cheeringPhrase)
@@ -178,7 +173,7 @@ extension RunningHomeView {
     var runningAroundMe: some View {
         VStack(spacing: 16) {
             HStack {
-                Image(.smallFire)
+                Image(.fire3DImg)
                     .resizable()
                     .frame(width: 38, height: 38)
                 
@@ -250,7 +245,7 @@ extension RunningHomeView {
                         }
                     }
         }, label: {
-            Image(.locationButton)
+            Image(.locationIcon)
         })
     }
 }

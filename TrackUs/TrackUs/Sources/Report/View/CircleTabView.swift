@@ -29,7 +29,7 @@ struct CircleTabView: View {
                 Button {
                     isPickerPresented.toggle()
                 } label: {
-                    Image("Calendar")
+                    Image(.calendarIcon)
                     
                 }
                 .padding()

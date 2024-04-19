@@ -66,7 +66,7 @@ final class CourseDrawingMapViewController: UIViewController, GestureManagerDele
     private lazy var deleteButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setImage(UIImage(named: "trash"), for: .normal)
+        button.setImage(UIImage(named: "trash_icon"), for: .normal)
         button.addTarget(self, action: #selector(deleteButtonTapped), for: .touchUpInside)
         return button
     }()
@@ -74,7 +74,7 @@ final class CourseDrawingMapViewController: UIViewController, GestureManagerDele
     private lazy var revertButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setImage(UIImage(named: "revert"), for: .normal)
+        button.setImage(UIImage(named: "revert_icon"), for: .normal)
         button.addTarget(self, action: #selector(revertButtonTapped), for: .touchUpInside)
         return button
     }()

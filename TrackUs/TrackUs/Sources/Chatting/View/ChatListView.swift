@@ -150,7 +150,7 @@ struct ProfileImage: View {
                 .frame(width: size, height: size)
                 .clipShape(Circle())
         }else {
-            Image(.profileDefault)
+            Image(.profileImg)
                 .resizable()
                 .frame(width: size, height: size)
                 .clipShape(Circle())

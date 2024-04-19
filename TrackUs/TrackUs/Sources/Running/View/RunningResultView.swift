@@ -13,9 +13,11 @@ struct RunningResultView: View {
     @ObservedObject var trackingViewModel: TrackingViewModel
     @ObservedObject private var settingViewModel = SettingPopupViewModel()
     private let exerciseManager: ExerciseManager!
+    private let mapView: MapboxMapView
     
     @State private var showingPopup = false
     @State private var showingAlert = false
+    @State private var number = 0
     
     init(trackingViewModel: TrackingViewModel, settingViewModel: SettingPopupViewModel = SettingPopupViewModel(), showingPopup: Bool = false, showingAlert: Bool = false) {
         
@@ -23,11 +25,16 @@ struct RunningResultView: View {
         self.settingViewModel = settingViewModel
         self.showingPopup = showingPopup
         self.showingAlert = showingAlert
+        
         self.exerciseManager = ExerciseManager(
             distance: trackingViewModel.distance,
             target: trackingViewModel.goalDistance,
             elapsedTime: trackingViewModel.elapsedTime
         )
+        
+        self.mapView = MapboxMapView(
+            coordinates: trackingViewModel.coordinates,
+            trackingViewModel: trackingViewModel)
     }
 }
 
@@ -35,13 +42,11 @@ extension RunningResultView {
     
     var body: some View {
         VStack {
-            PathPreviewMap(
-                coordinates: trackingViewModel.coordinates
-            )
+            mapView
             
             VStack {
                 VStack(spacing: 20) {
-                    
+                    Text("\(number)")
                     RoundedRectangle(cornerRadius: 27)
                         .fill(.indicator)
                         .frame(
@@ -57,7 +62,7 @@ extension RunningResultView {
                             .customFontStyle(.gray1_R16)
                         
                         HStack {
-                            Image(.distance)
+                            Image(.distanceIcon)
                             VStack(alignment: .leading) {
                                 Text("킬로미터")
                                 Text(exerciseManager.compareKilometers)
@@ -69,7 +74,7 @@ extension RunningResultView {
                         }
                         
                         HStack {
-                            Image(.fire)
+                            Image(.fireIcon)
                             VStack(alignment: .leading) {
                                 Text("소모 칼로리")
                                 Text(exerciseManager.compareCalories)
@@ -81,7 +86,7 @@ extension RunningResultView {
                         }
                         
                         HStack {
-                            Image(.time)
+                            Image(.timeImg)
                             VStack(alignment: .leading) {
                                 Text("러닝 타임")
                                 Text(exerciseManager.compareEstimatedTime)
@@ -93,7 +98,7 @@ extension RunningResultView {
                         }
                         
                         HStack {
-                            Image(.pace)
+                            Image(.paceIcon)
                             VStack(alignment: .leading) {
                                 Text("페이스")
                                 Text(trackingViewModel.pace.asString(unit: .pace))
@@ -158,6 +163,7 @@ extension RunningResultView {
             SaveDataPopup(showingPopup: $showingPopup, title: $trackingViewModel.title) {
                     self.hideKeyboard()
                     self.showingPopup = false
+                
                     trackingViewModel.addRecord { result in
                         switch result {
                         case .success(let _):
