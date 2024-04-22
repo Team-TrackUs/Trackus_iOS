@@ -17,6 +17,7 @@ struct CourseDetailView: View {
         
         case edit = "수정"
         case delete = "삭제"
+        case block = "차단"
     }
     
     private let authViewModel = AuthenticationViewModel.shared
@@ -52,7 +53,7 @@ struct CourseDetailView: View {
                     RunningStats(
                         estimatedTime: courseViewModel.course.estimatedTime,
                         calories: courseViewModel.course.estimatedCalorie,
-                        distance: courseViewModel.course.coordinates.caculateTotalDistance()
+                        distance: courseViewModel.course.coordinates.totalDistance
                     )
                         .padding(.top, 20)
                         .padding(.horizontal, 16)
@@ -92,7 +93,7 @@ struct CourseDetailView: View {
             NavigationBackButton()
         } right: {
             VStack {
-               if isOwner { editMenu }
+            editMenu
             }
         }
         .alert(isPresented: $showingAlert) {
@@ -170,18 +171,21 @@ extension CourseDetailView {
     var editMenu: some View {
         Menu {
             ForEach(MenuValue.allCases) { menu in
-                let role: ButtonRole = menu == .delete ? .destructive : .cancel
-                Button(role: role) {
-                    switch menu {
-                    case .delete:
-                        deleteButtonTapped()
-                    case .edit:
-                        editButtonTapped()
-                    }
-               } label: {
-                   Text(menu.rawValue)
-                      
-               }
+                if menu == .edit && isOwner {
+                    Button(action: editButtonTapped, label: {
+                        Text(menu.rawValue)
+                    })
+                }
+                if menu == .delete && isOwner {
+                    Button(role: .destructive,action: deleteButtonTapped, label: {
+                        Text(menu.rawValue)
+                    })
+                }
+                if menu == .block && !isOwner {
+                    Button(role: .destructive, action: blockButtonTapped, label: {
+                        Text(menu.rawValue)
+                    })
+                }
            }
         } label: {
             Image(systemName: "ellipsis")
@@ -198,5 +202,9 @@ extension CourseDetailView {
     
     func deleteButtonTapped() {
         showingAlert = true
+    }
+    
+    func blockButtonTapped() {
+        
     }
 }

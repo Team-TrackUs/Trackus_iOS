@@ -64,8 +64,10 @@ struct PlaceholderTextView: UIViewRepresentable {
 }
 
 struct Withdrawal: View {
-    @StateObject var authViewModel = AuthenticationViewModel.shared
     @EnvironmentObject var router: Router
+    @StateObject var courseListViewModel = CourseListViewModel()
+    
+    @StateObject var authViewModel = AuthenticationViewModel.shared
     @State private var reason: String = ""
     @State private var isAgreed: Bool = false
     @State private var showWithdrawalAlert: Bool = false
@@ -207,6 +209,8 @@ struct Withdrawal: View {
     func withdrawalButtonTapped() {
         Task {
             let isDeleted = await authViewModel.deleteAccount(withReason: reason)
+            await courseListViewModel.deleteUserWithUID(authViewModel.userInfo.uid)
+            
             if isDeleted {
                 router.popToRoot()
             }

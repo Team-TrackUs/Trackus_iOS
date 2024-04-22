@@ -22,7 +22,6 @@ struct ProfileEditView: View {
     @State private var age: Double?
     @State private var gender: Bool?
     @State private var isProfilePublic: Bool = false
-    @StateObject var settingPopupViewModel = SettingPopupViewModel()
 
     @State private var heightPickerPresented: Bool = false
     @State private var weightPickerPresented: Bool = false

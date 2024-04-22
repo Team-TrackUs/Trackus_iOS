@@ -7,72 +7,75 @@
 
 import SwiftUI
 
-// MARK: - PAGE
-enum Page: Hashable, Identifiable {
-    // Root
-    case running
-    case chat
-    case report
-    case profile
-    // Profile
-    case profileEdit
-    case runningRecorded
-    case faq
-    case setting
-    case withDrawal
-    // Home
-    case runningSelect(CourseListViewModel, UserSearchViewModel)
-    case runningStart(TrackingViewModel)
-    case runningResult(TrackingViewModel)
-    case courseDrawing
-    case courseDetail(CourseViewModel)
-    case courseRegister(CourseViewModel)
-    // Chat
-    case chatting(ChatViewModel)
-    // Report
-    case recordDetail(Runninglog)
-    // UserProfileView
-    case userProfile(String)
-    case userReport(String)
-}
 
-extension Page {
-    static func == (lhs: Page, rhs: Page) -> Bool {
-        return lhs.hashValue == rhs.hashValue
-    }
-    
-    var id: String {
-        String(describing: self)
-    }
-}
-
-// MARK: - FULL SCREEN
-enum FullScreenCover: String, Identifiable {
-    case payment
-    
-    var id: String {
-        self.rawValue
-    }
-}
-
-// MARK: - SHEET
-enum Sheet: Hashable, Identifiable {
-    static func == (lhs: Sheet, rhs: Sheet) -> Bool {
-        return lhs.hashValue == rhs.hashValue
-    }
-    
-    case webView(url: String)
-    
-    var id: String {
-        String(describing: self)
-    }
-}
 
 enum Tab {
-    case running, recruitment, chat, report, profile
+    case running, chat, report, profile
+    var tabName: String {
+        switch self {
+        case .chat:
+            "채팅"
+        case .profile:
+            "프로필"
+        case .report:
+            "리포트"
+        case .running:
+            "러닝"
+        }
+    }
 }
 
 final class Router: ObservableObject {
+    // MARK: - PAGE
+    enum Page: Hashable {
+        // Root
+        case running
+        case chat
+        case report
+        case profile
+        // Profile
+        case profileEdit
+        case runningRecorded
+        case faq
+        case setting
+        case withDrawal
+        // Home
+        case runningSelect(CourseListViewModel, UserSearchViewModel)
+        case runningStart(RunActivityViewModel)
+        case runningResult(RunActivityViewModel)
+        case courseDrawing
+        case courseDetail(CourseViewModel)
+        case courseRegister(CourseViewModel)
+        // Chat
+        case chatting(ChatViewModel)
+        // Report
+        case recordDetail(Runninglog)
+        // UserProfileView
+        case userProfile(String)
+        case userReport(String)
+    }
+
+    // MARK: - FULL SCREEN
+    enum FullScreenCover: String, Identifiable {
+        case payment
+        
+        var id: String {
+            self.rawValue
+        }
+    }
+
+    // MARK: - SHEET
+    enum Sheet: Hashable, Identifiable {
+        static func == (lhs: Sheet, rhs: Sheet) -> Bool {
+            return lhs.hashValue == rhs.hashValue
+        }
+        
+        case webView(url: String)
+        
+        var id: String {
+            String(describing: self)
+        }
+    }
     
     @Published var path = NavigationPath()
     @Published var selectedIndex: Tab = .running
@@ -90,32 +93,37 @@ final class Router: ObservableObject {
         path.append(page)
     }
     
+    @MainActor
     func pop() {
         if path.count != 0 {
             path.removeLast()
         }
     }
     
+    @MainActor
     func popToRoot() {
         path.removeLast(path.count)
     }
     
+    @MainActor
     func present(sheet: Sheet) {
         self.sheet = sheet
     }
     
+    @MainActor
     func present(fullScreenCover: FullScreenCover) {
         self.fullScreenCover = fullScreenCover
     }
     
+    @MainActor
     func dismissSheet() {
         self.sheet = nil
     }
     
+    @MainActor
     func dismissFullScreenCover() {
         self.fullScreenCover = nil
     }
-    
     
     @ViewBuilder
     func buildScreen(page: Page) -> some View {
@@ -146,10 +154,10 @@ final class Router: ObservableObject {
             Withdrawal()
         case .runningSelect(let courseListViewModel, let userSearchViewModel):
             RunningSelectView(courseListViewModel: courseListViewModel, userSearchViewModel: userSearchViewModel)
-        case .runningStart(let trackingViewModel):
-            RunningStartView(trackingViewModel: trackingViewModel)
-        case .runningResult(let trackingViewModel):
-            RunningResultView(trackingViewModel: trackingViewModel)
+        case .runningStart(let runViewModel):
+            RunningStartView(runViewModel: runViewModel)
+        case .runningResult(let runViewModel):
+            RunningResultView(runViewModel: runViewModel)
         case .recordDetail(let myRecord):
             MyRecordDetailView(runningLog: myRecord)
         case .userProfile(let userId):
@@ -178,8 +186,17 @@ final class Router: ObservableObject {
     }
 }
 
-extension Page {
+extension Router.Page {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
+    
+    static func == (lhs: Router.Page, rhs: Router.Page) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+    
+    var id: String {
+        String(describing: self)
+    }
 }
+

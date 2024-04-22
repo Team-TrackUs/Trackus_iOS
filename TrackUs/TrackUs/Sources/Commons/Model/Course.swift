@@ -47,6 +47,7 @@ struct Course: Codable, Hashable {
     var isEdit = false
     
     /// 데이터생성(데이터전송용)
+    /// 
     static func createObject() -> Course {
         Course(
             uid: UUID().uuidString,

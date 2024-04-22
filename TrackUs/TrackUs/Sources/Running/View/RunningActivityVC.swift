@@ -18,38 +18,35 @@ import MapboxMaps
 /**
  라이브트래킹 맵뷰
  */
-struct TrackingModeMapView: UIViewControllerRepresentable {
-    @ObservedObject var router: Router
-    @ObservedObject var trackingViewModel: TrackingViewModel
+struct RunningActivityVCHosting: UIViewControllerRepresentable {
+    @EnvironmentObject var router: Router
+    public var runViewModel: RunActivityViewModel
     
     func makeUIViewController(context: Context) -> UIViewController {
-        return TrackingModeMapViewController(
+        return RunningActivityVC(
             router: router,
-            trackingViewModel: trackingViewModel
-        )
+            runViewModel: runViewModel)
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
     }
     
-    func makeCoordinator() -> TrackingModeMapViewController {
-        return TrackingModeMapViewController(
+    func makeCoordinator() -> RunningActivityVC {
+        return RunningActivityVC(
             router: router,
-            trackingViewModel: trackingViewModel
-        )
+            runViewModel: runViewModel)
     }
 }
 
 
-final class TrackingModeMapViewController: UIViewController, GestureManagerDelegate {
+final class RunningActivityVC: UIViewController, GestureManagerDelegate {
     private let router: Router
+    private let runViewModel: RunActivityViewModel!
     private var mapView: MapView!
-    private let locationManager = LocationManager.shared
-    private let trackingViewModel: TrackingViewModel
+    private let locationService = LocationService.shared
     private var locationTrackingCancellation: AnyCancelable?
     private var cancellation = Set<AnyCancelable>()
     private var puckConfiguration = Puck2DConfiguration.makeDefault(showBearing: true)
-    
     
     // UI
     private let buttonWidth = 86.0
@@ -57,6 +54,7 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
     private lazy var pauseButton: UIButton = {
         let button = makeCircleButton(systemImageName: "pause.fill")
         button.addTarget(self, action: #selector(pauseButtonTapped), for: .touchUpInside)
+        button.isHidden = true
         return button
     }()
     
@@ -72,7 +70,6 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(stopButtonLongPressed))
         button.addGestureRecognizer(tapGesture)
         button.addGestureRecognizer(longPressGesture)
-        button.addTarget(self, action: #selector(pauseButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -138,10 +135,10 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
         let label = UILabel()
         label.text = "0.0km"
         label.textColor = .gray1
-        if let descriptor = UIFont.systemFont(ofSize: 20.0, weight: .bold).fontDescriptor.withSymbolicTraits([.traitBold, .traitItalic]) {
+        if let descriptor = UIFont.systemFont(ofSize: 16.0, weight: .bold).fontDescriptor.withSymbolicTraits([.traitBold, .traitItalic]) {
             label.font = UIFont(descriptor: descriptor, size: 0)
         } else {
-            label.font = UIFont.systemFont(ofSize: 20.0, weight: .bold)
+            label.font = UIFont.systemFont(ofSize: 16.0, weight: .bold)
         }
         return label
     }()
@@ -169,7 +166,7 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
     }()
     
     private lazy var paceLabel: UILabel = {
-        let label = makeBigTextLabel(text: "-'--''")
+        let label = makeBigTextLabel(text: "_'__''")
         return label
     }()
     
@@ -178,9 +175,9 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
         return label
     }()
     
-    init(router: Router, trackingViewModel: TrackingViewModel) {
+    init(router: Router, runViewModel: RunActivityViewModel) {
         self.router = router
-        self.trackingViewModel = trackingViewModel
+        self.runViewModel = runViewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -193,7 +190,7 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
         setupCamera()
         setupUI()
         bind()
-        trackingViewModel.initTimer()
+        runViewModel.start()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -215,34 +212,33 @@ final class TrackingModeMapViewController: UIViewController, GestureManagerDeleg
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-           super.viewWillDisappear(true)
-           
-           NotificationCenter.default.removeObserver(self)
-       }
+        super.viewWillDisappear(true)
+        NotificationCenter.default.removeObserver(self)
+    }
 }
 
 // MARK: - BackgroundTask 관련
-extension TrackingModeMapViewController: CLLocationManagerDelegate {
+extension RunningActivityVC: CLLocationManagerDelegate {
     // 위치업데이트
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else {
             return
         }
         
-        self.trackingViewModel.addPath(with: location.asCLLocationCoordinate2D())
+        self.runViewModel.addPath(withCoordinate: location.asCLLocationCoordinate2D)
     }
     
     @objc func enterBackground() {
-        locationManager.locationManager.delegate = self
+        locationService.locationManager.delegate = self
     }
     
     @objc func enterForeground() {
-        locationManager.locationManager.delegate = nil
+        locationService.locationManager.delegate = nil
     }
 }
 
 // MARK: - Setup UI
-extension TrackingModeMapViewController {
+extension RunningActivityVC {
     /// UI 설정
     private func setupUI() {
         // setup UI
@@ -327,11 +323,11 @@ extension TrackingModeMapViewController {
 }
 
 // MARK: - Interaction with combine
-extension TrackingModeMapViewController {
+extension RunningActivityVC {
     /// 맵뷰 설정 & 초기 카메라 셋팅
     private func setupCamera() {
         /// 초기위치 및 카메라
-        guard let location = locationManager.currentLocation?.coordinate else { return }
+        guard let location = locationService.currentLocation?.coordinate else { return }
         
         let cameraOptions = CameraOptions(center: CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude), zoom: 16)
         let options = MapInitOptions(cameraOptions: cameraOptions)
@@ -348,117 +344,122 @@ extension TrackingModeMapViewController {
         self.mapView.location.options.puckType = .puck2D(puckConfiguration)
     }
     
-    
-    
     // 뷰에 갱신될 값들을 바인딩
     private func bind() {
-        self.trackingViewModel.$count.receive(on: DispatchQueue.main).sink { [weak self] count in
-            guard let self = self else { return }
-            self.countLabel.text = "\(count)"
-            if count == 0 { updatedOnStart() }
+        runViewModel.$count.receive(on: DispatchQueue.main).sink { [weak self] count in
+            self?.countLabel.text = "\(count)"
+            if count == 0 {
+                self?.updatedOnStart()
+            }
         }.store(in: &cancellation)
         
-        
-        self.trackingViewModel.$isPause.receive(on: DispatchQueue.main).sink { [weak self] isPause in
+        // 운동시간
+        runViewModel.$seconds.receive(on: DispatchQueue.main).sink { [weak self] seconds in
             guard let self = self else { return }
-            isPause ? self.updatedOnPause() : self.updatedOnPlay()
+            self.timeLabel.text = seconds.asString(style: .positional)
         }.store(in: &cancellation)
         
-        self.trackingViewModel.$distance.receive(on: DispatchQueue.main).sink { [weak self] distance in
+        // 이동거리
+        runViewModel.$distance.receive(on: DispatchQueue.main).sink { [weak self] distance in
             guard let self = self else { return }
             
-            self.kilometerLabel.text = "\(distance.asString(unit: .kilometer))/\(trackingViewModel.goalDistance.asString(unit: .kilometer))"
+            self.kilometerLabel.text = "\(distance.asString(unit: .kilometer)) / \(runViewModel.target.asString(unit: .kilometer))"
         }.store(in: &cancellation)
         
-        self.trackingViewModel.$elapsedTime.receive(on: DispatchQueue.main).receive(on: DispatchQueue.main).sink { [weak self] time in
-            guard let self = self else { return }
-            self.timeLabel.text = time.asString(style: .positional)
-        }.store(in: &cancellation)
-        
-        self.trackingViewModel.$calorie.receive(on: DispatchQueue.main).sink { [weak self] calorie in
+        // 칼로리
+        runViewModel.$calorie.receive(on: DispatchQueue.main).sink { [weak self] calorie in
             guard let self = self else { return }
             self.calorieLable.text = String(format: "%.1f", calorie)
         }.store(in: &cancellation)
         
-        self.trackingViewModel.$pace.receive(on: DispatchQueue.main).sink { [weak self] pace in
+        // 페이스
+        runViewModel.$pace.receive(on: DispatchQueue.main).sink { [weak self] pace in
             guard let self = self else { return }
             self.paceLabel.text = pace.asString(unit: .pace)
+            
         }.store(in: &cancellation)
     }
     
     // 카운트다운 종료시
     private func updatedOnStart() {
-        self.countLabel.removeFromSuperview()
-        self.countTextLabel.removeFromSuperview()
-        self.overlayView.isHidden = true
         self.roundedVStackView.isHidden = false
         self.circleHStackView.isHidden = false
-        self.trackingViewModel.startRecord()
+        self.overlayView.isHidden = true
+        self.countLabel.isHidden = true
+        self.countTextLabel.isHidden = true
+        self.pauseButton.isHidden = false
+        self.runViewModel.play()
+        self.startTracking()
     }
     
     // 일시중지 됬을때
     private func updatedOnPause() {
-        self.stopTracking()
+        self.buttonStackView.isHidden = false
         self.overlayView.isHidden = false
         self.pauseButton.isHidden = true
-        if trackingViewModel.count == 0 {
-            self.buttonStackView.isHidden = false
-        }
+        self.runViewModel.stop()
+        self.stopTracking()
     }
     
     // 기록중일떄
     private func updatedOnPlay() {
-        self.startTracking()
-        self.overlayView.isHidden = true
         self.buttonStackView.isHidden = true
+        self.overlayView.isHidden = true
         self.pauseButton.isHidden = false
+        self.runViewModel.play()
+        self.startTracking()
     }
     
-    // 트래킹 시작
+    // 위치받아오기 시작
     private func startTracking() {
         // 맵뷰에서 컴바인 형식으로 새로운 위치를 받아옴(사용자가 이동할떄마다 값을 방출)
         locationTrackingCancellation = mapView.location.onLocationChange.observe { [weak mapView] newLocation in
             // 새로받아온 위치
             guard let location = newLocation.last, let mapView else { return }
             
-            self.trackingViewModel.addPath(with: location.coordinate)
+            self.runViewModel.addPath(withCoordinate: location.coordinate)
+            
             mapView.camera.ease(
                 to: CameraOptions(center: location.coordinate, zoom: 15),
                 duration: 1.3)
         }
     }
     
-    // 트래킹 종료
+    // 위치받아오기 종료
     private func stopTracking() {
         locationTrackingCancellation?.cancel()
     }
 }
 
-// MARK: - Objc-C Methods
-extension TrackingModeMapViewController {
+// MARK: - 버튼동작 관련
+extension RunningActivityVC {
     // 일시중지 버튼이 눌렸을때
     @objc func pauseButtonTapped() {
-        self.trackingViewModel.stopRecord()
+        updatedOnPause()
     }
     
     // 플레이 버튼이 눌렸을때
     @objc func playButtonTapped() {
-        self.trackingViewModel.startRecord()
+        updatedOnPlay()
     }
     
     // 중지 버튼이 눌렸을때
     @objc func stopButtonTapped() {
-        
+        self.showToast(message: "종료 버튼을 2초간 탭하면 운동이 종료됩니다.")
     }
     
     // 중지버튼 롱프레스
-    @objc func stopButtonLongPressed() {
-        router.push(.runningResult(trackingViewModel))
+    @objc func stopButtonLongPressed(_ recognizer: UILongPressGestureRecognizer) {
+        if recognizer.state == .began {
+            self.stopTracking()
+            self.runViewModel.stop()
+            self.router.push(.runningResult(runViewModel))
+        }
     }
 }
 
 // MARK: - UI Generator
-extension TrackingModeMapViewController {
+extension RunningActivityVC {
     
     private func makeCircleStackView() -> UIStackView {
         let circleDiameter: CGFloat = 98.0
@@ -508,5 +509,23 @@ extension TrackingModeMapViewController {
             label.font = UIFont.systemFont(ofSize: 20.0, weight: .bold)
         }
         return label
+    }
+    
+    func showToast(message : String, font: UIFont = UIFont.systemFont(ofSize: 14.0)) {
+        let toastLabel = UILabel(frame: CGRect(x: self.view.frame.size.width/2 - 135, y: self.view.frame.size.height-230, width: 270, height: 45))
+        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.6)
+        toastLabel.textColor = UIColor.white
+        toastLabel.font = font
+        toastLabel.textAlignment = .center;
+        toastLabel.text = message
+        toastLabel.alpha = 1.0
+        toastLabel.layer.cornerRadius = 10;
+        toastLabel.clipsToBounds  =  true
+        self.view.addSubview(toastLabel)
+        UIView.animate(withDuration: 4.0, delay: 0.1, options: .curveEaseOut, animations: {
+            toastLabel.alpha = 0.0
+        }, completion: {(isCompleted) in
+            toastLabel.removeFromSuperview()
+        })
     }
 }

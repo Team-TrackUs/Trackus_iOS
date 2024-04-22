@@ -52,7 +52,7 @@ struct RunningCell: View {
                             .frame(width: 24, height: 24)
                             .clipShape(Circle())
                         
-                        Text(user.username)
+                        Text(user.username.subString(count: 5))
                             .customFontStyle(.gray2_L12)
                             .padding(.leading, 4)
                         Image(.crownIcon)

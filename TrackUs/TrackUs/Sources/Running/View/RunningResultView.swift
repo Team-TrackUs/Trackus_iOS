@@ -6,47 +6,36 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct RunningResultView: View {
     @EnvironmentObject var router: Router
-    
-    @ObservedObject var trackingViewModel: TrackingViewModel
-    @ObservedObject private var settingViewModel = SettingPopupViewModel()
-    private let exerciseManager: ExerciseManager!
-    private let mapView: MapboxMapView
-    
-    @State private var showingPopup = false
+    @ObservedObject var runViewModel: RunActivityViewModel
+    private let workoutService: WorkoutService
+    @State private var showingModal = false
     @State private var showingAlert = false
-    @State private var number = 0
     
-    init(trackingViewModel: TrackingViewModel, settingViewModel: SettingPopupViewModel = SettingPopupViewModel(), showingPopup: Bool = false, showingAlert: Bool = false) {
-        
-        self.trackingViewModel = trackingViewModel
-        self.settingViewModel = settingViewModel
-        self.showingPopup = showingPopup
-        self.showingAlert = showingAlert
-        
-        self.exerciseManager = ExerciseManager(
-            distance: trackingViewModel.distance,
-            target: trackingViewModel.goalDistance,
-            elapsedTime: trackingViewModel.elapsedTime
-        )
-        
-        self.mapView = MapboxMapView(
-            coordinates: trackingViewModel.coordinates,
-            trackingViewModel: trackingViewModel)
+    init(runViewModel: RunActivityViewModel) {
+        self.runViewModel = runViewModel
+        self.workoutService = WorkoutService(
+            isGroup: runViewModel.isGroup,
+            measuringDistance: runViewModel.distance,
+            measuringMomentum: runViewModel.calorie,
+            measurementTime: runViewModel.seconds,
+            targetDistance: runViewModel.target)
     }
 }
 
 extension RunningResultView {
-    
     var body: some View {
         VStack {
-            mapView
+            MainMapVCHosting(coordinates: runViewModel.coordinates) { snapshot in
+                runViewModel.addSnapshot(withImage: snapshot)
+            }
+            .offset(y: -10)
             
             VStack {
                 VStack(spacing: 20) {
-                    Text("\(number)")
                     RoundedRectangle(cornerRadius: 27)
                         .fill(.indicator)
                         .frame(
@@ -65,11 +54,11 @@ extension RunningResultView {
                             Image(.distanceIcon)
                             VStack(alignment: .leading) {
                                 Text("킬로미터")
-                                Text(exerciseManager.compareKilometers)
+                                Text(workoutService.distanceCompString)
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
-                            Text(exerciseManager.compareKilometersLabel)
+                            Text(workoutService.workoutSummary.distance)
                                 .customFontStyle(.gray1_R12)
                         }
                         
@@ -77,11 +66,11 @@ extension RunningResultView {
                             Image(.fireIcon)
                             VStack(alignment: .leading) {
                                 Text("소모 칼로리")
-                                Text(exerciseManager.compareCalories)
+                                Text(workoutService.calorieCompString)
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
-                            Text(exerciseManager.compareCaloriesLabel)
+                            Text(workoutService.workoutSummary.caclorie)
                                 .customFontStyle(.gray1_R12)
                         }
                         
@@ -89,11 +78,11 @@ extension RunningResultView {
                             Image(.timeImg)
                             VStack(alignment: .leading) {
                                 Text("러닝 타임")
-                                Text(exerciseManager.compareEstimatedTime)
+                                Text(workoutService.timeCompString)
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
-                            Text(exerciseManager.compareEstimatedTimeLabel)
+                            Text(workoutService.workoutSummary.time)
                                 .customFontStyle(.gray1_R12)
                         }
                         
@@ -101,7 +90,7 @@ extension RunningResultView {
                             Image(.paceIcon)
                             VStack(alignment: .leading) {
                                 Text("페이스")
-                                Text(trackingViewModel.pace.asString(unit: .pace))
+                                Text("\(runViewModel.pace.asString(unit: .pace))")
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
@@ -111,7 +100,7 @@ extension RunningResultView {
                     }
                     
                     HStack {
-                        Text(exerciseManager.feedbackMessageLabel)
+                        Text(workoutService.workoutSummary.review)
                             .customFontStyle(.gray1_R14)
                             .multilineTextAlignment(.leading)
                             .lineLimit(3)
@@ -125,9 +114,8 @@ extension RunningResultView {
                         }
                         
                         MainButton(active: true, buttonText: "러닝 기록 저장", buttonColor: .main, minHeight: 45) {
-                            showingPopup = true
+                            showingModal = true
                         }
-                        
                     }
                 }
                 .padding(20)
@@ -159,21 +147,23 @@ extension RunningResultView {
                 )
             )
         }
-        .popup(isPresented: $showingPopup) {
-            SaveDataPopup(showingPopup: $showingPopup, title: $trackingViewModel.title) {
-                    self.hideKeyboard()
-                    self.showingPopup = false
+        .popup(isPresented: $showingModal) {
+            
+            SaveDataModal(text: $runViewModel.title) {
+                showingModal = false
                 
-                    trackingViewModel.addRecord { result in
-                        switch result {
-                        case .success(let _):
-                            router.popToRoot()
-                        case .failure(let error):
-                            print(error.errorMessage)
-                        }
+                Task {
+                    do {
+                        try await runViewModel.saveRunDataToFirestore()
+                    } catch {
+                        
                     }
-                
+                }
+            } cancle: {
+                self.showingModal = false
             }
+
+            
         } customize: {
             $0
                 .backgroundColor(.black.opacity(0.3))
@@ -184,12 +174,71 @@ extension RunningResultView {
         .navigationBarHidden(true)
         .edgesIgnoringSafeArea(.top)
         .ignoresSafeArea(.keyboard)
-        .presentLoadingView(status: trackingViewModel.isLoading)
         .preventGesture()
     }
 }
 
 
+struct SaveDataModal: View {
+    @FocusState private var titleTextFieldFocused: Bool
+    @Binding var text: String
+    let action: () -> ()
+    let cancle: () -> ()
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("러닝 기록 저장")
+                    .customFontStyle(.gray1_B16)
+                
+                Text("러닝기록 저장을 위해\n러닝의 이름을 설정해주세요.")
+                    .customFontStyle(.gray1_R14)
+                    .padding(.top, 8)
+                
+                VStack {
+                    TextField("저장할 러닝 이름을 입력해주세요.", text: $text)
+                        .customFontStyle(.gray1_R12)
+                        .padding(8)
+                        .frame(height: 32)
+                        .textFieldStyle(PlainTextFieldStyle())
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(titleTextFieldFocused ? .main : .gray2))
+                        .focused($titleTextFieldFocused)
+                }
+                .padding(.top, 16)
+                
+                HStack {
+                    Spacer()
+                    Button(action: cancle, label: {
+                        Text("취소")
+                            .customFontStyle(.main_R16)
+                            .frame(minHeight: 40)
+                            .padding(.horizontal, 20)
+                            .overlay(Capsule().stroke(.main))
+                    })
+                    
+                    Spacer()
+                    
+                    Button(action: action, label: {
+                        Text("확인")
+                            .customFontStyle(.white_B16)
+                            .frame(minHeight: 40)
+                            .padding(.horizontal, 20)
+                            .background(.main)
+                            .clipShape(Capsule())
+                    })
+                    Spacer()
+                }
+                .padding(.top, 20)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 20)
+        }
+        
+        .frame(width: 290, alignment: .leading)
+        .background(.white)
+        .cornerRadius(12)
+    }
+}
 
 
 
