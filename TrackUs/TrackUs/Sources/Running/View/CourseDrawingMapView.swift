@@ -230,7 +230,6 @@ extension CourseDrawingMapViewController {
                 courseViewModel.uiImage = image
                 router.push(.courseRegister(courseViewModel))
             }
-            
         }
     }
     

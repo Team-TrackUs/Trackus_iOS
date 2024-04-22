@@ -108,7 +108,6 @@ struct RunningSelectView: View {
                         showingPopup.toggle()
                     } else {
                         if let seletedItem = courseListViewModel.findCourseWithUID(seletedID) {
-
                             router.push(.runningStart(RunActivityViewModel(
                                 targetDistance: seletedItem.distance,
                                 groupId: seletedID))

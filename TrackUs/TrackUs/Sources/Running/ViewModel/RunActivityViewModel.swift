@@ -28,7 +28,9 @@ import HealthKit
 import MapboxMaps
 import Firebase
 
-final class RunActivityViewModel: ObservableObject, HashableObject {
+extension RunActivityViewModel: HashableObject {}
+
+final class RunActivityViewModel: ObservableObject {
     private var timer: Timer?
     private var anchorDate: Date?
     private var startDate: Date?
@@ -37,6 +39,7 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
     private var caloriesQuery: HKStatisticsCollectionQuery!
     private var runningQuery: HKObserverQuery!
     private var snapshot: UIImage?
+    
     var isGroup: Bool {
         !groupId.isEmpty
     }
@@ -210,3 +213,5 @@ final class RunActivityViewModel: ObservableObject, HashableObject {
         }
     }
 }
+
+

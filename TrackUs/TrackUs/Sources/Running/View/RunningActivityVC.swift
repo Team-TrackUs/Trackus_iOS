@@ -215,7 +215,6 @@ final class RunningActivityVC: UIViewController, GestureManagerDelegate {
         super.viewWillDisappear(true)
         NotificationCenter.default.removeObserver(self)
     }
-    
 }
 
 // MARK: - BackgroundTask 관련
@@ -225,6 +224,8 @@ extension RunningActivityVC: CLLocationManagerDelegate {
         guard let location = locations.last else {
             return
         }
+        
+        self.runViewModel.addPath(withCoordinate: location.asCLLocationCoordinate2D)
     }
     
     @objc func enterBackground() {

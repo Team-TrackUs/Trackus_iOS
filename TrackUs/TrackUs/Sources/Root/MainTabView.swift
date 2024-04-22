@@ -23,7 +23,6 @@ struct MainTabView: View {
         NavigationStack(path: $router.path) {
             ZStack{
                 TabView(selection: $router.selectedIndex) {
-                    // Sheet 애니메이션 끊김현상으로 일시적으로 VStack으로 래핑
                     VStack {
                         router.buildScreen(page: .running)
                     }

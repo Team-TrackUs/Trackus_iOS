@@ -11,11 +11,18 @@ import UIKit
 struct RunningResultView: View {
     @EnvironmentObject var router: Router
     @ObservedObject var runViewModel: RunActivityViewModel
+    private let workoutService: WorkoutService
     @State private var showingModal = false
     @State private var showingAlert = false
     
     init(runViewModel: RunActivityViewModel) {
         self.runViewModel = runViewModel
+        self.workoutService = WorkoutService(
+            isGroup: runViewModel.isGroup,
+            measuringDistance: runViewModel.distance,
+            measuringMomentum: runViewModel.calorie,
+            measurementTime: runViewModel.seconds,
+            targetDistance: runViewModel.target)
     }
 }
 
@@ -47,11 +54,11 @@ extension RunningResultView {
                             Image(.distanceIcon)
                             VStack(alignment: .leading) {
                                 Text("킬로미터")
-                                Text(runViewModel.distance.asString(unit: .kilometer))
+                                Text(workoutService.distanceCompString)
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
-                            Text("")
+                            Text(workoutService.workoutSummary.distance)
                                 .customFontStyle(.gray1_R12)
                         }
                         
@@ -59,11 +66,11 @@ extension RunningResultView {
                             Image(.fireIcon)
                             VStack(alignment: .leading) {
                                 Text("소모 칼로리")
-                                Text(runViewModel.calorie.asString(unit: .calorie))
+                                Text(workoutService.calorieCompString)
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
-                            Text("")
+                            Text(workoutService.workoutSummary.caclorie)
                                 .customFontStyle(.gray1_R12)
                         }
                         
@@ -71,11 +78,11 @@ extension RunningResultView {
                             Image(.timeImg)
                             VStack(alignment: .leading) {
                                 Text("러닝 타임")
-                                Text(runViewModel.seconds.asString(style: .positional))
+                                Text(workoutService.timeCompString)
                                     .customFontStyle(.gray1_R14)
                             }
                             Spacer()
-                            Text("")
+                            Text(workoutService.workoutSummary.time)
                                 .customFontStyle(.gray1_R12)
                         }
                         
@@ -93,7 +100,7 @@ extension RunningResultView {
                     }
                     
                     HStack {
-                        Text("")
+                        Text(workoutService.workoutSummary.review)
                             .customFontStyle(.gray1_R14)
                             .multilineTextAlignment(.leading)
                             .lineLimit(3)
@@ -109,7 +116,6 @@ extension RunningResultView {
                         MainButton(active: true, buttonText: "러닝 기록 저장", buttonColor: .main, minHeight: 45) {
                             showingModal = true
                         }
-                        
                     }
                 }
                 .padding(20)
