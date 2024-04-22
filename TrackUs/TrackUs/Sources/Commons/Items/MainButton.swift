@@ -45,11 +45,11 @@ struct MainButton: View {
     
     var body: some View {
         Button(action:  {
-            isLoading = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            Task {
+                isLoading = true
                 action()
-                isLoading = false
             }
+            isLoading = false
         }) {
             HStack (spacing: 0) {
                 if isLoading {

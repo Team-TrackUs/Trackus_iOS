@@ -63,21 +63,18 @@ public struct Member: Codable, Hashable {
     var uid: String
     var userName: String
     var profileImageUrl: String?
+    var token: String
     
-    init(uid: String, userName: String, profileImageUrl: String? = nil) {
+    init(uid: String, userName: String, profileImageUrl: String? = nil, token: String) {
         self.uid = uid
         self.userName = userName
         self.profileImageUrl = profileImageUrl
+        self.token = token
     }
 }
 
 struct Message: Identifiable, Hashable {
     var id: String
-    
-//    static func == (lhs: Message, rhs: Message) -> Bool {
-//        lhs.sendMember.uid == rhs.sendMember.uid
-//    }
-    
     var timestamp: Date
     var imageUrl: String?
     var text: String?
@@ -96,7 +93,7 @@ struct Message: Identifiable, Hashable {
     }
 }
 
-
+/// Message - Firesotre 데이터 받기 타입
 public struct FirestoreMessage: Codable, Hashable {
 
     @DocumentID public var id: String?
@@ -153,3 +150,17 @@ extension DateFormatter {
     }
 }
 
+/// 메세지 맵핑용
+struct MessageMap: Hashable {
+    let message: Message
+    let sameUser: Bool
+    let sameDate: Bool
+    let sameTime: Bool
+    
+    init(message: Message, sameUser: Bool, sameDate: Bool, sameTime: Bool) {
+        self.message = message
+        self.sameUser = sameUser
+        self.sameDate = sameDate
+        self.sameTime = sameTime
+    }
+}

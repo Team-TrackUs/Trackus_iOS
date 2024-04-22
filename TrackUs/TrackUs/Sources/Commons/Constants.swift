@@ -18,6 +18,10 @@ enum Constants {
         static let OPEN_SOURCE_LICENSE_URL = "https://lizard-basketball-e41.notion.site/a57a3078e21c4821932d2189859b8bcb?pvs=4"
         static let SERVICE_REQUEST_URL = "https://forms.gle/drvCZV4kHdgZJonRA"
         static let TEAM_INTRO_URL = "https://lizard-basketball-e41.notion.site/Team-TrackUs-2d71e86df51f4bbba4b0b7a5b04ac947?pvs=4"
+        
+        static let PERSONAL_INFORMATION_PROCESSING_POLICY = "https://colorful-force-5d2.notion.site/a3c5eb465e464a4a85ec708f97e0201e?pvs=4"
+        static let TERMS_OF_LOCATION_INFORMATION_SERVICE = "https://colorful-force-5d2.notion.site/TrackUs-be971d4c799c4c12ab9e984aeafedc1d?pvs=4"
+        
     }
 
     enum FirebasePath {

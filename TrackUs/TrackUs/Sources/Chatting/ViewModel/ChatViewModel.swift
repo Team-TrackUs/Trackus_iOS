@@ -15,9 +15,6 @@ class ChatViewModel: ObservableObject {
     
     @Published var currentChatID: String
     @Published var members: [String : Member] = [:]
-    //@Published var messages: [Message] = []
-    //@Published var chatRoom: ChatRoom
-    
     @Published var messageMap: [MessageMap] = []
     
     var chatRoom: ChatRoom {
@@ -34,7 +31,6 @@ class ChatViewModel: ObservableObject {
     }
     
     var newChat: Bool = false
-    // 뭐지
     var lock = NSRecursiveLock()
     
     private let ref = FirebaseManger().firestore.collection("chatRoom")
@@ -43,14 +39,11 @@ class ChatViewModel: ObservableObject {
     init(currentChatID: String, members: [String : Member], messages: [Message], chatRoom: ChatRoom) {
         self.currentChatID = currentChatID
         self.members = members
-        //self.messages = messages
-        //self.chatRoom = chatRoom
     }
     
     /// 기존 채팅방 생성자
     init(chatRoom: ChatRoom, users: [String: Member]){
         self.currentChatID = chatRoom.id
-        //self.chatRoom = chatRoom
         self.members = chatRoom.members.reduce(into: [String: Member]()) { result, uid in
             if let member = users[uid] {
                 result[uid] = member
@@ -62,20 +55,24 @@ class ChatViewModel: ObservableObject {
     /// 1대1 채팅 생성자
     init(myInfo: UserInfo, opponentInfo: UserInfo){
         // 기존 채팅 있는지 확인
-//        self.chatRoom = ChatRoom(id: UUID().uuidString,
-//                                 title: "",
-//                                 members: [myInfo.uid, opponentInfo.uid],
-//                                 nonSelfMembers: [opponentInfo.uid],
-//                                 group: false)
         self.currentChatID = ""
         self.members = [myInfo.uid: Member(uid: myInfo.uid ,
-                                          userName: myInfo.username,
-                                          profileImageUrl: myInfo.profileImageUrl),
+                                           userName: myInfo.username,
+                                           profileImageUrl: myInfo.profileImageUrl,
+                                           token: myInfo.token),
                         opponentInfo.uid: Member(uid: opponentInfo.uid,
-                                               userName: opponentInfo.username,
-                                               profileImageUrl: opponentInfo.profileImageUrl)]
+                                                 userName: opponentInfo.username,
+                                                 profileImageUrl: opponentInfo.profileImageUrl,
+                                                 token: opponentInfo.token)]
         createChatRoom(myInfo: myInfo, opponentInfo: opponentInfo)
     }
+    
+    // notification용
+    init(chatRoomID: String){
+        self.currentChatID = chatRoomID
+        self.members = members
+    }
+    
     // 채팅방 삭제
     func deleteChatRoom(chatRoomID: String) {
         ref.document(chatRoomID).delete{ error in }
@@ -171,10 +168,6 @@ class ChatViewModel: ObservableObject {
                 
             }
     }
-    // 신규 메세지 갯수 리스너
-//    func subscribeToUnreadCount() {
-//
-//    }
     
     // 채팅방 리스너 종료 -> 이전 페이지
     
@@ -231,6 +224,7 @@ class ChatViewModel: ObservableObject {
         // 마지막 메세지 수정
         ref.document(currentChatID)
             .updateData(["latestMessage" : latestMessageData])
+        PushNotificationServiece.shared.sendPushNotificationTo(accessToken: authViewModel.accessToken, chatRoom: self.chatRoom, members: self.members, body: chatText)
     }
     
     // 사용자 메세지 확인 후 초기화 - 채팅방 들어올때
@@ -249,10 +243,7 @@ class ChatViewModel: ObservableObject {
     }
     
     // 마지막 메세지 변경
-    
 }
-
-// =========================
 
 extension ChatViewModel {
     func messageMapping(_ messages: [Message]) -> [MessageMap] {
@@ -264,25 +255,13 @@ extension ChatViewModel {
                 //let nextMessageExists = messages[$0.offset + 1] != nil
                 let prevMessageIsSameUser = $0.offset != 0 ? messages[$0.offset - 1].sendMember.uid == $0.element.sendMember.uid : false
                 let sameDate = $0.offset != 0 ? messages[$0.offset - 1].date == $0.element.date : false
+                let nextMessageIsSameUser = $0.offset != messages.count - 1 ? messages[$0.offset + 1].sendMember.uid != $0.element.sendMember.uid : true
+                let sameTime = $0.offset != messages.count - 1 && $0.offset != 0  ? messages[$0.offset + 1].time != $0.element.time : true
                 
-                return MessageMap(message: $0.element, sameUser: prevMessageIsSameUser, sameDate: sameDate)
+                return MessageMap(message: $0.element, sameUser: prevMessageIsSameUser, sameDate: sameDate, sameTime: nextMessageIsSameUser || sameTime)
             }
     }
 }
 
-struct MessageMap: Hashable {
-    let message: Message
-    let sameUser: Bool
-    let sameDate: Bool
-    
-    init(message: Message, sameUser: Bool, sameDate: Bool) {
-        self.message = message
-        self.sameUser = sameUser
-        self.sameDate = sameDate
-    }
-    
-//    func hash(into hasher: inout Hasher) {
-//        hasher.combine(message)
-//    }
-}
+
 
