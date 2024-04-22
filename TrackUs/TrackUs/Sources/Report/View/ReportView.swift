@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-//import FirebaseFirestore
 
 enum ReportTab: String, CaseIterable {
     case report = "리포트"

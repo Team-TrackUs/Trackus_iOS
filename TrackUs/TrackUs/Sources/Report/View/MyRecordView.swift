@@ -20,7 +20,6 @@ struct MyRecordView: View {
     @EnvironmentObject var router: Router
     @ObservedObject var viewModel = ReportViewModel.shared
     var vGridItems = [GridItem()]
-    @State var filterSelect : RecordFilter = .all
     @State private var calendarButton = false
     @State private var selectedFilter: RecordFilter?
     @State private var gridDelete = false
@@ -35,7 +34,6 @@ struct MyRecordView: View {
                 VStack(alignment: .leading) {
                     
                     VStack(alignment: .leading) {
-                        //                        152.asString(unit: .pace)
                         Text("러닝 기록")
                             .customFontStyle(.gray1_B24)
                             .padding(.top, 24)
@@ -84,7 +82,6 @@ struct MyRecordView: View {
                         }
                     }
                     LazyVGrid(columns: vGridItems, spacing: 0) {
-                        //                        ForEach(viewModel.runningLog, id: \.documentID) { item in
                         ForEach(filteredRunningLog, id: \.documentID) { item in
                             VStack {
                                 ZStack {
@@ -92,7 +89,7 @@ struct MyRecordView: View {
                                         selectedRunningLog = item
                                         router.push(.recordDetail(selectedRunningLog!))
                                     } label: {
-                                        RecordCell(isDelete: $isDelete, gridDelete: $gridDelete, runningLog: item, isSelected: isRecordAvailableOnDate(runningLog: item, selectedDate: selectedDate))
+                                        RecordCell(runningLog: item)
                                     }
                                     HStack(alignment: .top) {
                                         Spacer()
@@ -122,7 +119,6 @@ struct MyRecordView: View {
                                             isMenuOpen = true
                                         }
                                     }
-                                    //                                    }
                                 }
                                 
                                 Divider()
@@ -180,7 +176,6 @@ struct MyRecordView: View {
             
         }, content: {
             CustomDateFilter(selectedDate: $selectedDate, isPickerPresented: $calendarButton)
-//                .presentationDetents([.height(450)])
                 .presentationDetents([.height(390)])
                 .presentationDragIndicator(.hidden)
         })
@@ -191,36 +186,20 @@ struct MyRecordView: View {
                 if let selectedRunningLog = selectedRunningLog {
                     
                     deleteRunningLog(selectedRunningLog: selectedRunningLog)
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { // 팝업이 없어지면 화면 새로고침
-                        viewModel.fetchUserLog(selectedDate: selectedDate!)
-                    }
                 }
             }
             Button("취소", role: .cancel) {}
         } message: {
             Text("러닝 기록을 삭제하시겠습니까? \n 삭제한 러닝기록은 복구할 수 없습니다.")
         }
-        //        .refreshable {
-        //            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-        //                viewModel.fetchUserLog()
-        //            }
-        //        }
-    }
-    
-    func isRecordAvailableOnDate(runningLog: Runninglog, selectedDate: Date?) -> Bool {
-        guard let selectedDate = selectedDate else { return false }
-        let calendar = Calendar.current
-        let recordDate = calendar.startOfDay(for: runningLog.timestamp)
-        let selectedDateWithoutTime = calendar.startOfDay(for: selectedDate)
-        return recordDate == selectedDateWithoutTime
     }
     
     func deleteRunningLog(selectedRunningLog: Runninglog) {
-        print("삭제 함수 시작")
-        if let documentID = selectedRunningLog.documentID {
-            print(documentID)
+        if let documentID = selectedRunningLog.documentID,
+           let index = viewModel.runningLog.firstIndex(where: { $0.documentID == documentID }) {
             viewModel.deleteRunningLog(documentID)
+            
+            viewModel.runningLog.remove(at: index)
         }
     }
     
@@ -245,11 +224,7 @@ extension MyRecordView {
 
 //MARK: - RecordCell
 struct RecordCell: View {
-    @ObservedObject var viewModel = ReportViewModel.shared
-    @Binding var isDelete: Bool
-    @Binding var gridDelete : Bool
     let runningLog : Runninglog
-    let isSelected: Bool
     
     var body: some View {
         VStack(spacing: 5) {
@@ -284,7 +259,6 @@ struct RecordCell: View {
                         Spacer()
                     }
                     
-                    //                    Text("광명시 러닝 메이트 구합니다")
                     Text(runningLog.title ?? "러닝")
                         .lineLimit(1)
                         .customFontStyle(.gray1_B16)
@@ -292,24 +266,16 @@ struct RecordCell: View {
                     HStack(spacing: 10) {
                         HStack {
                             Image(.pinIcon)
-                            //                            Text("서울숲카페거리")
                             Text(runningLog.address ?? "대한민국 서울시")
-                            //                                .customFontStyle(.gray1_R12)
                                 .customFontStyle(.gray1_R9)
                                 .lineLimit(1)
                         }
                         
-                        //                        Spacer()
-                        
                         HStack {
                             Image(.timeIcon)
-                            //                            Text("10:02 AM")
                             Text(formatTime(runningLog.timestamp))
-                            //                                .customFontStyle(.gray1_R12)
                                 .customFontStyle(.gray1_R9)
                         }
-                        
-                        //                        Spacer()
                         
                         HStack {
                             Image(.arrowBothIcon)
@@ -321,22 +287,8 @@ struct RecordCell: View {
                     HStack {
                         Text(formatDate(runningLog.timestamp))
                             .customFontStyle(.gray1_SB12)
-//                        HStack {
-//                            Image(systemName: "person.2.fill")
-//                                .resizable()
-//                                .frame(width: 15, height: 12)
-//                                .foregroundColor(.gray1)
-//                            
-//                            Text("1")
-//                            //                            Text(" ")
-//                                .customFontStyle(.gray1_M16)
-//                        }
                         
                         Spacer()
-                        
-                        //                        Text("2024년 2월 12일")
-//                        Text(formatDate(runningLog.timestamp))
-//                            .customFontStyle(.gray1_SB12)
                     }
                 }
             }
@@ -384,11 +336,8 @@ struct CustomDateFilter: View {
                     Spacer()
                     
                     Button {
-//                        withAnimation{
-                            currentMonth -= 1
-//                        }
+                        currentMonth -= 1
                     } label: {
-//                        Image(systemName: "arrowtriangle.left.fill")
                         Image(systemName: "chevron.left")
                             .foregroundColor(.white)
                     }
@@ -400,11 +349,8 @@ struct CustomDateFilter: View {
                     }
                     
                     Button {
-//                        withAnimation{
-                            currentMonth += 1
-//                        }
+                        currentMonth += 1
                     } label: {
-//                        Image(systemName: "arrowtriangle.right.fill")
                         Image(systemName: "chevron.right")
                             .foregroundColor(.white)
                     }
@@ -501,11 +447,6 @@ struct CustomDateFilter: View {
         .background(value.day != -1 && isSelected ? .main : .white)
         .cornerRadius(30)
     }
-    var formattedDate: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd"
-        return dateFormatter.string(from: currentDate)
-    }
     
     func isSameDay(date1: Date, date2: Date)-> Bool{
         let calendar = Calendar.current
@@ -534,7 +475,6 @@ struct CustomDateFilter: View {
         return currentMonth
     }
     
-    //    func extractDate() ->[DateValue]{
     func extractDate() ->[DateValue]{
         
         let calendar = Calendar.current
@@ -562,16 +502,6 @@ struct CustomDateFilter: View {
         let components1 = calendar.dateComponents([.year, .month], from: date1)
         let components2 = calendar.dateComponents([.year, .month], from: date2)
         return components1 == components2
-    }
-    
-    func isMockDataAvailableOnDate(date: Date) -> Bool {
-        let calendar = Calendar.current
-        for record in viewModel.runningLog { // 임시
-            if calendar.isDate(record.timestamp, inSameDayAs: date) {
-                return true
-            }
-        }
-        return false
     }
     
 }

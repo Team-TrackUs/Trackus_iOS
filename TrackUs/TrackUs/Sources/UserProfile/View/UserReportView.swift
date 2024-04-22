@@ -207,11 +207,16 @@ struct userReportContent: View {
             Text("신고 하시겠습니까?")
         }
         .alert("신고가 완료되었습니다.", isPresented: $successReport) {
-            Button("확인") {
+            Button("차단", role: .destructive) {
+                // 차단하는 기능
+                
+                router.pop()
+            }
+            Button("취소", role: .cancel) {
                 router.pop()
             }
         } message: {
-            Text("")
+            Text("\n\(userInfo.username)님을 차단하시겠습니까?")
         }
     }
 }

@@ -13,7 +13,6 @@ struct MyRecordDetailView: View {
     let runningLog: Runninglog
     private let exerciseManager: ExerciseManager!
     
-    @EnvironmentObject var router: Router
     @ObservedObject var viewModel = ReportViewModel.shared
     
     @State private var isOpen: Bool = true
