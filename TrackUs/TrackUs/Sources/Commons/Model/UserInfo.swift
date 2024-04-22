@@ -44,6 +44,15 @@ struct UserInfo : Codable {
     var setDailyGoal: Double?
     var runningStyle: RunningStyle?
     var token: String
+    // 본인이 차단한 사용자 리스트
+    var blockUserList: [String]
+    // 본인이 차단한 사용자 + 본인을 차단한 사용자 리스트
+    var blockedUserMeList: [String]
+    
+    
+//    init(from decoder: any Decoder) throws {
+//        <#code#>
+//    }
     
     init(){
         self.uid = ""
@@ -51,22 +60,24 @@ struct UserInfo : Codable {
         self.isProfilePublic = false
         self.isProSubscriber = false
         self.token = ""
+        self.blockUserList = [""]
+        self.blockedUserMeList = [""]
     }
     
-    enum CodingKeys:String, CodingKey {
-        case uid = "uid"
-        case username = "username"
-        case weight = "weight"
-        case height = "height"
-        case age = "age"
-        case gender = "gender"
-        case isProfilePublic = "isProfilePublic"
-        case isProSubscriber = "isProSubscriber"
-        case profileImageUrl = "profileImageUrl"
-        case setDailyGoal = "setDailyGoal"
-        case runningStyle = "runningStyle"
-        case token = "token"
-    }
+//    enum CodingKeys:String, CodingKey {
+//        case uid = "uid"
+//        case username = "username"
+//        case weight = "weight"
+//        case height = "height"
+//        case age = "age"
+//        case gender = "gender"
+//        case isProfilePublic = "isProfilePublic"
+//        case isProSubscriber = "isProSubscriber"
+//        case profileImageUrl = "profileImageUrl"
+//        case setDailyGoal = "setDailyGoal"
+//        case runningStyle = "runningStyle"
+//        case token = "token"
+//    }
 }
 
 public struct FirestoreUserInfo: Codable, Hashable {
@@ -82,4 +93,8 @@ public struct FirestoreUserInfo: Codable, Hashable {
     public let setDailyGoal: Double?
     public var runningStyle: String?
     public let token: String
+    // 본인이 차단한 user List
+    public let blockUsersList: [String]
+    // 본인을 차단한 user List
+    public let blockMeList: [String]
 }
