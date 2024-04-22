@@ -7,54 +7,6 @@
 
 import SwiftUI
 
-// MARK: - PAGE
-enum Page: Hashable, Identifiable {
-    // Root
-    case running
-    case chat
-    case report
-    case profile
-    // Profile
-    case profileEdit
-    case runningRecorded
-    case faq
-    case setting
-    case withDrawal
-    case trackusIntro
-    // Home
-    case runningSelect(CourseListViewModel, UserSearchViewModel)
-    case runningStart(TrackingViewModel)
-    case runningResult(TrackingViewModel)
-    case courseDrawing
-    case courseDetail(CourseViewModel)
-    case courseRegister(CourseViewModel)
-    // Chat
-    case chatting(ChatViewModel)
-    // Report
-    case recordDetail(Runninglog)
-    // UserProfileView
-    case userProfile(String)
-    case userReport(String)
-}
-
-extension Page {
-    static func == (lhs: Page, rhs: Page) -> Bool {
-        return lhs.hashValue == rhs.hashValue
-    }
-    
-    var id: String {
-        String(describing: self)
-    }
-}
-
-// MARK: - FULL SCREEN
-enum FullScreenCover: String, Identifiable {
-    case payment
-    
-    var id: String {
-        self.rawValue
-    }
-}
 
 
 enum Tab {
@@ -101,6 +53,7 @@ final class Router: ObservableObject {
         // UserProfileView
         case userProfile(String)
         case userReport(String)
+        case trackusIntro
     }
 
     // MARK: - FULL SCREEN
@@ -249,4 +202,3 @@ extension Router.Page {
         String(describing: self)
     }
 }
-

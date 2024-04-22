@@ -79,7 +79,6 @@ struct TeamIntroView: View {
                 }
                 .padding(.horizontal, 16)
             }
-//            .padding(.horizontal, 16)
             .customNavigation {
                 NavigationText(title: "팀 트랙어스")
             } left: {
