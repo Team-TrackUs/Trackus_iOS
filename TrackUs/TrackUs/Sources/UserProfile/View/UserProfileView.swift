@@ -20,7 +20,7 @@ struct UserProfileView: View {
     }
     
     var body: some View {
-        VStack {
+        ScrollView {
             UserProfileContent(userInfo: userViewModel.otherUserInfo, selectedDate: $selectedDate, userProfileViewModel: userViewModel, userUid: userUid)
         }
         .onAppear {
@@ -87,34 +87,56 @@ struct UserProfileContent: View {
             }
             
             VStack {
-                HStack {
+                HStack(spacing: 63) {
                     if userInfo.uid != authViewModel.userInfo.uid {
-                        Button(action: {
-                            // 채팅방 있는여부 확인
-                            router.push(.chatting(ChatViewModel(myInfo: authViewModel.userInfo, opponentInfo: userInfo)))
-                        }) {
+                        VStack {
+                            // 채팅 버튼
+                            Button {
+                                router.push(.chatting(ChatViewModel(myInfo: authViewModel.userInfo, opponentInfo: userInfo)))
+                            } label: {
+                                Image(systemName: "bubble")
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundStyle(.gray1)
+                            }
+                            
                             Text("1:1 대화")
-                                .frame(width: 113, height: 28)
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(26)
+                                .customFontStyle(.gray2_R12)
                         }
-                        .padding(.top, 12)
                         
-                        Button(action: {
-                            // 신고하기 화면으로 이동해야함!
-                            router.push(.userReport(userUid))
-                        }) {
-                            Text("신고하기")
-                                .frame(width: 113, height: 28)
-                                .background(Color.red)
-                                .customFontStyle(.white_M14)
-                                .foregroundColor(.white)
-                                .cornerRadius(26)
+                        VStack {
+                            // 차단 버튼
+                            Button {
+                                // 차단하기 기능
+                                
+                            } label: {
+                                Image(systemName: "person.slash")
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundStyle(.gray1)
+                            }
+                            
+                            Text("차단")
+                                .customFontStyle(.gray2_R12)
                         }
-                        .padding(.top, 12)
+                        
+                        VStack {
+                            // 신고 버튼
+                            Button {
+                                router.push(.userReport(userUid))
+                            } label: {
+                                Image(systemName: "exclamationmark.circle")
+                                    .resizable()
+                                    .frame(width: 30, height: 30)
+                                    .foregroundStyle(.caution)
+                            }
+                            
+                            Text("신고")
+                                .customFontStyle(.gray2_R12)
+                        }
                     }
                 }
+                .padding(.top, 12)
             }
             .padding(.bottom, 15)
         }
