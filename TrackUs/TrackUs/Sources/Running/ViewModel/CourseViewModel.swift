@@ -10,14 +10,14 @@ import MapboxMaps
 /**
   코스데이터에 대한 개별적인 뷰모델
  */
-class CourseViewModel: ObservableObject {
+class CourseViewModel: ObservableObject, HashableObject {
     enum ErrorType: Error {
         case fetchError
     }
-    let id = UUID()
+    
     private let authViewModel = AuthenticationViewModel.shared
     private let chatViewModel = ChatListViewModel.shared
-    private let locationManager = LocationManager.shared
+    private let locationManager = LocationService.shared
     
     @Published var course: Course
     @Published var uiImage: UIImage?
@@ -67,9 +67,9 @@ extension CourseViewModel {
     /// 경로추가 -> 시간, 칼로리, 거리 업데이트
     @MainActor
     func updateInfoWithPath() {
-        course.estimatedTime = ExerciseManager.calculateEstimatedTime(distance: course.distance, style: .init(rawValue: course.runningStyle))
-        course.estimatedCalorie = ExerciseManager.calculatedCaloriesBurned(distance: course.distance)
-        course.distance = course.courseRoutes.toCLLocationCoordinate2D().caculateTotalDistance()
+        course.estimatedTime = WorkoutService.calcEstimatedTime(distance: course.distance, style: .init(rawValue: course.runningStyle))
+        course.estimatedCalorie = WorkoutService.calcCaloriesBurned(distance: course.distance)
+        course.distance = course.courseRoutes.toCLLocationCoordinate2D.totalDistance
     }
 }
 
@@ -165,12 +165,3 @@ extension CourseViewModel {
     }
 }
 
-extension CourseViewModel: Hashable {
-    static func == (lhs: CourseViewModel, rhs: CourseViewModel) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-}

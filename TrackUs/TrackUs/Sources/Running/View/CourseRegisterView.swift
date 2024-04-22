@@ -10,6 +10,7 @@ import SwiftUI
 /**
   코스등록뷰
  */
+
 struct CourseRegisterView: View {
     @EnvironmentObject var router: Router
     @ObservedObject var courseViewModel: CourseViewModel

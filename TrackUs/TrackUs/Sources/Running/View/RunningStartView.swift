@@ -8,13 +8,11 @@
 import SwiftUI
 
 struct RunningStartView: View {
-    @EnvironmentObject var router: Router
-    @ObservedObject var trackingViewModel: TrackingViewModel
+    public var runViewModel: RunActivityViewModel
     
     var body: some View {
-        TrackingModeMapView(
-            router: router,
-            trackingViewModel: trackingViewModel
+        RunningActivityVCHosting(
+            runViewModel: runViewModel
         )
         .edgesIgnoringSafeArea(.all)
         .navigationBarHidden(true)
