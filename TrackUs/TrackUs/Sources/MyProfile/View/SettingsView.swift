@@ -23,7 +23,7 @@ struct SettingsView: View {
                 } content: {
                     MenuItem(title: "버전정보", label: "v.1.0.0")
                     Button {
-                        router.present(sheet: .webView(url: Constants.WebViewUrl.TEAM_INTRO_URL))
+                        router.push(.trackusIntro)
                     } label: {
                         MenuItem(title: "팀 트랙어스", image: .init(.chevronRightIcon))
                     }

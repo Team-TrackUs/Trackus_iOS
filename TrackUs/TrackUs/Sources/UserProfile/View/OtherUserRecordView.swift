@@ -31,7 +31,7 @@ struct OtherUserRecordView: View {
     let runningLog: [Runninglog]
     
     var body: some View {
-        ScrollView {
+        VStack {
             ZStack(alignment: .top) {
                 VStack(alignment: .leading) {
                     VStack(alignment: .leading) {
@@ -112,7 +112,6 @@ struct OtherUserRecordView: View {
             
         }, content: {
             OtherUserCustomDateFilter(selectedDate: $selectedDate, isPickerPresented: $calendarButton)
-//                .presentationDetents([.height(450)])
                 .presentationDetents([.height(390)])
                 .presentationDragIndicator(.hidden)
         })
@@ -242,7 +241,6 @@ struct OtherUserRecordCell: View {
 //MARK: - 커스텀 캘린더
 
 struct OtherUserCustomDateFilter: View {
-//    @ObservedObject var viewModel = ReportViewModel.shared
     @ObservedObject var viewModel = UserProfileViewModel.shared
     @State var currentDate: Date = Date()
     @State var currentMonth: Int = 0
@@ -262,11 +260,8 @@ struct OtherUserCustomDateFilter: View {
                     Spacer()
                     
                     Button {
-//                        withAnimation{
                             currentMonth -= 1
-//                        }
                     } label: {
-//                        Image(systemName: "arrowtriangle.left.fill")
                         Image(systemName: "chevron.left")
                             .foregroundColor(.white)
                     }
@@ -278,11 +273,8 @@ struct OtherUserCustomDateFilter: View {
                     }
                     
                     Button {
-//                        withAnimation{
                             currentMonth += 1
-//                        }
                     } label: {
-//                        Image(systemName: "arrowtriangle.right.fill")
                         Image(systemName: "chevron.right")
                             .foregroundColor(.white)
                     }
@@ -412,7 +404,6 @@ struct OtherUserCustomDateFilter: View {
         return currentMonth
     }
     
-    //    func extractDate() ->[DateValue]{
     func extractDate() ->[DateValue]{
         
         let calendar = Calendar.current

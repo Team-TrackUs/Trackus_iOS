@@ -35,7 +35,6 @@ enum AvgAge: String, CaseIterable, Identifiable { // 나이대 피커
 struct AgeGraphView: View {
     var selectedTab: CircleTab
     @State private var isPickerPresented = false
-    //    @State var selectedAge : AvgAge = .twenties
     @Binding var selectedAge : AvgAge
     @Binding var selectedDate: Date?
     @ObservedObject var viewModel = ReportViewModel.shared
@@ -45,10 +44,6 @@ struct AgeGraphView: View {
         guard let selectedDate = selectedDate else { return [] }
         return viewModel.runningLog.filter { Calendar.current.isDate($0.timestamp, inSameDayAs: selectedDate) }
     }
-//    var runningLogForSelectedDate: [UserRunningLog] {
-//        guard let selectedDate = selectedDate else { return [] }
-//        return viewModel.runningLog.filter { Calendar.current.isDate($0.timestamp, inSameDayAs: selectedDate) }
-//    }
     
     // 연령대
     var allUserRunningLogForSelectedDate: [Runninglog] {

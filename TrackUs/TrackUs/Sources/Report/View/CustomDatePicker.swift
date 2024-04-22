@@ -10,7 +10,6 @@ import SwiftUI
 //MARK: - 달력
 
 struct CustomDatePicker: View {
-    //    @Binding var currentDate: Date
     @State var currentDate: Date = Date()
     @State var currentMonth: Int = 0
     @Binding var selectedDate: Date?
@@ -28,11 +27,8 @@ struct CustomDatePicker: View {
                     Spacer()
                     
                     Button {
-//                        withAnimation{
-                            currentMonth -= 1
-//                        }
+                        currentMonth -= 1
                     } label: {
-//                        Image(systemName: "arrowtriangle.left.fill")
                         Image(systemName: "chevron.left")
                             .foregroundColor(.white)
                     }
@@ -44,11 +40,8 @@ struct CustomDatePicker: View {
                     }
                     
                     Button {
-//                        withAnimation{
-                            currentMonth += 1
-//                        }
+                        currentMonth += 1
                     } label: {
-//                        Image(systemName: "arrowtriangle.right.fill")
                         Image(systemName: "chevron.right")
                             .foregroundColor(.white)
                     }
@@ -226,7 +219,6 @@ struct MonthPicker: View {
                     Button {
                         adjustYear(by: -1)
                     } label: {
-//                        Image(systemName: "arrowtriangle.left.fill")
                         Image(systemName: "chevron.left")
                             .foregroundColor(.white)
                     }
@@ -240,7 +232,6 @@ struct MonthPicker: View {
                     Button {
                         adjustYear(by: 1)
                     } label: {
-//                        Image(systemName: "arrowtriangle.right.fill")
                         Image(systemName: "chevron.right")
                             .foregroundColor(.white)
                     }

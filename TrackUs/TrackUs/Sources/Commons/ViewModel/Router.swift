@@ -53,6 +53,7 @@ final class Router: ObservableObject {
         // UserProfileView
         case userProfile(String)
         case userReport(String)
+        case trackusIntro
     }
 
     // MARK: - FULL SCREEN
@@ -166,6 +167,8 @@ final class Router: ObservableObject {
             ChattingView(chatViewModel: chatViewModel)
         case .userReport(let userId):
             UserReportView(userUid: userId)
+        case .trackusIntro:
+            TeamIntroView()
         }
     }
     
@@ -199,4 +202,3 @@ extension Router.Page {
         String(describing: self)
     }
 }
-

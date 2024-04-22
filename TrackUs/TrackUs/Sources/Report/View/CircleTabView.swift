@@ -43,12 +43,10 @@ struct CircleTabView: View {
         }, content: {
             if selectedPicker == .day {
                 CustomDatePicker(selectedDate: $selectedDate, isPickerPresented: $isPickerPresented)
-//                    .presentationDetents([.height(400)])
                     .presentationDetents([.height(330)])
                     .presentationDragIndicator(.hidden)
             } else {
                 MonthPicker(isPickerPresented: $isPickerPresented, selectedDate: $selectedDate)
-//                    .presentationDetents([.height(300)])
                     .presentationDetents([.height(250)])
                     .presentationDragIndicator(.hidden)
             }
@@ -119,7 +117,6 @@ struct DailyCircleView: View {
     var progressValue: CGFloat {
         guard let dailyGoal = authViewModel.userInfo.setDailyGoal else { return 0.0 } // 기본값
         
-//        let distanceInKm = totalDistanceForSelectedDate / 1000.0 // 러닝 데이터의 총 거리 (km)
         let distanceInKm = totalDistanceForSelectedDate / 1000.0 // 러닝 데이터의 총 거리 (km)
         let progressPercentage = min(distanceInKm / dailyGoal, 1.0) // 진행률 (0.0 ~ 1.0)
         
@@ -151,7 +148,6 @@ struct DailyCircleView: View {
                 Button {
                     selectedDate = yesterdayDate
                 } label: {
-//                    Image(systemName: "arrowtriangle.left.fill")
                     Image(systemName: "chevron.left")
                         .foregroundColor(.gray2)
                 }
@@ -163,7 +159,6 @@ struct DailyCircleView: View {
                 Button {
                     selectedDate = tomorrowDate
                 } label: {
-//                    Image(systemName: "arrowtriangle.right.fill")
                     Image(systemName: "chevron.right")
                         .foregroundColor(.gray2)
                 }
@@ -178,10 +173,6 @@ struct DailyCircleView: View {
                     HStack(spacing: 4) {
                         Text("목표 거리량")
                             .customFontStyle(.blue1_B12)
-//                        Image(systemName: "questionmark.circle")
-//                            .resizable()
-//                            .frame(width: 13, height: 13)
-//                            .foregroundColor(.blue1)
                     }
                     Text("\(String(format: "%.1f", totalDistanceForSelectedDate / 1000.0) + "km") / \(String(format: "%.1f", authViewModel.userInfo.setDailyGoal ?? 1.0) + "km")")
                         .customFontStyle(.gray1_H17)
@@ -256,7 +247,7 @@ struct DailyCircleView: View {
     
     // 필터링된 데이터에서 시간 값 합산
     var totalTimeForSelectedDate: Double {
-        Double(runningLogForSelectedDate.reduce(0) { $0 + $1.elapsedTime })
+        Double(runningLogForSelectedDate.reduce(0) { $0 + $1.seconds })
     }
     
     // 필터링된 데이터에서 평균 페이스 계산
@@ -267,13 +258,6 @@ struct DailyCircleView: View {
         
         let totalPace = runningLogForSelectedDate.reduce(0.0) { $0 + $1.pace }
         return totalPace / Double(runningLogForSelectedDate.count)
-    }
-    
-    func currentMonthAndYearAndDate() -> String {
-        let currentDate = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy년 M월 d일"
-        return dateFormatter.string(from: currentDate)
     }
 }
 
@@ -288,7 +272,6 @@ struct MonthlyCircleView: View {
     var progressValue: CGFloat {
         guard let dailyGoal = authViewModel.userInfo.setDailyGoal else { return 0.0 } // 기본값
         
-//        let distanceInKm = averageDistanceForSelectedMonth / 1000.0 // 러닝 데이터의 총 거리 (km)
         let distanceInKm = averageDistanceForSelectedMonth / 1000.0 // 러닝 데이터의 총 거리 (km)
         let progressPercentage = min(distanceInKm / dailyGoal, 1.0) // 진행률 (0.0 ~ 1.0)
         
@@ -322,22 +305,12 @@ struct MonthlyCircleView: View {
         }
     }
     
-    // 다음 달 첫 번째 날짜
-    private var firstDayOfNextMonth: Date {
-        if let selectedDate = selectedDate {
-            return Calendar.current.date(byAdding: .month, value: 1, to: firstDayOfSelectedMonth) ?? Date()
-        } else {
-            return Date()
-        }
-    }
-    
     var body: some View {
         VStack {
             HStack {
                 Button {
                     selectedDate = lastMonthDate
                 } label: {
-//                    Image(systemName: "arrowtriangle.left.fill")
                     Image(systemName: "chevron.left")
                         .foregroundColor(.gray2)
                 }
@@ -349,7 +322,6 @@ struct MonthlyCircleView: View {
                 Button {
                     selectedDate = nextMonthDate
                 } label: {
-//                    Image(systemName: "arrowtriangle.right.fill")
                     Image(systemName: "chevron.right")
                         .foregroundColor(.gray2)
                 }
@@ -364,10 +336,6 @@ struct MonthlyCircleView: View {
                     HStack(spacing: 4) {
                         Text("목표 거리량")
                             .customFontStyle(.blue1_B12)
-//                        Image(systemName: "questionmark.circle")
-//                            .resizable()
-//                            .frame(width: 13, height: 13)
-//                            .foregroundColor(.blue1)
                     }
                     Text("\(String(format: "%.1f", averageDistanceForSelectedMonth / 1000.0) + "km") / \(String(format: "%.1f", authViewModel.userInfo.setDailyGoal ?? 1.0) + "km")")
                         .customFontStyle(.gray1_H17)
@@ -462,7 +430,7 @@ struct MonthlyCircleView: View {
             return 0 // 러닝 데이터가 없는 경우 평균 시간을 0으로 설정하거나 다른 처리를 수행
         }
         
-        let totalTime = runningLogForSelectedMonth.reduce(0) { $0 + $1.elapsedTime }
+        let totalTime = runningLogForSelectedMonth.reduce(0) { $0 + $1.seconds }
 //        return Double(totalTime / runningLogForSelectedMonth.count)
         return totalTime / Double(runningLogForSelectedMonth.count)
     }
@@ -478,14 +446,6 @@ struct MonthlyCircleView: View {
         let totalPace = runningLogForSelectedMonth.reduce(0.0) { $0 + $1.pace }
         return totalPace / Double(runningLogForSelectedMonth.count)
     }
-    
-    func currentMonthAndYear() -> String {
-        let currentDate = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy년 M월"
-        return dateFormatter.string(from: currentDate)
-    }
-    
     
 }
 
@@ -531,14 +491,6 @@ struct CircularProgressView: View {
                 .id(selectedDate) // selectedDate의 변경을 감지하기 위해 id 추가
         }
     }
-}
-
-// 일일 운동량
-struct RunningSummary {
-    let calorie: Double
-    let distance: Double
-    let elapsedTime: Int
-    let pace: Double
 }
 
 //#Preview {

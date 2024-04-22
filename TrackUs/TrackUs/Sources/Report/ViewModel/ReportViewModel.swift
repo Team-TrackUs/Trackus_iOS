@@ -14,16 +14,15 @@ struct Runninglog : Hashable {
     var documentID: String? // 추가 문서ID
     var calorie: Double
     var distance: Double
-    var elapsedTime: Double
+    var seconds: Double
     var pace: Double
     var timestamp: Date
     var address: String?
     var coordinates: [GeoPoint]?
     var routeImageUrl: String?
     var title: String?
-    var targetDistance: Double?
+    var target: Double?
     var isGroup: Bool?
-    var exprectedTime: Double
 }
 
 class ReportViewModel : ObservableObject {
@@ -36,7 +35,6 @@ class ReportViewModel : ObservableObject {
     static let shared = ReportViewModel()
     
     @Published var runningLog = [Runninglog]()
-//    @Published var runningLog = [UserRunningLog]()
     @Published var allUserRunningLog = [Runninglog]()
     @Published var userAge: Int = AvgAge.twenties.intValue
     
@@ -116,9 +114,6 @@ class ReportViewModel : ObservableObject {
             print("error uid is nil")
             return
         }
-        
-//        let db = Firestore.firestore()
-//        db.collection("users").document(uid).collection("runningRecords").getDocuments() { (snapshot, error) in
         db.collection("users").document(uid).collection("records").getDocuments() { (snapshot, error) in
             if let error = error {
                 print("error fetching runningRecords: \(error.localizedDescription)")
@@ -130,7 +125,7 @@ class ReportViewModel : ObservableObject {
                 let documentID = runningData.documentID // 추가 문서 ID
                 if let calorie = runningData.data()["calorie"] as? Double,
                    let distance = runningData.data()["distance"] as? Double,
-                   let elapsedTime = runningData.data()["elapsedTime"] as? Double,
+                   let elapsedTime = runningData.data()["seconds"] as? Double,
                    let pace = runningData.data()["pace"] as? Double,
                    let timestamp = runningData.data()["timestamp"] as? Timestamp {
                     let dateValue = timestamp.dateValue()
@@ -140,16 +135,15 @@ class ReportViewModel : ObservableObject {
                     let address = runningData.data()["address"] as? String
                     let routeImageUrl = runningData.data()["routeImageUrl"] as? String
                     let coordinates = runningData.data()["coordinates"] as? [GeoPoint]
-                    let targetDistance = runningData.data()["targetDistance"] as? Double
+                    let targetDistance = runningData.data()["target"] as? Double
                     let isGroup = runningData.data()["isGroup"] as? Bool
-                    let exprectedTime = runningData.data()["exprectedTime"] as? Double
                     
-                    let log = Runninglog(documentID: documentID, calorie: calorie, distance: distance, elapsedTime: elapsedTime, pace: pace, timestamp: dateValue, address: address, coordinates: coordinates, routeImageUrl: routeImageUrl, title: title, targetDistance: targetDistance, isGroup: isGroup, exprectedTime: exprectedTime ?? 0)
+                    
+                    let log = Runninglog(documentID: documentID, calorie: calorie, distance: distance, seconds: elapsedTime, pace: pace, timestamp: dateValue, address: address, coordinates: coordinates, routeImageUrl: routeImageUrl, title: title, target: targetDistance, isGroup: isGroup)
                     
                     if !self.runningLog.contains(log) {
                         self.runningLog.append(log)
                     }
-//                    self.runningLog.append(log)
                 }
             }
             
@@ -180,7 +174,6 @@ class ReportViewModel : ObservableObject {
             
             for document in snapshot!.documents {
                 let userID = document.documentID
-//                db.collection("users").document(userID).collection("runningRecords").getDocuments() { (snapshot, error) in
                 db.collection("users").document(userID).collection("records").getDocuments() { (snapshot, error) in
                     if let error = error {
                         print("Error fetching SameAgeUser Running Log")
@@ -191,7 +184,7 @@ class ReportViewModel : ObservableObject {
                     for runningData in snapshot!.documents {
                         if let calorie = runningData.data()["calorie"] as? Double,
                            let distance = runningData.data()["distance"] as? Double,
-                           let elapsedTime = runningData.data()["elapsedTime"] as? Double,
+                           let elapsedTime = runningData.data()["seconds"] as? Double,
                            let pace = runningData.data()["pace"] as? Double,
                            let timestamp = runningData.data()["timestamp"] as? Timestamp {
                             let dateValue = timestamp.dateValue()
@@ -201,16 +194,15 @@ class ReportViewModel : ObservableObject {
                             let address = runningData.data()["address"] as? String
                             let routeImageUrl = runningData.data()["routeImageUrl"] as? String
                             let coordinates = runningData.data()["coordinates"] as? [GeoPoint]
-                            let targetDistance = runningData.data()["targetDistance"] as? Double
+                            let targetDistance = runningData.data()["target"] as? Double
                             let isGroup = runningData.data()["isGroup"] as? Bool
-                            let exprectedTime = runningData.data()["exprectedTime"] as? Double
                             
-                            let log = Runninglog(calorie: calorie, distance: distance, elapsedTime: elapsedTime, pace: pace, timestamp: dateValue, address: address, coordinates: coordinates, routeImageUrl: routeImageUrl, title: title, targetDistance: targetDistance, isGroup: isGroup, exprectedTime: exprectedTime ?? 0)
+                            
+                            let log = Runninglog(calorie: calorie, distance: distance, seconds: elapsedTime, pace: pace, timestamp: dateValue, address: address, coordinates: coordinates, routeImageUrl: routeImageUrl, title: title, target: targetDistance, isGroup: isGroup)
                             
                             if !self.allUserRunningLog.contains(log) {
                                 self.allUserRunningLog.append(log)
                             }
-//                            self.allUserRunningLog.append(log)
                         }
                     }
                     
@@ -231,7 +223,6 @@ class ReportViewModel : ObservableObject {
             return
         }
         
-//        let docRef = db.collection("users").document(uid).collection("runningRecords").document(documentID)
         let docRef = db.collection("users").document(uid).collection("records").document(documentID)
         docRef.delete() { error in
             if let error = error {
@@ -243,33 +234,6 @@ class ReportViewModel : ObservableObject {
     }
     
     //MARK: - BarGraphView에서 사용하는 함수들 월별
-    
-//    func updateMonthMyAvgData(selectedDate: Date) { // 월별 데이터
-////        guard let selectedDate = selectedDate else { return }
-//        
-//        let calendar = Calendar.current
-//        guard let startDateOfYear = calendar.date(from: calendar.dateComponents([.year], from: selectedDate)),
-//              let endDateOfYear = calendar.date(byAdding: DateComponents(year: 1, day: -1), to: startDateOfYear) else {
-//            return
-//        }
-//        
-//        var monthIndex = 0
-//        var currentDate = startDateOfYear
-//        
-//        while currentDate <= endDateOfYear {
-//            guard let endDateOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: currentDate) else {
-//                return
-//            }
-//            
-//            let dataForThisMonth = getDataForMonth(startDate: currentDate, endDate: endDateOfMonth)
-//            let averageDistanceForMonth = dataForThisMonth.reduce(0.0) { $0 + $1.data } / Double(dataForThisMonth.count)
-//            
-//            monthMyAvgData[monthIndex].data = averageDistanceForMonth
-//            
-//            monthIndex += 1
-//            currentDate = calendar.date(byAdding: .month, value: 1, to: currentDate)!
-//        }
-//    }
     
     func updateMonthMyAvgData(selectedDate: Date) {
         let calendar = Calendar.current
@@ -311,7 +275,6 @@ class ReportViewModel : ObservableObject {
     }
     
     func getDataForMonth(startDate: Date, endDate: Date) -> [AgeMonthAvg] {
-//        let runningLogForMonth = viewModel.runningLog.filter { $0.timestamp >= startDate && $0.timestamp <= endDate }
         let runningLogForMonth = runningLog.filter { $0.timestamp >= startDate && $0.timestamp <= endDate }
         var dataForMonth: [String: Double] = [:]
         let calendar = Calendar.current
@@ -338,7 +301,6 @@ class ReportViewModel : ObservableObject {
     }
     
     func updateMonthAgeAvgData(selectedDate: Date) {
-//        guard let selectedDate = selectedDate else { return }
         
         let calendar = Calendar.current
         guard let startDateOfYear = calendar.date(from: calendar.dateComponents([.year], from: selectedDate)),
@@ -391,7 +353,6 @@ class ReportViewModel : ObservableObject {
     }
     
     func calculateChangeInDataCount(selectedDate: Date) -> Int {
-//        guard let selectedDate = selectedDate else { return 0 }
         
         let calendar = Calendar.current
         let previousMonthDate = calendar.date(byAdding: .month, value: -1, to: selectedDate)!
@@ -415,7 +376,6 @@ class ReportViewModel : ObservableObject {
     //MARK: - BarGraphView에서 사용하는 함수들 주별
     
     func updateWeakMyAvgData(selectedDate: Date) {
-//        guard let selectedDate = selectedDate else { return }
         
         let calendar = Calendar.current
         guard let startDate = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: selectedDate)),
@@ -436,14 +396,10 @@ class ReportViewModel : ObservableObject {
                 weakMyAvgData[dayIndex].data = 0
             }
         }
-        
-        //                print("Updated weakMyAvgData: \(weakMyAvgData)")
     }
     
     
     func getDataForWeek(startDate: Date, endDate: Date) -> [AgeWeakAvg] {
-        //        print("시작 날짜 \(startDate), 끝 날짜 \(endDate)")
-//        print("여기서부터 시작!!!!!!!\(viewModel.runningLog) 여기까지가 끝!!!!!!")
         let runningLogForWeek = runningLog.filter { $0.timestamp >= startDate && $0.timestamp <= endDate }
         var dataForWeek: [String: Double] = [:]
         let calendar = Calendar.current
@@ -472,8 +428,6 @@ class ReportViewModel : ObservableObject {
     //MARK: - 선택한 연령대의 일주일치 평균 운동량
     func updateWeakAgeAvgData(selectedDate: Date) {
         
-//        guard let selectedDate = selectedDate else { return }
-        
         let calendar = Calendar.current
         guard let startDate = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: selectedDate)),
               let endDate = calendar.date(byAdding: .day, value: 6, to: startDate) else {
@@ -483,10 +437,7 @@ class ReportViewModel : ObservableObject {
         let startOfDay = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: startDate)!
         let endOfDay = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: endDate)!
         
-        //        print("Start Date for the Week: \(startOfDay)")
-        //        print("End Date for the Week: \(endOfDay)")
         let dataForThisWeek = getAgeDataForWeek(startDate: startOfDay, endDate: endOfDay)
-        //        print("Data for This Week: \(dataForThisWeek)")
         
         for (dayIndex, day) in Calendar.current.weekdaySymbols.enumerated() {
             let dataForDay = dataForThisWeek.filter { $0.weak == day }
@@ -497,15 +448,10 @@ class ReportViewModel : ObservableObject {
             }
         }
         
-        //        print("연령대 데이터 업데이트: \(weakAgeAvgData)")
-        
     }
     
     func getAgeDataForWeek(startDate: Date, endDate: Date) -> [AgeWeakAvg] {
-        //        print("시작 날짜 \(startDate), 끝 날짜 \(endDate)")
-        //        print("뷰모델에서 가져온 데이터들1 : \(viewModel.allUserRunningLog)")
         let runningLogForWeek = allUserRunningLog.filter { $0.timestamp >= startDate && $0.timestamp <= endDate }
-        //        print("뷰모델에서 필터링해서 가져온 데이터들 : \(runningLogForWeek)")
         var dataForWeek: [String: (totalDistance: Double, count: Int)] = [:]
         let calendar = Calendar.current
         let weekDays = calendar.weekdaySymbols

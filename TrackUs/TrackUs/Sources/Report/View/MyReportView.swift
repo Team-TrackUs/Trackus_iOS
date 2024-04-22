@@ -8,13 +8,9 @@
 import SwiftUI
 
 struct MyReportView: View {
-    //    @State private var selectedTab: CircleTab = .day
     @Binding var selectedTab: CircleTab
-    @EnvironmentObject var router: Router
     @Binding var selectedDate: Date?
     @Binding var selectedAge : AvgAge
-    
-    @ObservedObject var viewModel = ReportViewModel.shared
     
     var body: some View {
         ScrollView {
@@ -53,10 +49,6 @@ struct MyReportView: View {
             .padding(.vertical, 20)
             .padding(.horizontal, 16)
         }
-        //        .onAppear {
-        //            viewModel.fetchUserLog()
-        //            viewModel.fetchUserAgeLog()
-        //        }
     }
 }
 
