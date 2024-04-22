@@ -5,12 +5,18 @@
 //  Created by 권석기 on 3/19/24.
 //
 
+// 참여자x/유저탈퇴 -> 
 import SwiftUI
 import Kingfisher
 
 struct RunningCell: View {
     let course: Course
-    let user: UserInfo
+    let user: UserInfo?
+    
+    init(course: Course, user: UserInfo? = nil) {
+        self.course = course
+        self.user = user
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -44,7 +50,7 @@ struct RunningCell: View {
                     }
                     
                     HStack(spacing: 0) {
-                        KFImage(URL(string: user.profileImageUrl ?? ""))
+                        KFImage(URL(string: user?.profileImageUrl ?? ""))
                             .placeholder({ProgressView()})
                             .onFailureImage(KFCrossPlatformImage(named: "profile_img"))
                             .resizable()
@@ -52,7 +58,7 @@ struct RunningCell: View {
                             .frame(width: 24, height: 24)
                             .clipShape(Circle())
                         
-                        Text(user.username.subString(count: 5))
+                        Text(user?.username.subString(count: 5) ?? "탈퇴유저")
                             .customFontStyle(.gray2_L12)
                             .padding(.leading, 4)
                         Image(.crownIcon)
