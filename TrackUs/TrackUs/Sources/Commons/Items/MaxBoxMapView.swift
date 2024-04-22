@@ -21,7 +21,7 @@ struct MapBoxMapView: UIViewControllerRepresentable {
 class MapViewController: UIViewController, GestureManagerDelegate {
     internal var mapView: MapView!
     private var locationTrackingCancellation: AnyCancelable?
-    private let locationManager = LocationManager.shared
+    private let locationManager = LocationService.shared
     private lazy var locationButton = UIButton(frame: .zero)
 
     override public func viewDidLoad() {

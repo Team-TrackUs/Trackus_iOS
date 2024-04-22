@@ -116,7 +116,7 @@ extension CourseDrawingMapViewController {
     // 맵뷰 초기화
     private func setupMapView() {
         // 현재위치가 없는경우 정해진 위치(광화문)로 카메라 세팅
-        let center = LocationManager.shared.currentLocation?.asCLLocationCoordinate2D() ?? Constants.DEFAULT_LOCATION
+        let center = LocationService.shared.currentLocation?.asCLLocationCoordinate2D ?? Constants.DEFAULT_LOCATION
         
         let cameraOptions = CameraOptions(center: center, zoom: 17)
         let myMapInitOptions = MapInitOptions(cameraOptions: cameraOptions)
@@ -166,7 +166,7 @@ extension CourseDrawingMapViewController {
             // 데이터 초기화
             cleanUpDataSource()
             
-            let coordinates = newValue.courseRoutes.toCLLocationCoordinate2D()
+            let coordinates = newValue.courseRoutes.toCLLocationCoordinate2D
             
             // 마커찍기
             coordinates.enumerated().forEach { (offset, value) in
@@ -230,7 +230,6 @@ extension CourseDrawingMapViewController {
                 courseViewModel.uiImage = image
                 router.push(.courseRegister(courseViewModel))
             }
-            
         }
     }
     

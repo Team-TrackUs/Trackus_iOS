@@ -27,6 +27,7 @@ struct ImageUploader {
             }
         }
     }
+    
     static func uploadImage(image: UIImage, type: ImageUploader.UploadType,  completion: @escaping(String) -> Void) {
         guard let imageData = image.jpegData(compressionQuality: 0.5) else { return }
         let ref = type.filePath
@@ -45,6 +46,21 @@ struct ImageUploader {
                 print("Succesfully upload image...")
                 completion(url)
             }
+        }
+    }
+    
+    static func uploadImageAsync(image: UIImage, type: ImageUploader.UploadType) async throws -> String {
+        guard let imageData = image.jpegData(compressionQuality: 0.5) else { throw ErrorType.imageError }
+        let ref = type.filePath
+        
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
+        do {
+            _ = try await ref.putDataAsync(imageData, metadata: metadata)
+           let url = try await ref.downloadURL()
+            return url.absoluteString
+        } catch {
+           throw error
         }
     }
 }

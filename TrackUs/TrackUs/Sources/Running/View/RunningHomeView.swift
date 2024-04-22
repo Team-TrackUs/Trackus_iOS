@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Kingfisher
+import PopupView
 @_spi(Experimental) import MapboxMaps
 
 struct RunningHomeView: View {
@@ -19,7 +20,6 @@ struct RunningHomeView: View {
     @State private var viewport: Viewport = .followPuck(zoom: 13, bearing: .constant(0))
     @State private var isOpen: Bool = false
     @State private var showingPopup: Bool = false
-    @State private var showingFloater: Bool = true
     @State private var showingAlert: Bool = false
     @State private var offset: CGFloat = 0
     @State private var deltaY: CGFloat = 0
@@ -34,7 +34,7 @@ struct RunningHomeView: View {
     private var isFocusingUser: Bool {
         return viewport.followPuck?.bearing == .constant(0)
     }
-
+    
     private var isFollowingUser: Bool {
         return viewport.followPuck?.bearing == .heading
     }
@@ -45,24 +45,24 @@ extension RunningHomeView {
     var body: some View {
         GeometryReader { geometry in
             Map(viewport: $viewport) {
-                      Puck2D(bearing: .heading)
-                  }
-          
+                Puck2D(bearing: .heading)
+            }
+            
             .mapStyle(.init(uri: StyleURI(rawValue: "mapbox://styles/seokki/clslt5i0700m901r64bli645z") ?? .light))
-                .onTapGesture {
-                    withAnimation {
-                        isOpen = false
-                    }
-                    offset = 0
+            .onTapGesture {
+                withAnimation {
+                    isOpen = false
                 }
-                
-                .overlay(alignment: .bottomTrailing, content: {
-                    addCourseButton
-                        .padding(16)
-                })
-                .frame(height: geometry.size.height - 95)
-                .offset(y: min(offset, 0))
-                .animation(.interactiveSpring(), value: offset)
+                offset = 0
+            }
+            
+            .overlay(alignment: .bottomTrailing, content: {
+                addCourseButton
+                    .padding(16)
+            })
+            .frame(height: geometry.size.height - 95)
+            .offset(y: min(offset, 0))
+            .animation(.interactiveSpring(), value: offset)
             
             // MARK: - Sheet
             BottomSheet(isOpen: $isOpen, maxHeight: 510, minHeight: 100) {
@@ -101,11 +101,15 @@ extension RunningHomeView {
             
         }
         .overlay(alignment: .topTrailing) {
-                locationMeButton
+            locationMeButton
                 .padding(.top, UIApplication.shared.statusBarFrame.height)
         }
         .onAppear {
             courseListViewModel.fetchCourseData()
+            
+            Task {
+                await HealthKitService.requestAuthorization()
+            }
         }
         .edgesIgnoringSafeArea(.top)
     }
@@ -162,6 +166,14 @@ extension RunningHomeView {
                         )
                     )
                 }
+                .popup(isPresented: $showingPopup) {
+                    HealthSettingPopup(isShowing: $showingPopup)
+                } customize: {
+                    $0
+                        .isOpaque(true)
+                        .dragToDismiss(false)
+                        .closeOnTap(false)
+                }
             }
             .padding(.vertical, 10)
             Divider()
@@ -191,6 +203,7 @@ extension RunningHomeView {
             
             // 가로 스크롤
             if !courseListViewModel.courseList.isEmpty, authViewModel.userInfo.uid != "" {
+             
                 ScrollView(.horizontal, showsIndicators: false) {
                     VStack {
                         HStack(spacing: 12) {
@@ -209,7 +222,7 @@ extension RunningHomeView {
                 .padding(.leading, 16)
             } else {
                 PlaceholderView(
-                    title: "근처 러닝 모임이 존재하지 않습니다.", 
+                    title: "근처 러닝 모임이 존재하지 않습니다.",
                     message: "러닝 메이트 모집 기능을 통해 직접 러닝 모임을 만들어보세요!",
                     maxHeight: 300
                 )
@@ -222,7 +235,7 @@ extension RunningHomeView {
         Button(action: {
             router.push(.courseDrawing)
         }, label: {
-           Circle()
+            Circle()
                 .frame(width: 52, height: 52)
                 .foregroundColor(.main)
                 .overlay (
@@ -236,29 +249,87 @@ extension RunningHomeView {
     var locationMeButton: some View {
         Button(action: {
             withViewportAnimation(.default(maxDuration: 1)) {
-                        if isFocusingUser {
-                            viewport = .followPuck(zoom: 16.5, bearing: .heading, pitch: 60)
-                        } else if isFollowingUser {
-                            viewport = .idle
-                        } else {
-                            viewport = .followPuck(zoom: 13, bearing: .constant(0))
-                        }
-                    }
+                if isFocusingUser {
+                    viewport = .followPuck(zoom: 16.5, bearing: .heading, pitch: 60)
+                } else if isFollowingUser {
+                    viewport = .idle
+                } else {
+                    viewport = .followPuck(zoom: 13, bearing: .constant(0))
+                }
+            }
         }, label: {
             Image(.locationIcon)
         })
+    }
+    
+    func getMessage() {
+        
     }
 }
 
 // MARK: - Method's
 extension RunningHomeView {
-   private func startButtonTapped() {
-        LocationManager.shared.checkLocationServicesEnabled { authrionzationStatus in
-            if authrionzationStatus == .authorizedWhenInUse {
-                router.push(.runningSelect(courseListViewModel, userSearchViewModel))
-            } else {
+    private func startButtonTapped() {
+        Task {
+            let dataAvailable = await HealthKitService().checkReadTypePersmission()
+            
+            if !dataAvailable {
+                showingPopup = true
+            }
+            else if !LocationService.locationServicesEnabled() {
                 showingAlert = true
+            } else {
+                router.push(.runningSelect(courseListViewModel, userSearchViewModel))
             }
         }
+    }
+}
+
+struct HealthSettingPopup: View {
+    @Binding var isShowing: Bool
+    
+    var body: some View {
+        VStack {
+            VStack(spacing: 20) {
+                Text("건강데이터")
+                    .customFontStyle(.gray1_B20)
+                
+                VStack(spacing: 10) {
+                    Image(.heartImg)
+                        .resizable()
+                        .frame(width: 60, height: 60)
+                    
+                    Text("운동정보 추적을 위해서 건강데이터 접근 권한이 필요합니다.")
+                        .multilineTextAlignment(.center)
+                        .customFontStyle(.gray2_R14)
+                        .frame(width: 230)
+                }
+                
+                
+                Button(action: {
+                    if let appSettings = URL(string: "App-Prefs:root=LOCATION_SERVICES") {
+                        UIApplication.shared.open(appSettings,options: [:],completionHandler: nil)
+                    }
+                }, label: {
+                    Text("설정으로 이동")
+                        .customFontStyle(.main_R16)
+                        .frame(minHeight: 40)
+                        .padding(.horizontal, 20)
+                        .overlay(Capsule().stroke(.main))
+                })
+                .frame(width: 230)
+                
+                Button(action: {
+                    isShowing = false
+                }, label: {
+                    Text("닫기")
+                        .customFontStyle(.gray1_B16)
+                })
+            }
+            .padding(20)
+        }
+        .padding(20)
+        .background(.white)
+        .cornerRadius(12)
     }
 }

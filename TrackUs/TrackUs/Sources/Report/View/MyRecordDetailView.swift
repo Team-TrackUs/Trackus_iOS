@@ -9,6 +9,7 @@ import SwiftUI
 import MapboxMaps
 
 struct MyRecordDetailView: View {
+    
     let runningLog: Runninglog
     private let exerciseManager: ExerciseManager!
     
@@ -32,7 +33,7 @@ struct MyRecordDetailView: View {
         
         ZStack {
             GeometryReader { geometry in
-                MapboxMapView(coordinates: runningLog.coordinates?.toCLLocationCoordinate2D() ?? [])
+                MapboxMapView(coordinates: runningLog.coordinates?.toCLLocationCoordinate2D ?? [])
                     .onTapGesture {
                         withAnimation {
                             isOpen = false

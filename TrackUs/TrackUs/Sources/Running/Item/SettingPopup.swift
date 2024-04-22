@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct SettingPopup: View {
-    @Binding var showingPopup: Bool
-    @EnvironmentObject var router: Router
-    @ObservedObject var settingVM: SettingPopupViewModel
+    @ObservedObject var settingViewModel: SettingViewModel
+    @Binding var isShowing: Bool
+    let action: () -> ()
     
     var body: some View {
         VStack {
@@ -18,7 +18,7 @@ struct SettingPopup: View {
                 HStack {
                     Spacer()
                     Button(action: {
-                        showingPopup = false
+                        isShowing = false
                     }) {
                         Image(systemName: "xmark")
                             .foregroundStyle(.gray1)
@@ -40,19 +40,18 @@ struct SettingPopup: View {
                         Text("목표 거리량")
                             .font(.system(size: 12, weight: .bold))
                             .foregroundStyle(.gray1)
-                        
                         Picker(selection: Binding<Double>(
-                            get: { settingVM.goalMinValue / 1000.0 },
-                            set: { newValue in
-                                settingVM.goalMinValue = newValue * 1000.0
-                                settingVM.updateEstimatedTime()
-                            }
-                        )) {
-                            ForEach(Array(stride(from: 0.1, through: 40.0, by: 0.1)), id: \.self) {
-                                Text("\($0, specifier: "%.1f") km")
-                                    .customFontStyle(.gray1_R16)
-                            }
-                        } label: {}
+                                                  get: { settingViewModel.distance / 1000.0 },
+                                                  set: { newValue in
+                                                      settingViewModel.distance = newValue * 1000.0
+                                                  }
+                                              )) {
+                                                  ForEach(Array(stride(from: 0.1, through: 40.0, by: 0.1)), id: \.self) {
+                                                      Text("\($0, specifier: "%.1f") km")
+                                                          .customFontStyle(.gray1_R16)
+                                                  }
+                                              } label: {}
+
                             .padding(5)
                             .accentColor(.gray1)
                             .frame(maxWidth: .infinity)
@@ -67,17 +66,18 @@ struct SettingPopup: View {
                             .font(.system(size: 12, weight: .bold))
                             .foregroundStyle(.gray1)
                         
-                        Picker(selection: Binding<Int>(
-                            get: { Int(settingVM.estimatedTime / 60.0) },
-                            set: { newValue in
-                                settingVM.estimatedTime = Double(newValue) * 60.0
-                            }
-                        ))  {
-                            ForEach(1..<240, id: \.self)  {
-                                Text("\($0) min")
-                                    .customFontStyle(.gray1_R16)
-                            }
-                        } label: {}
+                                              Picker(selection: Binding<Int>(
+                                                  get: { Int(settingViewModel.estimatedTime / 60.0) },
+                                                  set: { newValue in
+                                                      settingViewModel.estimatedTime = Double(newValue) * 60.0
+                                                  }
+                                              ))  {
+                                                  ForEach(1..<240, id: \.self)  {
+                                                      Text("\($0) min")
+                                                          .customFontStyle(.gray1_R16)
+                                                  }
+                                              } label: {}
+                      
                             .padding(5)
                             .accentColor(.gray1)
                             .frame(maxWidth: .infinity)
@@ -88,7 +88,7 @@ struct SettingPopup: View {
                     }
                 }
                 
-                Button(action: startButtonTapped) {
+                Button(action: action) {
                     Text("개인 러닝 시작")
                         .customFontStyle(.white_B16)
                         .padding(.horizontal, 24)
@@ -107,11 +107,5 @@ struct SettingPopup: View {
         .padding(.horizontal, 30)
     }
     
-    func startButtonTapped() {
-        showingPopup = false
-        settingVM.saveSettings()
-        router.push(.runningStart(
-            TrackingViewModel(goalDistance: settingVM.goalMinValue)
-        ))
-    }
+    
 }
