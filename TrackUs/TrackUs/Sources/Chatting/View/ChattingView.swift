@@ -20,6 +20,9 @@ struct ChattingView: View {
     
     @State private var sideMenuTranslation: CGFloat = 0
     
+    // 높이 확인 용
+    @State private var contentHeight: CGFloat = .zero
+    
     @State var previousUser: String?
     
     @State private var title: String = ""
@@ -41,25 +44,48 @@ struct ChattingView: View {
                 // 채팅 내용 표기
                 ScrollViewReader{ proxy in
                     ScrollView{
-                        VStack(spacing: 6) {
+                        VStack(spacing: 2 ) {
                             ForEach(chatViewModel.messageMap, id: \.message) { messageMap in
                                 ChatMessageView(messageMap: messageMap,
                                                 myUid: authViewModel.userInfo.uid)
                                 .padding(.horizontal, 16)
+                                .id(messageMap)
                             }
-//                            ForEach(chatViewModel.messageMap, id: \.self.id) { messageMap in
-//                                ChatMessageView(messageMap: messageMap,
-//                                                myUid: authViewModel.userInfo.uid)
-//                                //.id(messageMap)
-//                                .padding(.horizontal, 16)
-//                            }
                         }
                     }
                     .onChange(of: chatViewModel.messageMap.count) { _ in // 새 메시지가 추가될 때마다 호출
-                        proxy.scrollTo(chatViewModel.messageMap.last!.message, anchor: .bottom)
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            proxy.scrollTo(chatViewModel.messageMap.last!.message, anchor: .top)
+                        }
                     }
                     .onAppear {
-                        proxy.scrollTo(chatViewModel.messageMap.last?.message.id, anchor: .bottom)
+                        proxy.scrollTo(chatViewModel.messageMap.last?.message, anchor: .top)
+                    }
+                    // 아래 내리기
+//                    .overlay(
+//                        VStack {
+//                            if !scrollToBottom {
+//                                Button("신규 메세지") {
+//                                    scrollToBottom(proxy)
+//                                    scrollToBottom = true
+//                                }
+//                                .padding()
+//                                .background(Color.blue)
+//                                .foregroundColor(.white)
+//                                .cornerRadius(10)
+//                                .padding()
+//                                .onTapGesture {
+//                                    scrollToBottom = true
+//                                }
+//                            }
+//                        }
+//                        , alignment: .bottom
+//                    )
+                    .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
+                        scrollToBottom = false
+                    }
+                    .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+                        scrollToBottom = false
                     }
                 }
                 Spacer()
@@ -115,6 +141,7 @@ struct ChattingView: View {
         }
         .onAppear {
             title = chatViewModel.chatRoom.group ? chatViewModel.chatRoom.title : chatViewModel.members[chatViewModel.chatRoom.nonSelfMembers.first!]?.userName ?? "러너"
+            chatViewModel.resetUnreadCounter(myuid: authViewModel.userInfo.uid)
             
         }
         .animation(.easeInOut, value: sideMenuPresented)
@@ -125,7 +152,7 @@ struct ChattingView: View {
         
 
     }
-    /// 메세지 바
+    // MARK: - 메세지 전송 바
     var messageBar: some View {
         // 하단 메세지 보내기
         HStack(alignment: .bottom, spacing: 12){
@@ -180,7 +207,7 @@ struct ChattingView: View {
                 .stroke(Color.gray3, lineWidth: 1)
         )
     }
-    /// 사이드 메뉴
+    // MARK: - 사이드 메뉴 View
     var SideMenuView: some View {
         VStack(alignment: .leading, spacing: 0) {
             // 제목부분
@@ -207,13 +234,15 @@ struct ChattingView: View {
                     .customFontStyle(.gray1_R12)
                 // 참여 중인 사용자 프로필 정보
                 ForEach(chatViewModel.chatRoom.members, id: \.self) { uid in
-                    Button {
-                        router.push(.userProfile(uid))
-                    } label: {
-                        HStack{
-                            ProfileImage(ImageUrl: chatViewModel.members[uid]?.profileImageUrl, size: 40)
-                            Text("\(chatViewModel.members[uid]?.userName ?? "")")
-                                .customFontStyle(.gray1_R14)
+                    if let member = chatViewModel.members[uid]{
+                        Button {
+                            router.push(.userProfile(uid))
+                        } label: {
+                            HStack{
+                                ProfileImage(ImageUrl: member.profileImageUrl, size: 40)
+                                Text(member.userName)
+                                    .customFontStyle(.gray1_R14)
+                            }
                         }
                     }
 
@@ -245,7 +274,7 @@ struct ChattingView: View {
         .transition(.move(edge: .trailing)) // 오른쪽에서 나오도록 애니메이션 적용
     }
 }
-
+// MARK: - 채팅 메세지
 struct ChatMessageView: View {
     @EnvironmentObject var router: Router
     //@Binding var previousUser: String
@@ -262,10 +291,6 @@ struct ChatMessageView: View {
     }
     
     var body: some View {
-//        if previousdate {
-//            Text(message.date)
-//                .customFontStyle(.gray1_R12)
-//        }
         HStack{
             if !messageMap.sameDate{
                 Text(messageMap.message.date)
@@ -281,19 +306,22 @@ struct ChatMessageView: View {
                 } label: {
                     HStack{
                         ProfileImage(ImageUrl: messageMap.message.sendMember.profileImageUrl, size: 40)
+                            .padding(.top, 8)
                     }
                 }
             }else{
                 Spacer(minLength: 47)
             }
             
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 if !mymessge && (!messageMap.sameUser || !messageMap.sameDate) {
-                    Text(messageMap.message.sendMember.userName) // 상대방 이름
+                    let userName = messageMap.message.sendMember.userName
+                    Text(userName.isEmpty ? "탈퇴 회원" : userName) // 상대방 이름
                         .customFontStyle(.gray1_R12)
+                        .padding(.top, 8)
                 }
                 HStack(alignment: .bottom){
-                    if mymessge {
+                    if mymessge && messageMap.sameTime {
                         Spacer()
                         Text(messageMap.message.time) // 메시지 작성 시간
                             .customFontStyle(.gray1_R12)
@@ -303,9 +331,11 @@ struct ChatMessageView: View {
                         .padding(8)
                         .background(mymessge ? .main : .gray3)
                         .cornerRadius(10)
-                    if !mymessge {
+                    if !mymessge && messageMap.sameTime {
                         Text(messageMap.message.time) // 메시지 작성 시간
                             .customFontStyle(.gray1_R12)
+                    }
+                    if !mymessge {
                         Spacer()
                     }
                 }
@@ -323,3 +353,15 @@ struct ChatMessageView: View {
     }
 }
 
+extension ChattingView {
+    func scrollToBottom(_ proxy: ScrollViewProxy?) {
+        // 스크롤 뷰를 제일 하단으로 스크롤합니다.
+        if let proxy = proxy {
+            withAnimation {
+                proxy.scrollTo(chatViewModel.messageMap.last!.message, anchor: .top)
+            }
+        }
+        // 스크롤 뷰의 제일 하단이 아님을 표시합니다.
+        scrollToBottom = false
+    }
+}

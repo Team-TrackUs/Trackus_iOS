@@ -24,8 +24,8 @@ struct MyRecordDetailView: View {
         self.runningLog = runningLog
         self.exerciseManager = ExerciseManager(
             distance: runningLog.distance,
-            target: runningLog.targetDistance ?? 0,
-            elapsedTime: runningLog.elapsedTime
+            target: runningLog.target ?? 0,
+            elapsedTime: runningLog.seconds
         )
     }
     

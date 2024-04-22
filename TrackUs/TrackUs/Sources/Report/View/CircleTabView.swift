@@ -247,7 +247,7 @@ struct DailyCircleView: View {
     
     // 필터링된 데이터에서 시간 값 합산
     var totalTimeForSelectedDate: Double {
-        Double(runningLogForSelectedDate.reduce(0) { $0 + $1.elapsedTime })
+        Double(runningLogForSelectedDate.reduce(0) { $0 + $1.seconds })
     }
     
     // 필터링된 데이터에서 평균 페이스 계산
@@ -430,7 +430,8 @@ struct MonthlyCircleView: View {
             return 0 // 러닝 데이터가 없는 경우 평균 시간을 0으로 설정하거나 다른 처리를 수행
         }
         
-        let totalTime = runningLogForSelectedMonth.reduce(0) { $0 + $1.elapsedTime }
+        let totalTime = runningLogForSelectedMonth.reduce(0) { $0 + $1.seconds }
+//        return Double(totalTime / runningLogForSelectedMonth.count)
         return totalTime / Double(runningLogForSelectedMonth.count)
     }
     

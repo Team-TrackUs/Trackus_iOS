@@ -92,7 +92,7 @@ class UserProfileViewModel: ObservableObject {
                 let documentID = runningData.documentID // 추가 문서 ID
                 if let calorie = runningData.data()["calorie"] as? Double,
                    let distance = runningData.data()["distance"] as? Double,
-                   let elapsedTime = runningData.data()["elapsedTime"] as? Double,
+                   let elapsedTime = runningData.data()["seconds"] as? Double,
                    let pace = runningData.data()["pace"] as? Double,
                    let timestamp = runningData.data()["timestamp"] as? Timestamp {
                     let dateValue = timestamp.dateValue()
@@ -102,11 +102,11 @@ class UserProfileViewModel: ObservableObject {
                     let address = runningData.data()["address"] as? String
                     let routeImageUrl = runningData.data()["routeImageUrl"] as? String
                     let coordinates = runningData.data()["coordinates"] as? [GeoPoint]
-                    let targetDistance = runningData.data()["targetDistance"] as? Double
+                    let targetDistance = runningData.data()["target"] as? Double
                     let isGroup = runningData.data()["isGroup"] as? Bool
-                    let exprectedTime = runningData.data()["exprectedTime"] as? Double
+                   
                     
-                    let log = Runninglog(documentID: documentID, calorie: calorie, distance: distance, elapsedTime: elapsedTime, pace: pace, timestamp: dateValue, address: address, coordinates: coordinates, routeImageUrl: routeImageUrl, title: title, targetDistance: targetDistance, isGroup: isGroup, exprectedTime: exprectedTime ?? 0)
+                    let log = Runninglog(documentID: documentID, calorie: calorie, distance: distance, seconds: elapsedTime, pace: pace, timestamp: dateValue, address: address, coordinates: coordinates, routeImageUrl: routeImageUrl, title: title, target: targetDistance, isGroup: isGroup)
                     
                     if !self.runningLog.contains(log) {
                         self.runningLog.append(log)
