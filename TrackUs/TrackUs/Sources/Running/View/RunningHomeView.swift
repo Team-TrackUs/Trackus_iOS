@@ -212,7 +212,11 @@ extension RunningHomeView {
                                 Button(action: {
                                     router.push(.courseDetail(CourseViewModel(course: course)))
                                 }, label: {
-                                    RunningCell(course: course, user: userSearchViewModel.filterdUserData(uid: [course.ownerUid])[0])
+                                    if let user =  userSearchViewModel.filterdUserData(uid: [course.ownerUid]).first {
+                                        RunningCell(course: course, user: userSearchViewModel.filterdUserData(uid: [user.uid])[0])
+                                    } else {
+                                        RunningCell(course: course)
+                                    }
                                 })
                             }
                         }
