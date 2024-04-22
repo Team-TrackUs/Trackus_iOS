@@ -45,9 +45,9 @@ struct UserInfo : Codable {
     var runningStyle: RunningStyle?
     var token: String
     // 본인이 차단한 사용자 리스트
-    //var blockUserList: [String]
+    var blockUserList: [String]?
     // 본인이 차단한 사용자 + 본인을 차단한 사용자 리스트
-    //var blockedUserMeList: [String]
+    var blockedUserMeList: [String]?
     
     
 //    init(from decoder: any Decoder) throws {
@@ -60,8 +60,8 @@ struct UserInfo : Codable {
         self.isProfilePublic = false
         self.isProSubscriber = false
         self.token = ""
-       // self.blockUserList = [""]
-        //self.blockedUserMeList = [""]
+        self.blockUserList = [""]
+        self.blockedUserMeList = [""]
     }
     
     enum CodingKeys:String, CodingKey {

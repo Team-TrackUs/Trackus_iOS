@@ -428,6 +428,7 @@ extension AuthenticationViewModel {
         
     }
     
+    // 사용자 accessToken 받아오기 -> Notification 관련 -> 이후 수정
     func getAccessToken(completion: @escaping (String?, Error?) -> Void) {
         // Firebase에 로그인하여 AccessToken을 가져오는 코드
         if let accessToken = Auth.auth().currentUser?.refreshToken {
