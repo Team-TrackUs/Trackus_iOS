@@ -136,8 +136,6 @@ class AuthenticationViewModel: NSObject, ObservableObject {
                 }
                 try await user?.delete()
                 try await Firestore.firestore().collection("users").document(uid).delete()
-//                Firestore.firestore().collection("users")
-//                    .whereField("members", isEqualTo: uid).delet
                 print("Document successfully removed!")
                 // 탈퇴 사유를 Firestore에 저장
                 if !reason.isEmpty {
@@ -406,16 +404,6 @@ extension AuthenticationViewModel {
                 } catch {
                     print(error)
                 }
-//                guard let _ = snapshot?.description else {return}
-//                let decoder =  JSONDecoder()
-//                do {
-//                    let data = snapshot?.data()
-//                    let jsonData = try JSONSerialization.data(withJSONObject:data ?? "")
-//                    self.userInfo = try decoder.decode(UserInfo.self, from: jsonData)
-//                    downloadImageFromStorage(uid: userInfo.uid)
-//                } catch let err {
-//                    print("err: \(err)")
-//                }
             }
         }
         

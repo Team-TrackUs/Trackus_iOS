@@ -48,7 +48,7 @@ struct UserInfo : Codable {
     var blockedUserList: [String]?
     var blockingMeList: [String]?
     /// 필터링용도 List : 본인이 차단한 사용자 + 본인을 차단한 사용자 리스트
-    var blockList: [String]? {
+    var blockList: [String] {
         var result: [String] = []
         if let blockedUserList = blockedUserList{
             result += blockedUserList
