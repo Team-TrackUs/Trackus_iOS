@@ -241,8 +241,6 @@ class ChatViewModel: ObservableObject {
         usersUnreadCountInfo[myuid] = 0
         ref.document(currentChatID).updateData(["usersUnreadCountInfo" : usersUnreadCountInfo])
     }
-    
-    // 마지막 메세지 변경
 }
 
 extension ChatViewModel {

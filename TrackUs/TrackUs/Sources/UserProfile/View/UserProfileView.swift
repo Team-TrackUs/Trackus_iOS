@@ -44,6 +44,7 @@ struct UserProfileContent: View {
     @Binding var selectedDate: Date?
     @ObservedObject var userProfileViewModel: UserProfileViewModel
     let userUid : String
+    // 차단 여부
     
     var body: some View {
         VStack {
@@ -108,7 +109,13 @@ struct UserProfileContent: View {
                             // 차단 버튼
                             Button {
                                 // 차단하기 기능
-                                
+                                if authViewModel.checkBlocking(uid: userInfo.uid){
+                                    // 차단 해제
+                                    authViewModel.UnblockingUser(uid: userInfo.uid)
+                                }else{
+                                    // 차단 등록
+                                    authViewModel.BlockingUser(uid: userInfo.uid)
+                                }
                             } label: {
                                 Image(systemName: "person.slash")
                                     .resizable()
@@ -116,7 +123,7 @@ struct UserProfileContent: View {
                                     .foregroundStyle(.gray1)
                             }
                             
-                            Text("차단")
+                            Text(authViewModel.checkBlocking(uid: userInfo.uid) ? "차단 해제" : "차단")
                                 .customFontStyle(.gray2_R12)
                         }
                         
