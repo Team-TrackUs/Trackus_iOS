@@ -26,6 +26,9 @@ struct ChatListView: View {
             
             List{
                 ForEach(chatViewModel.chatRooms, id: \.id) { chatRoom in
+                    // 차단 여부에 따라 표기
+                    if !chatRoom.group && (authViewModel.userInfo.blockList.contains( chatRoom.nonSelfMembers[0])){
+                    }else {
                     Button {
                         router.push(.chatting(ChatViewModel(chatRoom: chatRoom, users: chatViewModel.users)))
                     } label: {
@@ -79,6 +82,7 @@ struct ChatListView: View {
                                 .customFontStyle(.white_B16)
                         }
                     }
+                }
                 }
             }
             .listStyle(.plain)

@@ -44,15 +44,20 @@ struct UserInfo : Codable {
     var setDailyGoal: Double?
     var runningStyle: RunningStyle?
     var token: String
-    // 본인이 차단한 사용자 리스트
-    //var blockUserList: [String]
-    // 본인이 차단한 사용자 + 본인을 차단한 사용자 리스트
-    //var blockedUserMeList: [String]
-    
-    
-//    init(from decoder: any Decoder) throws {
-//        <#code#>
-//    }
+    /// 차단한 사용자 리스트
+    var blockedUserList: [String]?
+    var blockingMeList: [String]?
+    /// 필터링용도 List : 본인이 차단한 사용자 + 본인을 차단한 사용자 리스트
+    var blockList: [String] {
+        var result: [String] = []
+        if let blockedUserList = blockedUserList{
+            result += blockedUserList
+        }
+        if let blockingMeList = blockingMeList {
+            result += blockingMeList
+        }
+        return result
+    }
     
     init(){
         self.uid = ""
@@ -60,8 +65,6 @@ struct UserInfo : Codable {
         self.isProfilePublic = false
         self.isProSubscriber = false
         self.token = ""
-       // self.blockUserList = [""]
-        //self.blockedUserMeList = [""]
     }
     
     enum CodingKeys:String, CodingKey {
@@ -77,6 +80,8 @@ struct UserInfo : Codable {
         case setDailyGoal = "setDailyGoal"
         case runningStyle = "runningStyle"
         case token = "token"
+        case blockedUserList = "blockedUserList"
+        case blockingMeList = "blockingMeList"
     }
 }
 
