@@ -64,8 +64,10 @@ struct PlaceholderTextView: UIViewRepresentable {
 }
 
 struct Withdrawal: View {
-    @StateObject var authViewModel = AuthenticationViewModel.shared
     @EnvironmentObject var router: Router
+    @StateObject var courseListViewModel = CourseListViewModel()
+    
+    @StateObject var authViewModel = AuthenticationViewModel.shared
     @State private var reason: String = ""
     @State private var isAgreed: Bool = false
     @State private var showWithdrawalAlert: Bool = false
@@ -81,6 +83,7 @@ struct Withdrawal: View {
             }
         }
     }
+    
     var body: some View {
         VStack {
             ScrollView(showsIndicators: false) {
@@ -194,7 +197,7 @@ struct Withdrawal: View {
                 }
         )
         
-        .padding(.horizontal, Constants.ViewLayout.VIEW_STANDARD_HORIZONTAL_SPACING)
+        .padding(.horizontal, 16)
         .customNavigation {
             Text("회원탈퇴")
                 .customFontStyle(.gray1_SB16)
@@ -206,6 +209,8 @@ struct Withdrawal: View {
     func withdrawalButtonTapped() {
         Task {
             let isDeleted = await authViewModel.deleteAccount(withReason: reason)
+            await courseListViewModel.deleteUserWithUID(authViewModel.userInfo.uid)
+            
             if isDeleted {
                 router.popToRoot()
             }

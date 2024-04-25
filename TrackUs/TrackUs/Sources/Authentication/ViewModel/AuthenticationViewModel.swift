@@ -16,6 +16,7 @@ import CryptoKit
 import SwiftUI
 
 enum AuthenticationState {
+    case startapp
     case unauthenticated
     case authenticating
     case signUpcating
@@ -47,16 +48,20 @@ class FirebaseManger: NSObject {
 @MainActor
 class AuthenticationViewModel: NSObject, ObservableObject {
     static let shared = AuthenticationViewModel()
+    var chatListViewModel = ChatListViewModel.shared
     
-    @Published var authenticationState: AuthenticationState = .unauthenticated
+    @Published var authenticationState: AuthenticationState = .startapp
     @Published var errorMessage: String = ""
-    @Published var user: User?
-    @Published var newUser: Bool = false
-    @Published var checkBool: Bool?
+    @Published var user: Firebase.User?
     @Published var userInfo: UserInfo = UserInfo()
+    @Published var accessToken: String?
     
+    // 외부 공유용 사용
+    static var currentUid: String {
+        shared.userInfo.uid
+    }
     
-    // apple login 
+    // apple login
     var window: UIWindow?
     fileprivate var currentNonce: String?
 
@@ -83,7 +88,9 @@ class AuthenticationViewModel: NSObject, ObservableObject {
                             self.authenticationState = .signUpcating
                         }else {
                             self.getMyInformation()
+                            self.chatListViewModel.subscribeToUpdates()
                             self.authenticationState = .authenticated
+                            //self.accessToken = try await user?.getIDToken()
                         }
                     }
                 }
@@ -110,6 +117,8 @@ class AuthenticationViewModel: NSObject, ObservableObject {
     func logOut() {
         do {
             try Auth.auth().signOut()
+            userInfo = UserInfo()
+            
         }
         catch {
             print(error)
@@ -127,15 +136,18 @@ class AuthenticationViewModel: NSObject, ObservableObject {
                 }
                 try await user?.delete()
                 try await Firestore.firestore().collection("users").document(uid).delete()
+//                Firestore.firestore().collection("users")
+//                    .whereField("members", isEqualTo: uid).delet
                 print("Document successfully removed!")
                 // 탈퇴 사유를 Firestore에 저장
                 if !reason.isEmpty {
                     let withdrawalData = ["uid": uid,
                                           "reason": reason]
-                    Firestore.firestore().collection("withdrawalReasons").addDocument(data: withdrawalData)
+                    try await Firestore.firestore().collection("withdrawalReasons").addDocument(data: withdrawalData)
                 }
             }
             self.authenticationState = .unauthenticated
+            userInfo = UserInfo()
             return true
         }
         catch {
@@ -144,6 +156,23 @@ class AuthenticationViewModel: NSObject, ObservableObject {
             print("ErrorMessage : ", errorMessage)
             print("deletAccount Error!!")
             return false
+        }
+    }
+    
+    // MARK: - Token값 등록
+    func updateToken(_ token: String)  {
+        guard let uid = FirebaseManger.shared.auth.currentUser?.uid else {
+            return }
+        
+        let data = ["token": token]
+        FirebaseManger.shared.firestore.collection("users").document(uid).updateData(data) { error in
+            if let error = error {
+                // 업데이트 중에 오류가 발생한 경우 처리
+                print("Error updating token: \(error.localizedDescription)")
+            } else {
+                // 업데이트가 성공한 경우 처리
+                print("Token updated successfully")
+            }
         }
     }
 }
@@ -173,7 +202,9 @@ extension AuthenticationViewModel {
             
             let credential = GoogleAuthProvider.credential(withIDToken: idToken.tokenString,
                                                            accessToken: accessToken.tokenString)
-            try await Auth.auth().signIn(with: credential)
+            let auth = try await Auth.auth().signIn(with: credential)
+            self.userInfo.uid = auth.user.uid
+            self.accessToken = accessToken.tokenString
             return true
         }
         catch {
@@ -254,9 +285,15 @@ extension AuthenticationViewModel: ASAuthorizationControllerDelegate {
                                                            rawNonce: nonce,
                                                            fullName: appleIDCredential.fullName)
             // Sign in with Firebase.
+            
+            if let accessToken = credential.accessToken {}
             Task {
                 do {
-                    try await Auth.auth().signIn(with: credential)
+                    let auth = try await Auth.auth().signIn(with: credential)
+                    self.userInfo.uid = auth.user.uid
+                    if let accessToken = credential.accessToken {
+                        self.accessToken = accessToken
+                    }
                 }
                 catch {
                     print("Error authenticating: \(error.localizedDescription)")
@@ -328,7 +365,6 @@ extension AuthenticationViewModel {
     }
     // MARK: - 사용자 정보 저장 - 위 이미지 저장함수와 순차적으로 사용
     private func storeUserInformation() {
-        print(userInfo.runningStyle)
         guard let uid = FirebaseManger.shared.auth.currentUser?.uid else {
             return }
         // 해당부분 자료형 지정 필요
@@ -342,10 +378,10 @@ extension AuthenticationViewModel {
                         "isProSubscriber": false,
                         "profileImageUrl": userInfo.profileImageUrl as Any,
                         "setDailyGoal": userInfo.setDailyGoal as Any,
-                        "runningStyle": userInfo.runningStyle?.rawValue as Any] as [String : Any]
+                        "runningStyle": userInfo.runningStyle?.rawValue as Any,
+                        "token": userInfo.token] as [String : Any]
         FirebaseManger.shared.firestore.collection("users").document(uid).setData(userData){ error in
             if error != nil {
-                print("@@@@@@ error 1 @@@@@@")
                 return
             }
             print("success")
@@ -355,11 +391,11 @@ extension AuthenticationViewModel {
     // MARK: - 사용자 본인 정보 불러오기
     func getMyInformation(){
         
-        guard let uid = FirebaseManger.shared.auth.currentUser?.uid else {
+        guard let user = FirebaseManger.shared.auth.currentUser else {
             print("error uid")
             return
         }
-        FirebaseManger.shared.firestore.collection("users").document(uid).getDocument { [self] (snapshot, error) in
+        FirebaseManger.shared.firestore.collection("users").document(user.uid).getDocument { [self] (snapshot, error) in
             
             if let error = error {
                 print("Error getting documents: \(error)")
@@ -374,17 +410,37 @@ extension AuthenticationViewModel {
                 } catch let err {
                     print("err: \(err)")
                 }
-                print(self.userInfo)
             }
         }
+        
+        if let accessToken = user.refreshToken {
+            self.accessToken = accessToken
+        }
+        getAccessToken { (token, error) in
+            if let token = token {
+                // AccessToken 사용
+                self.accessToken = token
+            } else if let error = error {
+                // 오류 처리
+                print("오류 발생: \(error.localizedDescription)")
+            }
+        }
+        
     }
     
+    func getAccessToken(completion: @escaping (String?, Error?) -> Void) {
+        // Firebase에 로그인하여 AccessToken을 가져오는 코드
+        if let accessToken = Auth.auth().currentUser?.refreshToken {
+            self.accessToken = accessToken
+        }
+        
+    }
+
+    
     func downloadImageFromStorage(uid: String) {
-        guard let profileImageUrl = self.userInfo.profileImageUrl else { 
-            print("Url 없음 - downloadImageFromStorage")
+        guard let profileImageUrl = self.userInfo.profileImageUrl else {
             return
         }
-        print("Url 있음 - ", profileImageUrl)
         let ref = FirebaseManger.shared.storage.reference(forURL: profileImageUrl)
 //
 //        let storageRef = storage.reference(forURL: url.absoluteString)

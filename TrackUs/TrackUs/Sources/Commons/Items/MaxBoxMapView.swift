@@ -21,7 +21,7 @@ struct MapBoxMapView: UIViewControllerRepresentable {
 class MapViewController: UIViewController, GestureManagerDelegate {
     internal var mapView: MapView!
     private var locationTrackingCancellation: AnyCancelable?
-    private let locationManager = LocationManager.shared
+    private let locationManager = LocationService.shared
     private lazy var locationButton = UIButton(frame: .zero)
 
     override public func viewDidLoad() {
@@ -36,7 +36,7 @@ class MapViewController: UIViewController, GestureManagerDelegate {
         
         mapView = MapView(frame: view.bounds, mapInitOptions: myMapInitOptions)
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        mapView.mapboxMap.styleURI = .light
+        mapView.mapboxMap.styleURI = StyleURI(rawValue: "mapbox://styles/seokki/clslt5i0700m901r64bli645z")
         try? mapView.mapboxMap.setCameraBounds(with: cameraBoundsOptions)
         self.view.addSubview(mapView)
         
@@ -66,14 +66,13 @@ class MapViewController: UIViewController, GestureManagerDelegate {
         locationButton.addTarget(self, action: #selector(centerMapOnUser), for: .touchDown)
 
         if #available(iOS 13.0, *) {
-            locationButton.setImage(UIImage(named: "locationButton"), for: .normal)
+            locationButton.setImage(UIImage(named: "location_icon"), for: .normal)
         } else {
             locationButton.setTitle("No tracking", for: .normal)
         }
         
         let buttonWidth = 44.0
         locationButton.translatesAutoresizingMaskIntoConstraints = false
-//        locationButton.backgroundColor = UIColor(white: 0.97, alpha: 1)
         locationButton.layer.cornerRadius = buttonWidth/2
         locationButton.layer.shadowOffset = CGSize(width: -1, height: 1)
         locationButton.layer.shadowColor = UIColor.black.cgColor

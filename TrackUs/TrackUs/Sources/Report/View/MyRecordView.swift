@@ -1,0 +1,512 @@
+//
+//  MyRunningRecordView.swift
+//  TrackUs
+//
+//  Created by 박선구 on 2/10/24.
+//
+
+import SwiftUI
+import Firebase
+
+enum RecordFilter: String, CaseIterable, Identifiable { // 나이대 피커
+    case all = "전체"
+    case personal = "개인"
+    case mate = "러닝메이트"
+    
+    var id: Self { self }
+}
+
+struct MyRecordView: View {
+    @EnvironmentObject var router: Router
+    @ObservedObject var viewModel = ReportViewModel.shared
+    var vGridItems = [GridItem()]
+    @State private var calendarButton = false
+    @State private var selectedFilter: RecordFilter?
+    @State private var gridDelete = false
+    @Binding var selectedDate: Date?
+    @State var selectedRunningLog: Runninglog?
+    @State var isDelete = false
+    @State private var isMenuOpen = false
+    
+    var body: some View {
+        ScrollView {
+            ZStack(alignment: .top) {
+                VStack(alignment: .leading) {
+                    
+                    VStack(alignment: .leading) {
+                        Text("러닝 기록")
+                            .customFontStyle(.gray1_B24)
+                            .padding(.top, 24)
+                            .padding(.bottom, 8)
+                        Text("러닝 기록과 상세 러닝 정보를 확인해보세요.")
+                            .customFontStyle(.gray2_R15)
+                            .padding(.bottom, 20)
+                    }
+                    
+                    HStack {
+                        Menu {
+                            ForEach(RecordFilter.allCases) { filter in
+                                Button {
+                                    selectedFilter = filter
+                                } label: {
+                                    Text(filter.rawValue)
+                                }
+                            }
+                        } label: {
+                            HStack {
+                                Text(selectedFilter?.rawValue ?? "전체")
+                                    .customFontStyle(.gray1_SB12)
+                                Image(systemName: "arrowtriangle.down.fill")
+                                    .resizable()
+                                    .frame(width: 6, height: 6)
+                                    .foregroundColor(.gray1)
+                            }
+                            .padding(5)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(lineWidth: 1)
+                                    .foregroundColor(.gray1)
+                            )
+                        }
+                        .onTapGesture {
+                            isMenuOpen = true
+                        }
+                        
+                        
+                        Spacer()
+                        
+                        Button {
+                            calendarButton.toggle()
+                        } label: {
+                            Image(.calendarIcon)
+                        }
+                    }
+                    LazyVGrid(columns: vGridItems, spacing: 0) {
+                        ForEach(filteredRunningLog, id: \.documentID) { item in
+                            VStack {
+                                ZStack {
+                                    Button {
+                                        selectedRunningLog = item
+                                        router.push(.recordDetail(selectedRunningLog!))
+                                    } label: {
+                                        RecordCell(runningLog: item)
+                                    }
+                                    HStack(alignment: .top) {
+                                        Spacer()
+                                        
+                                        Menu {
+                                            Button(role: .destructive ,action: {
+                                                self.isDelete = true
+                                                self.selectedRunningLog = item
+                                            }) {
+                                                Text("러닝기록 삭제")
+                                            }
+                                            
+                                            Button {
+                                                
+                                            } label: {
+                                                Text("취소")
+                                            }
+                                            .foregroundColor(.gray1)
+                                        } label: {
+                                            Image(systemName: "ellipsis")
+                                                .rotationEffect(.degrees(90))
+                                                .frame(width: 40, height: 40)
+                                        }
+                                        .foregroundColor(.gray1)
+                                        .offset(y: -25)
+                                        .onTapGesture {
+                                            isMenuOpen = true
+                                        }
+                                    }
+                                }
+                                
+                                Divider()
+                                    .padding(.top, 24)
+                                    .edgesIgnoringSafeArea(.all)
+                            }
+                        }
+                    }
+                }
+                .padding(.vertical, 20)
+                .padding(.horizontal, 16)
+                
+                if isMenuOpen {
+                    Color.black.opacity(0.001)
+                        .edgesIgnoringSafeArea(.all)
+                        .onTapGesture {
+                            isMenuOpen = false
+                        }
+                }
+            }
+        }
+        .popup(isPresented: $gridDelete) {
+            HStack {
+                Image(.trashSlashIcon)
+                
+                Spacer()
+                
+                Text("러닝 기록이 삭제되었습니다.")
+                    .customFontStyle(.gray1_SB16)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 8)
+            .background(.white)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(lineWidth: 1)
+                    .foregroundColor(.gray3)
+            )
+            .clipShape(Capsule())
+            .padding(45)
+            .shadow(radius: 5)
+            .offset(y: 30)
+            
+        } customize: {
+            $0
+                .type(.floater())
+                .position(.bottom)
+                .animation(.smooth)
+                .autohideIn(1)
+        }
+        
+        .sheet(isPresented: $calendarButton,onDismiss: {
+            
+        }, content: {
+            CustomDateFilter(selectedDate: $selectedDate, isPickerPresented: $calendarButton)
+                .presentationDetents([.height(390)])
+                .presentationDragIndicator(.hidden)
+        })
+        .alert("알림", isPresented: $isDelete) {
+            Button("삭제", role: .destructive) {
+                gridDelete = true
+                print("삭제버튼")
+                if let selectedRunningLog = selectedRunningLog {
+                    
+                    deleteRunningLog(selectedRunningLog: selectedRunningLog)
+                }
+            }
+            Button("취소", role: .cancel) {}
+        } message: {
+            Text("러닝 기록을 삭제하시겠습니까? \n 삭제한 러닝기록은 복구할 수 없습니다.")
+        }
+    }
+    
+    func deleteRunningLog(selectedRunningLog: Runninglog) {
+        if let documentID = selectedRunningLog.documentID,
+           let index = viewModel.runningLog.firstIndex(where: { $0.documentID == documentID }) {
+            viewModel.deleteRunningLog(documentID)
+            
+            viewModel.runningLog.remove(at: index)
+        }
+    }
+    
+    var filteredRunningLog: [Runninglog] {
+        switch selectedFilter {
+        case .personal:
+            return viewModel.runningLog.filter { $0.isGroup == false }
+        case .mate:
+            return viewModel.runningLog.filter { $0.isGroup == true }
+        default:
+            return viewModel.runningLog
+        }
+    }
+}
+
+extension MyRecordView {
+    func isSameDay(date1: Date, date2: Date) -> Bool {
+        let calendar = Calendar.current
+        return calendar.isDate(date1, inSameDayAs: date2)
+    }
+}
+
+//MARK: - RecordCell
+struct RecordCell: View {
+    let runningLog : Runninglog
+    
+    var body: some View {
+        VStack(spacing: 5) {
+            HStack(spacing: 10) {
+                ImageView(urlString: runningLog.routeImageUrl)
+                    .frame(width: 100, height: 100)
+                    .cornerRadius(12)
+                
+                VStack(alignment: .leading) {
+                    HStack {
+                        
+                        if runningLog.isGroup ?? false {
+                            Text("러닝메이트")
+                                .foregroundColor(.white)
+                                .font(.system(size: 11))
+                                .fontWeight(.semibold)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 3)
+                                .background(Color.orange2)
+                                .cornerRadius(25)
+                        } else {
+                            Text("개인")
+                                .foregroundColor(.white)
+                                .font(.system(size: 11))
+                                .fontWeight(.semibold)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 3)
+                                .background(Color.main)
+                                .cornerRadius(25)
+                        }
+                        
+                        Spacer()
+                    }
+                    
+                    Text(runningLog.title ?? "러닝")
+                        .lineLimit(1)
+                        .customFontStyle(.gray1_B16)
+                    
+                    HStack(spacing: 10) {
+                        HStack {
+                            Image(.pinIcon)
+                            Text(runningLog.address ?? "대한민국 서울시")
+                                .customFontStyle(.gray1_R9)
+                                .lineLimit(1)
+                        }
+                        
+                        HStack {
+                            Image(.timeIcon)
+                            Text(formatTime(runningLog.timestamp))
+                                .customFontStyle(.gray1_R9)
+                        }
+                        
+                        HStack {
+                            Image(.arrowBothIcon)
+                            Text("\((runningLog.distance).asString(unit: .kilometer))") // 수정된부분^^
+                                .customFontStyle(.gray1_R9)
+                        }
+                    }
+                    
+                    HStack {
+                        Text(formatDate(runningLog.timestamp))
+                            .customFontStyle(.gray1_SB12)
+                        
+                        Spacer()
+                    }
+                }
+            }
+            
+        }
+        .padding(.top, 24)
+    }
+    
+    func formatTime(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "hh:mm a"
+        dateFormatter.amSymbol = "AM"
+        dateFormatter.pmSymbol = "PM"
+        return dateFormatter.string(from: date)
+    }
+    
+    func formatDate(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy년 MM월 dd일"
+        dateFormatter.amSymbol = "AM"
+        dateFormatter.pmSymbol = "PM"
+        return dateFormatter.string(from: date)
+    }
+}
+
+//MARK: - 커스텀 캘린더
+
+struct CustomDateFilter: View {
+    @ObservedObject var viewModel = ReportViewModel.shared
+    @State var currentDate: Date = Date()
+    @State var currentMonth: Int = 0
+    @Binding var selectedDate: Date?
+    @Binding var isPickerPresented: Bool
+    let calendar = Calendar.current
+    
+    var body: some View {
+        VStack(spacing: 35){
+            
+            
+            let days: [String] = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+            
+            ZStack (alignment: .trailing){
+                HStack(spacing: 20){
+                    
+                    Spacer()
+                    
+                    Button {
+                        currentMonth -= 1
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.white)
+                    }
+                    
+                    HStack(spacing: 10){
+                        
+                        Text(extraDate()[1])
+                            .customFontStyle(.white_B16)
+                    }
+                    
+                    Button {
+                        currentMonth += 1
+                    } label: {
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.white)
+                    }
+                    
+                    Spacer()
+                    
+                    
+                }
+                .padding(.vertical)
+                .background(Color.main)
+                
+                Button {
+                    isPickerPresented.toggle()
+                } label: {
+                    Text("확인")
+                        .customFontStyle(.white_B16)
+                }
+                .padding()
+                
+            }
+            
+            HStack(spacing: 0){
+                ForEach(days, id: \.self){ day in
+                    
+                    Text(day)
+                        .customFontStyle(.gray1_B16)
+                        .frame(maxWidth: .infinity, maxHeight: 1)
+                }
+            }
+            
+            let columns = Array(repeating: GridItem(.flexible()), count: 7)
+            
+            LazyVGrid(columns: columns, spacing: 5) {
+                ForEach(extractDate()) { value in
+                    CardView(value: value, isSelected: isSameDay(date1: value.date, date2: selectedDate ?? Date()))
+                        .onTapGesture {
+                            selectedDate = value.date
+                        }
+                }
+            }
+            .frame(height: 230)
+            
+            Spacer()
+        }
+        .frame(maxHeight: .infinity)
+        .cornerRadius(10)
+        .onChange(of: currentMonth) { newValue in
+            
+            currentDate = getCurrentMonth()
+        }
+    }
+    
+    @ViewBuilder
+    func CardView(value: DateValue, isSelected: Bool) -> some View {
+        VStack {
+            ZStack(alignment: .center) {
+                if value.day != -1 {
+                    Text("\(value.day)")
+                        .font(.system(size: 16))
+                        .fontWeight(.semibold)
+                        .foregroundStyle(isSelected ? .white : isSameDay(date1: value.date, date2: currentDate) ? .gray1 : (isSameMonth(date1: value.date, date2: currentDate) && value.date > Date() ? .gray1 : .gray1))
+                        .frame(width: 30)
+                        .frame(height: 20)
+                    let hasGroupedRunning = viewModel.runningLog.contains { calendar.isDate($0.timestamp, inSameDayAs: value.date) && $0.isGroup == true }
+                    let hasPersonalRunning = viewModel.runningLog.contains { calendar.isDate($0.timestamp, inSameDayAs: value.date) && $0.isGroup == false }
+                    
+                    if hasGroupedRunning && hasPersonalRunning {
+                        HStack(spacing: 5) {
+                            Circle()
+                                .foregroundColor(isSelected ? .white : .orange2)
+                                .frame(width: 5, height: 5)
+                            
+                            Circle()
+                                .foregroundColor(isSelected ? .white : .main)
+                                .frame(width: 5, height: 5)
+                        }
+                        .offset(y: 12)
+                    } else if hasGroupedRunning {
+                        Circle()
+                            .foregroundColor(isSelected ? .white : .orange2)
+                            .frame(width: 5, height: 5)
+                            .offset(y: 12)
+                    } else if hasPersonalRunning {
+                        Circle()
+                            .foregroundColor(isSelected ? .white : .main)
+                            .frame(width: 5, height: 5)
+                            .offset(y: 12)
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 5)
+        .background(value.day != -1 && isSelected ? .main : .white)
+        .cornerRadius(30)
+    }
+    
+    func isSameDay(date1: Date, date2: Date)-> Bool{
+        let calendar = Calendar.current
+        
+        return calendar.isDate(date1, inSameDayAs: date2)
+    }
+    
+    func extraDate()-> [String]{
+        
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "yyyy MMMM "
+        
+        let date = formatter.string(from: currentDate)
+        
+        return date.components(separatedBy: " ")
+    }
+    
+    func getCurrentMonth()->Date{
+        
+        let calendar = Calendar.current
+        
+        guard let currentMonth = calendar.date(byAdding: .month, value: self.currentMonth, to: Date()) else {
+            return Date()
+        }
+        return currentMonth
+    }
+    
+    func extractDate() ->[DateValue]{
+        
+        let calendar = Calendar.current
+        
+        let currentMonth = getCurrentMonth()
+        
+        var days = currentMonth.getAllDates().compactMap{ date -> DateValue in
+            
+            let day = calendar.component(.day, from: date)
+            
+            return DateValue(day: day, date: date)
+        }
+        
+        let firstWeekday = calendar.component(.weekday, from: days.first?.date ?? Date())
+        
+        for _ in 0..<firstWeekday - 1{
+            days.insert(DateValue(day: -1, date: Date()), at: 0)
+        }
+        
+        return days
+    }
+    
+    func isSameMonth(date1: Date, date2: Date) -> Bool {
+        let calendar = Calendar.current
+        let components1 = calendar.dateComponents([.year, .month], from: date1)
+        let components2 = calendar.dateComponents([.year, .month], from: date2)
+        return components1 == components2
+    }
+    
+}
+
+//#Preview {
+//    MyRecordView()
+////    RecordCell()
+//}

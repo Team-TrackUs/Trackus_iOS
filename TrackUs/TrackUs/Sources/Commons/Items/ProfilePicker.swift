@@ -49,7 +49,7 @@ struct ProfilePicker: View {
                         .clipShape(Circle())
                         .shadow(radius: 1)
                 }else{
-                    Image(.profileDefault)
+                    Image(.profileImg)
                         .resizable()
                         .frame(width: size, height: size)
                         //.scaledToFit()

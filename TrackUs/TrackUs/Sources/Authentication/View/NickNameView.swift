@@ -13,7 +13,7 @@ struct NickNameView: View {
     
     // nickName 데이터값 변경
     @State private var nickName: String = ""
-    @State private var availability: Bool = true
+    @State private var availability: Bool = false
     
     init(signUpFlow: Binding<SignUpFlow>) {
         self._signUpFlow = signUpFlow

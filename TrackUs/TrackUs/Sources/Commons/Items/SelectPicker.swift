@@ -127,7 +127,7 @@ struct SelectPicker: View {
                                 .customFontStyle(.gray2_L16)
                         }
                         Spacer()
-                        Image(.pickerLogo)
+                        Image(.arrowUpwardIcon)
                             .resizable()
                             .frame(width: 9,height: 18)
                             .scaledToFit()
@@ -173,7 +173,6 @@ struct PickerSheet: View {
                         .tag(value)
                 }
             }
-            .customFontStyle(.gray1_M16)
             .pickerStyle(WheelPickerStyle())
             .presentationDetents([.height(300)])
             HStack(spacing: 8){
