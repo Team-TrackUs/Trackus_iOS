@@ -56,14 +56,8 @@ class ChatViewModel: ObservableObject {
     init(myInfo: UserInfo, opponentInfo: UserInfo){
         // 기존 채팅 있는지 확인
         self.currentChatID = ""
-        self.members = [myInfo.uid: Member(uid: myInfo.uid ,
-                                           userName: myInfo.username,
-                                           profileImageUrl: myInfo.profileImageUrl,
-                                           token: myInfo.token),
-                        opponentInfo.uid: Member(uid: opponentInfo.uid,
-                                                 userName: opponentInfo.username,
-                                                 profileImageUrl: opponentInfo.profileImageUrl,
-                                                 token: opponentInfo.token)]
+        self.members = [myInfo.uid: Member(userInfo: myInfo),
+                        opponentInfo.uid: Member(userInfo: opponentInfo)]
         createChatRoom(myInfo: myInfo, opponentInfo: opponentInfo)
     }
     
@@ -83,14 +77,12 @@ class ChatViewModel: ObservableObject {
     func createChatRoom(myInfo: UserInfo, opponentInfo: UserInfo) {
         // 기존 채팅 있는지 확인
         ref.whereField("members", isEqualTo: [myInfo.uid, opponentInfo.uid])
-            //.whereField("members", arrayContains: )
             .whereField("group", isEqualTo: false).getDocuments { snapshot, error in
                 if let error = error {
                     print("@@@@@ error \(error)")
                     self.newChat = true
                     return
                 }
-                
                 guard let documents = snapshot?.documents else { return }
                 
                 let chatRoom = documents.compactMap{ document -> ChatRoom? in
@@ -105,6 +97,7 @@ class ChatViewModel: ObservableObject {
                                 text: flm.text.isEmpty ? "사진을 보냈습니다." : flm.text
                             )
                         }
+                        self.currentChatID = firestoreChatRoom.id!
                         return ChatRoom(id: document.documentID,
                                                         title: firestoreChatRoom.title,
                                                         members: firestoreChatRoom.members,
