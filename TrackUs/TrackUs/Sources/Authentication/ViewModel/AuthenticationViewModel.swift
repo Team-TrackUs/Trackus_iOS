@@ -392,7 +392,7 @@ extension AuthenticationViewModel {
             print("error uid")
             return
         }
-        FirebaseManger.shared.firestore.collection("users").document(user.uid).getDocument { snapshot, error in
+        FirebaseManger.shared.firestore.collection("users").document(user.uid).addSnapshotListener { snapshot, error in
             
             if let error = error {
                 print("Error getting documents: \(error)")
