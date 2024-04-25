@@ -15,7 +15,7 @@ struct TeamIntroView: View {
         TrackUsMember(name: "Seokki Kwon", image: "kwonSeokki_img", isDesigner: false),
         TrackUsMember(name: "Juwon Choe", image: "choeJuwon_img", isDesigner: false),
         TrackUsMember(name: "Junseong Yoon", image: "yoonJunseong_img", isDesigner: false),
-        TrackUsMember(name: "Seonkoo Park", image: "parkSeonkoo_img", isDesigner: false),
+        TrackUsMember(name: "Seonkoo Park", image: "parkSeonKoo_img", isDesigner: false),
         TrackUsMember(name: "Jihoon Jeong", image: "jeongJihoon_img", isDesigner: true)
     ]
     
@@ -31,6 +31,8 @@ struct TeamIntroView: View {
                     VStack {
                         HStack(spacing: 20) {
                             Image(.profileImg)
+                                .resizable()
+                                .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: 100)
                                 .cornerRadius(14)
                                 .shadow(radius: 4)
                             

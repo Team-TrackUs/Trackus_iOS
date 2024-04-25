@@ -136,8 +136,6 @@ class AuthenticationViewModel: NSObject, ObservableObject {
                 }
                 try await user?.delete()
                 try await Firestore.firestore().collection("users").document(uid).delete()
-//                Firestore.firestore().collection("users")
-//                    .whereField("members", isEqualTo: uid).delet
                 print("Document successfully removed!")
                 // 탈퇴 사유를 Firestore에 저장
                 if !reason.isEmpty {
@@ -286,7 +284,6 @@ extension AuthenticationViewModel: ASAuthorizationControllerDelegate {
                                                            fullName: appleIDCredential.fullName)
             // Sign in with Firebase.
             
-            if let accessToken = credential.accessToken {}
             Task {
                 do {
                     let auth = try await Auth.auth().signIn(with: credential)
@@ -318,7 +315,7 @@ extension AuthenticationViewModel: ASAuthorizationControllerPresentationContextP
 // MARK: - 사용자 정보 관련
 extension AuthenticationViewModel {
     
-    // MARK: - 이미지 저장 부분 (이미지 저장 -> 사용자 저장 순)
+    /// 이미지 저장 (이미지 저장 -> 사용자 저장 순)
     func storeUserInfoInFirebase() {
         // 이미지 유무 확인 후 저장
         guard let image = self.userInfo.image else {
@@ -395,20 +392,17 @@ extension AuthenticationViewModel {
             print("error uid")
             return
         }
-        FirebaseManger.shared.firestore.collection("users").document(user.uid).getDocument { [self] (snapshot, error) in
+        FirebaseManger.shared.firestore.collection("users").document(user.uid).addSnapshotListener { snapshot, error in
             
             if let error = error {
                 print("Error getting documents: \(error)")
             }else{
-                guard let _ = snapshot?.description else {return}
-                let decoder =  JSONDecoder()
-                do {
-                    let data = snapshot?.data()
-                    let jsonData = try JSONSerialization.data(withJSONObject:data ?? "")
-                    self.userInfo = try decoder.decode(UserInfo.self, from: jsonData)
-                    downloadImageFromStorage(uid: userInfo.uid)
-                } catch let err {
-                    print("err: \(err)")
+                do{
+                    guard let firestoreUserInfo = try snapshot?.data(as: UserInfo.self) else { return }
+                    self.userInfo = firestoreUserInfo
+                    
+                } catch {
+                    print(error)
                 }
             }
         }
@@ -428,6 +422,7 @@ extension AuthenticationViewModel {
         
     }
     
+    // 사용자 accessToken 받아오기 -> Notification 관련 -> 이후 수정
     func getAccessToken(completion: @escaping (String?, Error?) -> Void) {
         // Firebase에 로그인하여 AccessToken을 가져오는 코드
         if let accessToken = Auth.auth().currentUser?.refreshToken {
@@ -492,4 +487,62 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return result
     }
+}
+
+// MARK: - 차단 사용자 관리
+extension AuthenticationViewModel {
+    
+    
+    /// 사용자 차단 - uid: 상대방 uid 지정
+    func BlockingUser(uid: String) {
+        // UserInfo 차단 리스트 추가
+        self.userInfo.blockedUserList?.append(uid)
+        // 본인 UserInfo에 차단 목록 추가
+        FirebaseManger.shared.firestore.collection("users").document(userInfo.uid).updateData([
+            "blockedUserList": FieldValue.arrayUnion([uid])
+        ]) { error in
+            if let error = error {
+                print("Error updating document: \(error)")
+            }
+        }
+        
+        // 상대방 UserInfo 추가
+        FirebaseManger.shared.firestore.collection("users").document(uid).updateData([
+            "blockingMeList": FieldValue.arrayUnion([userInfo.uid])
+        ]) { error in
+            if let error = error {
+                print("Error updating document: \(error)")
+            }
+        }
+    }
+    
+    /// 차단 해제  - uid: 상대방 uid 지정
+    func UnblockingUser(uid: String) {
+        // UserInfo 차단 리스트 제거
+        self.userInfo.blockedUserList?.removeAll { $0 == uid }
+        // 본인 UserInfo -> blockedUserList 차단 해제
+        FirebaseManger.shared.firestore.collection("users").document(userInfo.uid).updateData([
+            "blockedUserList": FieldValue.arrayRemove([uid])
+        ]) { error in
+            if let error = error {
+                print("Error updating document: \(error)")
+            }
+        }
+        
+        // 상대방 UserInfo -> blockingMeList uid 지우기
+        FirebaseManger.shared.firestore.collection("users").document(uid).updateData([
+            "blockingMeList": FieldValue.arrayRemove([userInfo.uid])
+        ]) { error in
+            if let error = error {
+                print("Error updating document: \(error)")
+            }
+        }
+    }
+    
+    // 차단 여부 확인 -> 상대방 uid 입력
+    func checkBlocking(uid: String) -> Bool {
+        guard let list = self.userInfo.blockedUserList else{ return false }
+        return list.contains(uid)
+    }
+    
 }
