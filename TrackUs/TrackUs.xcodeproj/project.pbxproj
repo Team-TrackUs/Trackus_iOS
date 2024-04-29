@@ -131,6 +131,7 @@
 		8EDEF7C92BA98DD5000A05E1 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDEF7C82BA98DD5000A05E1 /* PlaceholderView.swift */; };
 		8EDEF7CB2BA9903F000A05E1 /* RunningCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDEF7CA2BA9903F000A05E1 /* RunningCell.swift */; };
 		8EDEF7CD2BA990D3000A05E1 /* RunningStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDEF7CC2BA990D3000A05E1 /* RunningStats.swift */; };
+		9621AD5D2BDE3E5E000F3233 /* BlockedAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9621AD5C2BDE3E5E000F3233 /* BlockedAccountView.swift */; };
 		963AE4052B678EAC00E98BF4 /* TrackUsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963AE4042B678EAC00E98BF4 /* TrackUsApp.swift */; };
 		963AE4072B678EAC00E98BF4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963AE4062B678EAC00E98BF4 /* ContentView.swift */; };
 		963AE4092B678EAE00E98BF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 963AE4082B678EAE00E98BF4 /* Assets.xcassets */; };
@@ -258,6 +259,7 @@
 		8EDEF7C82BA98DD5000A05E1 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		8EDEF7CA2BA9903F000A05E1 /* RunningCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningCell.swift; sourceTree = "<group>"; };
 		8EDEF7CC2BA990D3000A05E1 /* RunningStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningStats.swift; sourceTree = "<group>"; };
+		9621AD5C2BDE3E5E000F3233 /* BlockedAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedAccountView.swift; sourceTree = "<group>"; };
 		963AE4012B678EAC00E98BF4 /* TrackUs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackUs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		963AE4042B678EAC00E98BF4 /* TrackUsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackUsApp.swift; sourceTree = "<group>"; usesTabs = 0; };
 		963AE4062B678EAC00E98BF4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -524,6 +526,7 @@
 				82AB28BC2B6B56E100D7734D /* SettingsView.swift */,
 				963AE4242B6A2C3C00E98BF4 /* Withdrawal.swift */,
 				82AB28BA2B6B531B00D7734D /* PremiumPaymentView.swift */,
+				9621AD5C2BDE3E5E000F3233 /* BlockedAccountView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -879,6 +882,7 @@
 				822AE5F02B704AA500D90264 /* PreparingService.swift in Sources */,
 				981492D12B8C5DFE0018BDA8 /* ChatInfo.swift in Sources */,
 				82AB28BB2B6B531B00D7734D /* PremiumPaymentView.swift in Sources */,
+				9621AD5D2BDE3E5E000F3233 /* BlockedAccountView.swift in Sources */,
 				FEEAEA0B2B8276E3001F1888 /* UserProfileView.swift in Sources */,
 				610F88222B74D01E00FB12A1 /* NetworkManager.swift in Sources */,
 				8EDEF7CB2BA9903F000A05E1 /* RunningCell.swift in Sources */,
@@ -1148,7 +1152,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.TrackUs.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = TrackUs_Development;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = TrackUs_Development2;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
