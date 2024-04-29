@@ -9,11 +9,14 @@ import SwiftUI
 import UIKit
 
 struct RunningResultView: View {
+    private let workoutService: WorkoutService
+    
     @EnvironmentObject var router: Router
     @ObservedObject var runViewModel: RunActivityViewModel
-    private let workoutService: WorkoutService
+    
     @State private var showingModal = false
     @State private var showingAlert = false
+    @State private var isLoading = false
     
     init(runViewModel: RunActivityViewModel) {
         self.runViewModel = runViewModel
@@ -151,10 +154,12 @@ extension RunningResultView {
             
             SaveDataModal(text: $runViewModel.title) {
                 showingModal = false
-                
+                isLoading = true
                 Task {
+                    defer { self.isLoading = false }
                     do {
                         try await runViewModel.saveRunDataToFirestore()
+                        router.popToRoot()
                     } catch {
                         
                     }
@@ -175,6 +180,7 @@ extension RunningResultView {
         .edgesIgnoringSafeArea(.top)
         .ignoresSafeArea(.keyboard)
         .preventGesture()
+        .presentLoadingView(status: isLoading)
     }
 }
 
