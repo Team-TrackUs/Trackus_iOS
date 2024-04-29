@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct BlockedAccountView: View {
+    @EnvironmentObject var router: Router
     @ObservedObject var authenticationViewModel = AuthenticationViewModel.shared
     
     @State private var blockedUserInfoList: [(username: String, profileImageUrl: String?, uid: String)] = []
@@ -23,20 +24,24 @@ struct BlockedAccountView: View {
                     ForEach(blockedUserInfoList, id: \.uid) { userInfo in
                         HStack {
                             if let profileImageUrl = userInfo.profileImageUrl {
-                                AsyncImage(url: URL(string: profileImageUrl)) { image in
-                                    image
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 50, height: 50)
-                                        .clipShape(Circle())
-                                        .padding(.trailing, 10)
-                                } placeholder: {
-                                    Image(systemName: "person.circle.fill")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 50, height: 50)
-                                        .clipShape(Circle())
-                                        .padding(.trailing, 10)
+                                Button {
+                                    router.push(.userProfile(userInfo.uid))
+                                } label: {
+                                    AsyncImage(url: URL(string: profileImageUrl)) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 50, height: 50)
+                                            .clipShape(Circle())
+                                            .padding(.trailing, 10)
+                                    } placeholder: {
+                                        Image(systemName: "person.circle.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 50, height: 50)
+                                            .clipShape(Circle())
+                                            .padding(.trailing, 10)
+                                    }
                                 }
                             } else {
                                 Image(systemName: "person.circle.fill")
@@ -92,7 +97,6 @@ struct BlockedAccountView: View {
                 }
             }
         }
-
         .customNavigation {
             Text("차단된 계정")
                 .customFontStyle(.gray1_SB16)
@@ -105,6 +109,7 @@ struct BlockedAccountView: View {
         authenticationViewModel.UnblockingUser(uid: uid)
     }
 }
+
 
 
 
