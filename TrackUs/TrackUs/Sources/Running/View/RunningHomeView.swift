@@ -203,7 +203,7 @@ extension RunningHomeView {
             .padding(.horizontal, 16)
             
             // 가로 스크롤
-            if !courseListViewModel.courseList.isEmpty, authViewModel.userInfo.uid != "" {
+            if !courseListViewModel.courseFromUnBlockList.isEmpty, authViewModel.userInfo.uid != "" {
              
                 ScrollView(.horizontal, showsIndicators: false) {
                     VStack {
