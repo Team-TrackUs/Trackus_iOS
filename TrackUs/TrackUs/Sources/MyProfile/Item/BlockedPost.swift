@@ -12,8 +12,6 @@ struct BlockedPost: View {
     let courseVM: CourseViewModel
     let completion: () -> Void
     
-    
-    
     var body: some View {
         HStack {
             KFImage(URL(string: courseVM.course.routeImageUrl))
@@ -36,11 +34,15 @@ struct BlockedPost: View {
                 completion()
             }) {
                 Text("차단해제")
+                    .customFontStyle(.gray1_R14)
+                    .padding(4)
+                    .background(
+                        Capsule(
+                            style: .continuous
+                        )
+                        .stroke(.gray1, lineWidth: 1)
+                    )
             }
-//            MainButton(buttonText: "차단해제") {
-//                courseVM.unblockCourse(uid: courseVM.course.uid)
-//                completion()
-//            }
         }
     }
 }

@@ -31,7 +31,7 @@ struct BlockedContentsMgmtView: View {
             }
         }
         .customNavigation {
-            NavigationText(title: "차단관리")
+            NavigationText(title: "차단 게시물")
         } left: {
             NavigationBackButton()
         }

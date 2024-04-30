@@ -60,7 +60,7 @@ struct CourseDetailView: View {
                         HStack {
                             Image(.sirenIcon)
                                 .resizable()
-                                .frame(width: 27, height: 27)
+                                .frame(width: 24, height: 24)
                             Text("신고 처리가 된 게시물입니다.")
                                 .customFontStyle(.gray2_L14)
                             Spacer()
