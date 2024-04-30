@@ -89,6 +89,11 @@ struct MyProfileView: View {
                     }) {
                         MenuItem(title: "오픈소스/라이센스", image: .init(.chevronRightIcon))
                     }
+                    Button(action: {
+                        router.push(.blockedMgmt)
+                    }) {
+                        MenuItem(title: "차단 게시물", image: .init(.chevronRightIcon))
+                    }
                 }
                 
                 Divider()

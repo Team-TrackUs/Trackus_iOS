@@ -45,7 +45,8 @@ struct Course: Codable, Hashable {
     var estimatedCalorie: Double
     var createdAt: Date?
     var isEdit = false
-    
+    let reportLog: [String]
+    let isBlocked: Bool
     /// 데이터생성(데이터전송용)
     /// 
     static func createObject() -> Course {
@@ -65,7 +66,9 @@ struct Course: Codable, Hashable {
             address: "",
             estimatedCalorie: 0,
             createdAt: nil,
-            isEdit: false
+            isEdit: false,
+            reportLog: [],
+            isBlocked: false
         )
     }
     
@@ -74,5 +77,10 @@ struct Course: Codable, Hashable {
     }
 }
 
-
+struct ReportForm: Encodable {
+    let text: String
+    let fromUser: String
+    let toUser: String
+    let category: String
+}
 

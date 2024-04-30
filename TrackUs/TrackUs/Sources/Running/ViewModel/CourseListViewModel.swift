@@ -13,6 +13,22 @@ class CourseListViewModel: ObservableObject, HashableObject {
     
     @Published var courseList = [Course]()
     
+    var courseFromUnBlockList: [Course] {
+        if let blockedCourseList = UserDefaults.standard.array(forKey: Constants.UserDefaultKeys.blockedCourse) as? [String] {
+            return courseList.filter { !blockedCourseList.contains($0.uid) }
+        } else {
+            return courseList
+        }
+    }
+    
+    var courseFromBlockList: [Course] {
+        if let blockedCourseList = UserDefaults.standard.array(forKey: Constants.UserDefaultKeys.blockedCourse) as? [String] {
+            return courseList.filter { blockedCourseList.contains($0.uid) }
+        } else {
+            return []
+        }
+    }
+    
     @MainActor
     var myCourseData: [Course] {
         let uid = authViewModel.userInfo.uid

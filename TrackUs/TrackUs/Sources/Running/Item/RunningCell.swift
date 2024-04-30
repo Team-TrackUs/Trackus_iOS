@@ -5,7 +5,6 @@
 //  Created by 권석기 on 3/19/24.
 //
 
-// 참여자x/유저탈퇴 -> 
 import SwiftUI
 import Kingfisher
 

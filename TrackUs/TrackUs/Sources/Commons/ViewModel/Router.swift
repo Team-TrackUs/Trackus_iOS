@@ -54,6 +54,8 @@ final class Router: ObservableObject {
         case userProfile(String)
         case userReport(String)
         case trackusIntro
+        case blockedMgmt
+        case courseReport(CourseViewModel)
     }
 
     // MARK: - FULL SCREEN
@@ -169,6 +171,10 @@ final class Router: ObservableObject {
             UserReportView(userUid: userId)
         case .trackusIntro:
             TeamIntroView()
+        case .blockedMgmt:
+            BlockedContentsMgmtView()
+        case .courseReport(let courseVM):
+            CourseReportView(courseVM: courseVM)
         }
     }
     

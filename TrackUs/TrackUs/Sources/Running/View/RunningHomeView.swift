@@ -12,9 +12,9 @@ import PopupView
 
 struct RunningHomeView: View {
     @EnvironmentObject var router: Router
+    @EnvironmentObject var courseListViewModel: CourseListViewModel
     
     @StateObject var authViewModel = AuthenticationViewModel.shared
-    @StateObject var courseListViewModel = CourseListViewModel()
     @StateObject var userSearchViewModel = UserSearchViewModel()
     
     @State private var viewport: Viewport = .followPuck(zoom: 13, bearing: .constant(0))
@@ -74,6 +74,7 @@ extension RunningHomeView {
                     
                     // 내주변 러닝메이트
                     runningAroundMe
+                  
                 }
             } onChanged: { gestureValue in
                 let newDeltaY = gestureValue.translation.height
@@ -207,7 +208,7 @@ extension RunningHomeView {
                 ScrollView(.horizontal, showsIndicators: false) {
                     VStack {
                         HStack(spacing: 12) {
-                            ForEach(courseListViewModel.courseList, id: \.self) { course in
+                            ForEach(courseListViewModel.courseFromUnBlockList, id: \.self) { course in
                                 
                                 Button(action: {
                                     router.push(.courseDetail(CourseViewModel(course: course)))
