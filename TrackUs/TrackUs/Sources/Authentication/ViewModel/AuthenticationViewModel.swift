@@ -448,8 +448,6 @@ extension AuthenticationViewModel {
             }
         }
     }
-    
-
 }
 
 // MARK: - 이미지 수정 부분

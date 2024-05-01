@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-public var previoosUser1: String?
-public var previousdate1: String?
 
 struct ChattingView: View {
     @EnvironmentObject var router: Router
@@ -27,6 +25,8 @@ struct ChattingView: View {
     
     @State private var title: String = ""
     @State private var scrollToBottom = false // State 변수 추가
+    
+    @State private var reportAlert = false
     
     private func updatePreviousSender(_ sender: String) -> Bool{
         if previousUser != sender {
@@ -52,8 +52,19 @@ struct ChattingView: View {
                                 .id(messageMap)
                             }
                         }
+                        
                     }
                     .onChange(of: chatViewModel.messageMap.count) { _ in // 새 메시지가 추가될 때마다 호출
+//                        if let lastIndex = chatViewModel.messageMap.indices.last {
+//                            withAnimation {
+//                                proxy.scrollTo(chatViewModel.messageMap[lastIndex], anchor: .bottom)
+//                            }
+//                            // Check if the proxy is at the bottom
+//                            let offset = proxy.frame(for: chatViewModel.messageMap[lastIndex]).maxY
+//                            let scrollViewHeight = proxy.frame(in: .global).height
+//                            let bottomOffset = scrollViewHeight - offset
+//                            scrollToBottom = bottomOffset < 100 // You can adjust the threshold
+//                        }
                         withAnimation(.easeInOut(duration: 0.5)) {
                             proxy.scrollTo(chatViewModel.messageMap.last!.message, anchor: .top)
                         }
@@ -149,6 +160,7 @@ struct ChattingView: View {
             // 메세지 읽음 확인
             chatViewModel.resetUnreadCounter(myuid: authViewModel.userInfo.uid)
         }
+
         
 
     }
@@ -189,11 +201,15 @@ struct ChattingView: View {
             // 메세지 전송 버튼
             Button(
                 action: {
-                    
-                    
-                    // 메세지 전송 함수
-                    chatViewModel.sendChatMessage(chatText: sendMessage, uid: authViewModel.userInfo.uid)
-                    sendMessage = ""
+                    if authViewModel.userInfo.reportIDList?.count ?? 0 >= 3{
+                        // 신고 횟수 누적 3회 이상의 경우
+                        print("채팅 불가")
+                        reportAlert.toggle()
+                    }else {
+                        // 메세지 전송 함수
+                        chatViewModel.sendChatMessage(chatText: sendMessage, uid: authViewModel.userInfo.uid)
+                        sendMessage = ""
+                    }
                 }, label: {
                     Image(systemName: "paperplane.circle.fill")
                         .resizable()
@@ -206,6 +222,12 @@ struct ChattingView: View {
             RoundedRectangle(cornerRadius: 20)
                 .stroke(Color.gray3, lineWidth: 1)
         )
+        .alert("채팅 제한",
+               isPresented: $reportAlert) {
+            Button("확인", role: .cancel) {}
+        } message: {
+            Text("신고로 인해 채팅이 일시 제한되었습니다.\n\n자세한 내용은 아래 메일을 통해\n문의해주시기 바랍니다.\nteam.trackus@gmail.com")
+        }
     }
     // MARK: - 사이드 메뉴 View
     var SideMenuView: some View {

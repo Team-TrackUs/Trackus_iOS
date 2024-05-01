@@ -58,6 +58,8 @@ struct UserInfo : Codable {
         }
         return result
     }
+    // 신고 누적 횟수
+    var reportIDList: [String]?
     
     init(){
         self.uid = ""
@@ -82,6 +84,7 @@ struct UserInfo : Codable {
         case token = "token"
         case blockedUserList = "blockedUserList"
         case blockingMeList = "blockingMeList"
+        case reportIDList = "reportIDList"
     }
 }
 
