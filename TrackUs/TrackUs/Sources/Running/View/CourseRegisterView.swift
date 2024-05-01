@@ -14,7 +14,7 @@ import SwiftUI
 struct CourseRegisterView: View {
     @EnvironmentObject var router: Router
     @ObservedObject var courseViewModel: CourseViewModel
-    
+    @StateObject var userSearchViewModel = UserSearchViewModel()
     @State private var isDatePickerPresented = false
     @State private var isTimePickerPresented = false
     @State private var isTooltipDisplay = false
@@ -142,7 +142,9 @@ extension CourseRegisterView {
                     courseViewModel.editCourse { result in
                         switch result {
                         case .success(let course):
-                            router.pushOverRootView(.courseDetail(CourseViewModel(course: course)))
+                            router.pushOverRootView(
+                                .courseDetail(CourseViewModel(course: course),
+                                              userSearchViewModel))
                         case .failure(let error):
                             print(error.localizedDescription)
                         }
@@ -151,7 +153,9 @@ extension CourseRegisterView {
                     courseViewModel.addCourse { result in
                         switch result {
                         case .success(let course):
-                            router.pushOverRootView(.courseDetail(CourseViewModel(course: course)))
+                            router.pushOverRootView(
+                                .courseDetail(CourseViewModel(course: course),
+                                              userSearchViewModel))
                         case .failure(let error):
                             print(error.localizedDescription)
                         }

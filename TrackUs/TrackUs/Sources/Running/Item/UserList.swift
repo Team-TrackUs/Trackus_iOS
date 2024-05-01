@@ -8,7 +8,7 @@
 import SwiftUI
 
 /**
-    user목록 뷰 -> 유저프로필 이동
+ user목록 뷰 -> 유저프로필 이동
  */
 struct UserList: View {
     @EnvironmentObject var router: Router
@@ -25,8 +25,8 @@ struct UserList: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 16) {
-                    Button(action: {}, label: {
-                        if let owner = users.first  { $0.uid == ownerUid} {
+                    if let owner = users.first(where: { $0.uid == ownerUid }) {
+                        Button(action: {}, label: {
                             Button(action: {
                                 router.push(.userProfile(owner.uid))
                             }, label: {
@@ -39,10 +39,9 @@ struct UserList: View {
                                     }
                                 }
                             })
-                        }
-                        
-                    })
-                    ForEach(users.filter {$0.uid != ownerUid}, id: \.self.uid) { user in
+                        })
+                    }
+                    ForEach(users.filter {$0.uid != ownerUid }, id: \.self.uid) { user in
                         Button(action: {
                             router.push(.userProfile(user.uid))
                         }, label: {

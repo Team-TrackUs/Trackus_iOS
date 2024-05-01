@@ -211,10 +211,12 @@ extension RunningHomeView {
                             ForEach(courseListViewModel.courseFromUnBlockList, id: \.self) { course in
                                 
                                 Button(action: {
-                                    router.push(.courseDetail(CourseViewModel(course: course)))
+                                    router.push(
+                                        .courseDetail(CourseViewModel(course: course),
+                                        userSearchViewModel))
                                 }, label: {
-                                    if let user =  userSearchViewModel.filterdUserData(uid: [course.ownerUid]).first {
-                                        RunningCell(course: course, user: userSearchViewModel.filterdUserData(uid: [user.uid])[0])
+                                    if let user =  userSearchViewModel.findUserWithUID(course.ownerUid) {
+                                        RunningCell(course: course, user: user)
                                     } else {
                                         RunningCell(course: course)
                                     }

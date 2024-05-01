@@ -26,7 +26,7 @@ struct CourseDetailView: View {
     @State private var showingAlert = false
     
     @EnvironmentObject var router: Router
-    @StateObject var userSearchViewModel = UserSearchViewModel()
+    @ObservedObject var userSearchViewModel: UserSearchViewModel
     @ObservedObject var courseViewModel: CourseViewModel
     
     var isOwner: Bool {
