@@ -22,7 +22,10 @@ enum Constants {
         
         static let PERSONAL_INFORMATION_PROCESSING_POLICY = "https://colorful-force-5d2.notion.site/a3c5eb465e464a4a85ec708f97e0201e?pvs=4"
         static let TERMS_OF_LOCATION_INFORMATION_SERVICE = "https://colorful-force-5d2.notion.site/TrackUs-be971d4c799c4c12ab9e984aeafedc1d?pvs=4"
-        
+    }
+    
+    enum UserDefaultKeys {
+        static let blockedCourse = "blockedCourse"
     }
 
     enum FirebasePath {

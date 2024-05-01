@@ -130,7 +130,9 @@ struct TrackUsApp: App {
         
         WindowGroup {
             ContentView()
+                .environmentObject(CourseListViewModel())
                 .environmentObject(Router())
+                
         }
     }
 }

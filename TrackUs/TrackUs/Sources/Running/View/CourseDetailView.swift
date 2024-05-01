@@ -17,7 +17,8 @@ struct CourseDetailView: View {
         
         case edit = "수정"
         case delete = "삭제"
-        case block = "차단"
+        case block = "이 게시물을 보지 않기"
+        case report = "신고하기"
     }
     
     private let authViewModel = AuthenticationViewModel.shared
@@ -25,7 +26,7 @@ struct CourseDetailView: View {
     @State private var showingAlert = false
     
     @EnvironmentObject var router: Router
-    @StateObject var userSearchViewModel = UserSearchViewModel()
+    @ObservedObject var userSearchViewModel: UserSearchViewModel
     @ObservedObject var courseViewModel: CourseViewModel
     
     var isOwner: Bool {
@@ -40,6 +41,10 @@ struct CourseDetailView: View {
         courseViewModel.course.members.count >= courseViewModel.course.numberOfPeople
     }
     
+    var reportStatus: Bool {
+        courseViewModel.course.reportLog.contains(authViewModel.userInfo.uid)
+    }
+    
     var body: some View {
         VStack {
             MapboxMapView(
@@ -49,14 +54,27 @@ struct CourseDetailView: View {
             .frame(height: 230)
             
             ScrollView {
+                
                 VStack(spacing: 0)   {
+                    if reportStatus {
+                        HStack {
+                            Image(.sirenIcon)
+                                .resizable()
+                                .frame(width: 24, height: 24)
+                            Text("신고 처리가 된 게시물입니다.")
+                                .customFontStyle(.gray2_L14)
+                            Spacer()
+                        }     .padding(.top, 10)
+                            .padding(.horizontal, 16)
+                    }
+                    
                     RunningStats(
                         estimatedTime: courseViewModel.course.estimatedTime,
                         calories: courseViewModel.course.estimatedCalorie,
                         distance: courseViewModel.course.coordinates.totalDistance
                     )
-                        .padding(.top, 20)
-                        .padding(.horizontal, 16)
+                    .padding(.top, 10)
+                    .padding(.horizontal, 16)
                     
                     courseDetailLabels
                         .padding(.top, 20)
@@ -79,7 +97,7 @@ struct CourseDetailView: View {
                 } else if isMember {
                     HStack {
                         MainButton(active: !isOwner, buttonText: "러닝 참가취소", buttonColor: .Caution) {
-                                courseViewModel.removeMember()
+                            courseViewModel.removeMember()
                         }
                     }
                 }
@@ -93,7 +111,7 @@ struct CourseDetailView: View {
             NavigationBackButton()
         } right: {
             VStack {
-            editMenu
+                editMenu
             }
         }
         .alert(isPresented: $showingAlert) {
@@ -122,6 +140,7 @@ extension CourseDetailView {
     // 제목, 부가설명 등등
     var courseDetailLabels: some View {
         VStack {
+            
             HStack {
                 Text(courseViewModel.course.startDate?.formattedString() ?? Date().formatted())
                     .customFontStyle(.gray2_R12)
@@ -182,11 +201,17 @@ extension CourseDetailView {
                     })
                 }
                 if menu == .block && !isOwner {
-                    Button(role: .destructive, action: blockButtonTapped, label: {
+                    Button(action: blockButtonTapped, label: {
                         Text(menu.rawValue)
+                            .customFontStyle(.gray2_R16)
                     })
                 }
-           }
+                if menu == .report && !isOwner {
+                    Button(role: .destructive, action: complainButtonTapped, label: {
+                        Text(menu.rawValue)
+                    }).disabled(reportStatus)
+                }
+            }
         } label: {
             Image(systemName: "ellipsis")
                 .foregroundStyle(.black)
@@ -205,6 +230,11 @@ extension CourseDetailView {
     }
     
     func blockButtonTapped() {
-        
+        courseViewModel.blockCourse(uid: courseViewModel.course.uid)
+        router.popToRoot()
+    }
+    
+    func complainButtonTapped() {
+        router.push(.courseReport(courseViewModel))
     }
 }

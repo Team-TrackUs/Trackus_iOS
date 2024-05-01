@@ -44,7 +44,7 @@ final class Router: ObservableObject {
         case runningStart(RunActivityViewModel)
         case runningResult(RunActivityViewModel)
         case courseDrawing
-        case courseDetail(CourseViewModel)
+        case courseDetail(CourseViewModel, UserSearchViewModel)
         case courseRegister(CourseViewModel)
         // Chat
         case chatting(ChatViewModel)
@@ -54,6 +54,8 @@ final class Router: ObservableObject {
         case userProfile(String)
         case userReport(String)
         case trackusIntro
+        case blockedMgmt
+        case courseReport(CourseViewModel)
     }
 
     // MARK: - FULL SCREEN
@@ -141,8 +143,8 @@ final class Router: ObservableObject {
             ProfileEditView()
         case .runningRecorded:
             RunningRecordView()
-        case .courseDetail(let courseViewModel):
-            CourseDetailView(courseViewModel: courseViewModel)
+        case .courseDetail(let courseViewModel, let userSearchViewModel):
+            CourseDetailView(userSearchViewModel: userSearchViewModel, courseViewModel: courseViewModel)
         case .courseDrawing:
             CourseDrawingView()
         case .courseRegister(let courseViewModel):
@@ -169,6 +171,10 @@ final class Router: ObservableObject {
             UserReportView(userUid: userId)
         case .trackusIntro:
             TeamIntroView()
+        case .blockedMgmt:
+            BlockedContentsMgmtView()
+        case .courseReport(let courseVM):
+            CourseReportView(courseVM: courseVM)
         }
     }
     

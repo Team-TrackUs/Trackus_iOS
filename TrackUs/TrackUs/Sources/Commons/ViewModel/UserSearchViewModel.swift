@@ -6,15 +6,16 @@
 //
 
 import Foundation
-
+import Combine
 /**
  유저 검색 뷰모델
  */
+extension UserSearchViewModel: HashableObject {}
 
 class UserSearchViewModel: ObservableObject {
     let id = UUID()
     @Published var users = [UserInfo]()
-    
+ 
     init() {
         fetchUsersData()
     }
@@ -43,12 +44,4 @@ class UserSearchViewModel: ObservableObject {
     }
 }
 
-extension UserSearchViewModel: Hashable {
-    static func == (lhs: UserSearchViewModel, rhs: UserSearchViewModel) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-}
+
