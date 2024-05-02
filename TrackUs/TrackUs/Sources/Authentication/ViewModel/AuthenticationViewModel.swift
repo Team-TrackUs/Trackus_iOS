@@ -379,7 +379,9 @@ extension AuthenticationViewModel {
                         "profileImageUrl": userInfo.profileImageUrl as Any,
                         "setDailyGoal": userInfo.setDailyGoal as Any,
                         "runningStyle": userInfo.runningStyle?.rawValue as Any,
+                        "isBlock": userInfo.isBlock as Any,
                         "token": userInfo.token] as [String : Any]
+                        
         FirebaseManger.shared.firestore.collection("users").document(uid).setData(userData){ error in
             if error != nil {
                 return

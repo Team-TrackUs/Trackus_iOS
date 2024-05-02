@@ -44,6 +44,7 @@ struct UserInfo : Codable {
     var setDailyGoal: Double?
     var runningStyle: RunningStyle?
     var token: String
+    var isBlock: Bool
     // 본인이 차단한 사용자 리스트
     //var blockUserList: [String]
     // 본인이 차단한 사용자 + 본인을 차단한 사용자 리스트
@@ -60,6 +61,7 @@ struct UserInfo : Codable {
         self.isProfilePublic = false
         self.isProSubscriber = false
         self.token = ""
+        self.isBlock = false
        // self.blockUserList = [""]
         //self.blockedUserMeList = [""]
     }
@@ -77,6 +79,7 @@ struct UserInfo : Codable {
         case setDailyGoal = "setDailyGoal"
         case runningStyle = "runningStyle"
         case token = "token"
+        case isBlock = "isBlock"
     }
 }
 
@@ -97,4 +100,5 @@ public struct FirestoreUserInfo: Codable, Hashable {
     public let blockUsersList: [String]
     // 본인을 차단한 user List
     public let blockMeList: [String]
+    public let isBlock: Bool
 }
