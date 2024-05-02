@@ -2,7 +2,7 @@
 //  BlockedAccountView.swift
 //  TrackUs
 //
-//  Created by 박소희 on 4/28/24.
+//  Created by 박소희 on 5/2/24.
 //
 
 import SwiftUI
@@ -80,6 +80,7 @@ struct BlockedAccountView: View {
             }
             .padding()
         }
+        
         .onAppear {
             blockedUserInfoList = authenticationViewModel.userInfo.blockedUserList?.compactMap { uid in
                 guard let username = authenticationViewModel.userInfo.blockedUserList?.first(where: { $0 == uid }) else {
@@ -109,11 +110,3 @@ struct BlockedAccountView: View {
         authenticationViewModel.UnblockingUser(uid: uid)
     }
 }
-
-
-
-
-
-//#Preview {
-//    BlockedAccountView()
-//}

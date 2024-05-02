@@ -134,7 +134,7 @@
 		8EDEF7C92BA98DD5000A05E1 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDEF7C82BA98DD5000A05E1 /* PlaceholderView.swift */; };
 		8EDEF7CB2BA9903F000A05E1 /* RunningCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDEF7CA2BA9903F000A05E1 /* RunningCell.swift */; };
 		8EDEF7CD2BA990D3000A05E1 /* RunningStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDEF7CC2BA990D3000A05E1 /* RunningStats.swift */; };
-		9621AD5D2BDE3E5E000F3233 /* BlockedAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9621AD5C2BDE3E5E000F3233 /* BlockedAccountView.swift */; };
+		962130652BE3C6EF0017AEC7 /* BlockedAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962130642BE3C6EF0017AEC7 /* BlockedAccountView.swift */; };
 		963AE4052B678EAC00E98BF4 /* TrackUsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963AE4042B678EAC00E98BF4 /* TrackUsApp.swift */; };
 		963AE4072B678EAC00E98BF4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 963AE4062B678EAC00E98BF4 /* ContentView.swift */; };
 		963AE4092B678EAE00E98BF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 963AE4082B678EAE00E98BF4 /* Assets.xcassets */; };
@@ -265,7 +265,7 @@
 		8EDEF7C82BA98DD5000A05E1 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		8EDEF7CA2BA9903F000A05E1 /* RunningCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningCell.swift; sourceTree = "<group>"; };
 		8EDEF7CC2BA990D3000A05E1 /* RunningStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningStats.swift; sourceTree = "<group>"; };
-		9621AD5C2BDE3E5E000F3233 /* BlockedAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedAccountView.swift; sourceTree = "<group>"; };
+		962130642BE3C6EF0017AEC7 /* BlockedAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedAccountView.swift; sourceTree = "<group>"; };
 		963AE4012B678EAC00E98BF4 /* TrackUs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackUs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		963AE4042B678EAC00E98BF4 /* TrackUsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackUsApp.swift; sourceTree = "<group>"; usesTabs = 0; };
 		963AE4062B678EAC00E98BF4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -542,6 +542,7 @@
 				963AE4242B6A2C3C00E98BF4 /* Withdrawal.swift */,
 				82AB28BA2B6B531B00D7734D /* PremiumPaymentView.swift */,
 				82D466D82BDFA68400F2C60F /* BlockedContentsMgmtView.swift */,
+				962130642BE3C6EF0017AEC7 /* BlockedAccountView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -671,11 +672,19 @@
 			path = Modifiers;
 			sourceTree = "<group>";
 		};
+		961C40C22BE3BF5F00A7E7EF /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		963AE3F82B678EAC00E98BF4 = {
 			isa = PBXGroup;
 			children = (
 				963AE4032B678EAC00E98BF4 /* TrackUs */,
 				963AE4022B678EAC00E98BF4 /* Products */,
+				961C40C22BE3BF5F00A7E7EF /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -899,7 +908,6 @@
 				822AE5F02B704AA500D90264 /* PreparingService.swift in Sources */,
 				981492D12B8C5DFE0018BDA8 /* ChatInfo.swift in Sources */,
 				82AB28BB2B6B531B00D7734D /* PremiumPaymentView.swift in Sources */,
-				9621AD5D2BDE3E5E000F3233 /* BlockedAccountView.swift in Sources */,
 				FEEAEA0B2B8276E3001F1888 /* UserProfileView.swift in Sources */,
 				610F88222B74D01E00FB12A1 /* NetworkManager.swift in Sources */,
 				8EDEF7CB2BA9903F000A05E1 /* RunningCell.swift in Sources */,
@@ -969,6 +977,7 @@
 				824038CA2B6FD040000BADD5 /* MaxBoxMapView.swift in Sources */,
 				61B914C32B89A506008CAC92 /* RunningSelectView.swift in Sources */,
 				610F88242B74D02900FB12A1 /* NetworkErrorView.swift in Sources */,
+				962130652BE3C6EF0017AEC7 /* BlockedAccountView.swift in Sources */,
 				6112431D2B7AA3110086EF40 /* CustomDatePicker.swift in Sources */,
 				82421C7F2BB6F7DF0065E7CF /* String+.swift in Sources */,
 				82AB28B72B6B512F00D7734D /* WebView.swift in Sources */,
@@ -1153,6 +1162,8 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 4N3558QY8F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TrackUs/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "운동정보를 추적하기 위해서 건강 데이터에 접근합니다.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "운동정보를 추적하기 위해서 건강 데이터에 접근합니다.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자의 정확한 운동정보를 추적하기 위해서 러닝중에는 백그라운드에서 위치를 추적합니다.";
@@ -1171,7 +1182,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.TrackUs.test;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = TrackUs_Development2;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = TrackUs_Development;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1197,6 +1208,8 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 4N3558QY8F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = TrackUs/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "운동정보를 추적하기 위해서 건강 데이터에 접근합니다.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "운동정보를 추적하기 위해서 건강 데이터에 접근합니다.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자의 정확한 운동정보를 추적하기 위해서 러닝중에는 백그라운드에서 위치를 추적합니다.";

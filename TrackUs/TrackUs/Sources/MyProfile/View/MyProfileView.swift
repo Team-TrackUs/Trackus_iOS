@@ -74,20 +74,6 @@ struct MyProfileView: View {
                 Divider()
                     .background(.divider)
                 
-                // MARK: - 차단 계정 관리
-                MenuItems {
-                    Text("차단 계정")
-                        .customFontStyle(.gray1_SB16)
-                } content: {
-                    Button(action: {
-                        router.push(.blockedAccount)
-                    }) {
-                        MenuItem(title: "차단된 계정 목록", image: .init(.chevronRightIcon))
-                    }
-                }
-                
-                Divider()
-                    .background(.divider)
                 
                 // MARK: - 서비스
                 MenuItems {
@@ -108,6 +94,11 @@ struct MyProfileView: View {
                         router.push(.blockedMgmt)
                     }) {
                         MenuItem(title: "차단 게시물", image: .init(.chevronRightIcon))
+                    }
+                    Button(action: {
+                        router.push(.blockedAccount)
+                    }) {
+                        MenuItem(title: "차단된 계정", image: .init(.chevronRightIcon))
                     }
                 }
                 
