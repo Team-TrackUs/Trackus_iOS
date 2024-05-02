@@ -39,6 +39,7 @@ final class Router: ObservableObject {
         case faq
         case setting
         case withDrawal
+        case blockedAccount
         // Home
         case runningSelect(CourseListViewModel, UserSearchViewModel)
         case runningStart(RunActivityViewModel)
@@ -155,6 +156,8 @@ final class Router: ObservableObject {
             SettingsView()
         case .withDrawal:
             Withdrawal()
+        case .blockedAccount:
+            BlockedAccountView()
         case .runningSelect(let courseListViewModel, let userSearchViewModel):
             RunningSelectView(courseListViewModel: courseListViewModel, userSearchViewModel: userSearchViewModel)
         case .runningStart(let runViewModel):

@@ -12,6 +12,14 @@
 ##  🏃🏻 프로젝트 소개
 * 러닝을 즐기는 사람들을 위한 매칭 앱입니다.
   * 러닝을 사랑하는 이들을 위한 지도 기반 모바일 앱으로. 러닝을 즐기는 사람들을 연결하여 모임과 소통을 촉진합니다. 사용자들은 다양한 지역에서 함께 러닝을 즐길 수 있으며, 개인의 성장과 목표 달성을 위해 러닝 데이터를 추적할 수 있습니다.
+    
+<img src="https://github.com/Team-TrackUs/Trackus_iOS/assets/144399406/b0802a63-14d6-46b9-8b9b-ffba1cc258da" width="125"/>ㅤ
+<img src="https://github.com/Team-TrackUs/Trackus_iOS/assets/144399406/24ed2f06-4fef-4801-a99f-031c20f45dec" width="125"/>ㅤ
+<img src="https://github.com/Team-TrackUs/Trackus_iOS/assets/144399406/0ab8d7f3-26b6-4a18-8e26-763f5e0d730b" width="125"/>ㅤ
+<img src="https://github.com/Team-TrackUs/Trackus_iOS/assets/144399406/99378108-4960-46d7-824f-750ae2dd79f2" width="125"/> ㅤ
+<img src="https://github.com/Team-TrackUs/Trackus_iOS/assets/144399406/6bc2177d-958d-4a3e-abe6-3bd1af58edd1" width="125"/> ㅤ
+<img src="https://github.com/Team-TrackUs/Trackus_iOS/assets/144399406/28174d31-c48e-4dd7-96c2-1d9a2afdf177" width="125"/> ㅤ
+<img src="https://github.com/Team-TrackUs/Trackus_iOS/assets/144399406/0e92a610-58c8-4472-bb4c-8a4cdecd8b07" width="125"/> ㅤ
 
 <br>
 

@@ -74,6 +74,7 @@ struct MyProfileView: View {
                 Divider()
                     .background(.divider)
                 
+                
                 // MARK: - 서비스
                 MenuItems {
                     Text("서비스")
@@ -93,6 +94,11 @@ struct MyProfileView: View {
                         router.push(.blockedMgmt)
                     }) {
                         MenuItem(title: "차단 게시물", image: .init(.chevronRightIcon))
+                    }
+                    Button(action: {
+                        router.push(.blockedAccount)
+                    }) {
+                        MenuItem(title: "차단된 계정", image: .init(.chevronRightIcon))
                     }
                 }
                 
