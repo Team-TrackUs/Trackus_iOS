@@ -44,6 +44,10 @@ struct UserProfileContent: View {
     @Binding var selectedDate: Date?
     @ObservedObject var userProfileViewModel: UserProfileViewModel
     let userUid : String
+    // 차단된 경우 alert용
+    @State var blockedAlert: Bool = false
+    // 차단여부 확인용
+    @State var blockAlert: Bool = false
     
     var body: some View {
         VStack {
@@ -92,7 +96,11 @@ struct UserProfileContent: View {
                         VStack {
                             // 채팅 버튼
                             Button {
-                                router.push(.chatting(ChatViewModel(myInfo: authViewModel.userInfo, opponentInfo: userInfo)))
+                                if authViewModel.userInfo.blockList.contains(userUid){
+                                    blockedAlert.toggle()
+                                } else {
+                                    router.push(.chatting(ChatViewModel(myInfo: authViewModel.userInfo, opponentInfo: userInfo)))
+                                }
                             } label: {
                                 Image(systemName: "bubble")
                                     .resizable()
@@ -103,12 +111,26 @@ struct UserProfileContent: View {
                             Text("1:1 대화")
                                 .customFontStyle(.gray2_R12)
                         }
+                        .alert("채팅 불가",
+                               isPresented: $blockedAlert) {
+                            Button("확인", role: .cancel) {}
+                        } message: {
+                            Text("차단된 사용자입니다.")
+                        }
+
                         
                         VStack {
                             // 차단 버튼
                             Button {
+                                blockAlert.toggle()
                                 // 차단하기 기능
-                                
+//                                if authViewModel.checkBlocking(uid: userInfo.uid){
+//                                    // 차단 해제
+//                                    authViewModel.UnblockingUser(uid: userInfo.uid)
+//                                }else{
+//                                    // 차단 등록
+//                                    authViewModel.BlockingUser(uid: userInfo.uid)
+//                                }
                             } label: {
                                 Image(systemName: "person.slash")
                                     .resizable()
@@ -116,9 +138,28 @@ struct UserProfileContent: View {
                                     .foregroundStyle(.gray1)
                             }
                             
-                            Text("차단")
+                            Text(authViewModel.checkBlocking(uid: userInfo.uid) ? "차단 해제" : "차단")
                                 .customFontStyle(.gray2_R12)
                         }
+                        .alert(Text(authViewModel.checkBlocking(uid: userInfo.uid) ? "차단 해제" : "차단 하기") , isPresented: $blockAlert) {
+                            Button("취소", role: .cancel) { }
+                            Button(role: .destructive) {
+                                
+                                if authViewModel.checkBlocking(uid: userInfo.uid){
+                                    // 차단 해제
+                                    authViewModel.UnblockingUser(uid: userInfo.uid)
+                                }else{
+                                    // 차단 등록
+                                    authViewModel.BlockingUser(uid: userInfo.uid)
+                                }
+                            } label: {
+                                Text(authViewModel.checkBlocking(uid: userInfo.uid) ? "차단 해제" : "차단 하기")
+                            }
+                        } message: {
+                            Text(authViewModel.checkBlocking(uid: userInfo.uid) ? "\(userInfo.username)님 차단을 해제하시겠습니까?" :
+                                "\(userInfo.username)님을 차단하시겠습니까?")
+                        }
+
                         
                         VStack {
                             // 신고 버튼

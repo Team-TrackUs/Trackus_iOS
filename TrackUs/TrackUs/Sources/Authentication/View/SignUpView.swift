@@ -90,25 +90,26 @@ struct SignUpView: View {
     
     func skipButton(){
         switch signUpFlow {
-//        case .nickname:
-//            signUpFlow = .profile
-        case .profile:
-            signUpFlow = .physical
-        case .physical:
-            signUpFlow = .ageGender
-        case .ageGender:
-            signUpFlow = .runningStyle
-        case .runningStyle:
-            signUpFlow = .daily
-        case .daily:
-            // 테스트용
-            router.popToRoot()
-            Task{
-                authViewModel.storeUserInfoInFirebase()
-            }
-            authViewModel.authenticationState = .authenticated
-        default:
-            return
+                //        case .nickname:
+                //            signUpFlow = .profile
+            case .profile:
+                signUpFlow = .physical
+            case .physical:
+                signUpFlow = .ageGender
+            case .ageGender:
+                signUpFlow = .runningStyle
+            case .runningStyle:
+                signUpFlow = .daily
+            case .daily:
+                // 테스트용
+                authViewModel.userInfo.isProfilePublic = true
+                Task{
+                    authViewModel.storeUserInfoInFirebase()
+                }
+                router.popToRoot()
+                authViewModel.authenticationState = .authenticated
+            default:
+                return
         }
     }
     

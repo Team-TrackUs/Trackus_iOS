@@ -54,6 +54,20 @@ struct UserInfo : Codable {
 //    init(from decoder: any Decoder) throws {
 //        <#code#>
 //    }
+    /// 차단한 사용자 리스트
+    var blockedUserList: [String]?
+    var blockingMeList: [String]?
+    /// 필터링용도 List : 본인이 차단한 사용자 + 본인을 차단한 사용자 리스트
+    var blockList: [String] {
+        var result: [String] = []
+        if let blockedUserList = blockedUserList{
+            result += blockedUserList
+        }
+        if let blockingMeList = blockingMeList {
+            result += blockingMeList
+        }
+        return result
+    }
     
     init(){
         self.uid = ""
@@ -80,6 +94,8 @@ struct UserInfo : Codable {
         case runningStyle = "runningStyle"
         case token = "token"
         case isBlock = "isBlock"
+        case blockedUserList = "blockedUserList"
+        case blockingMeList = "blockingMeList"
     }
 }
 

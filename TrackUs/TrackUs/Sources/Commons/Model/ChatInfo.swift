@@ -71,6 +71,13 @@ public struct Member: Codable, Hashable {
         self.profileImageUrl = profileImageUrl
         self.token = token
     }
+    
+    init(userInfo: UserInfo){
+        self.uid = userInfo.uid
+        self.userName = userInfo.username
+        self.profileImageUrl = userInfo.profileImageUrl
+        self.token = userInfo.token
+    }
 }
 
 struct Message: Identifiable, Hashable {

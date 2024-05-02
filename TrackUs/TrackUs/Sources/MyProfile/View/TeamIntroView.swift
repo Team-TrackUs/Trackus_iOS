@@ -31,6 +31,8 @@ struct TeamIntroView: View {
                     VStack {
                         HStack(spacing: 20) {
                             Image(.profileImg)
+                                .resizable()
+                                .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: 100)
                                 .cornerRadius(14)
                                 .shadow(radius: 4)
                             
