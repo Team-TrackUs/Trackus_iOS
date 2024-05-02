@@ -7,6 +7,7 @@
 
 import UIKit
 import MapboxMaps
+import Firebase
 /**
   코스데이터에 대한 개별적인 뷰모델
  */
@@ -22,7 +23,7 @@ class CourseViewModel: ObservableObject, HashableObject {
     @Published var course: Course
     @Published var uiImage: UIImage?
     @Published var isLoading = false
-    
+
     init(course: Course) {
         self.course = course
     }
@@ -140,6 +141,35 @@ extension CourseViewModel {
                 }
                 self.isLoading = false
             }
+        }
+    }
+    
+    /// 게시글 차단
+    func blockCourse(uid: String) {
+        if let blockedCourseList = UserDefaults.standard.array(forKey: Constants.UserDefaultKeys.blockedCourse) {
+            let newBlockedCourseList = blockedCourseList + [uid]
+            UserDefaults.standard.set(newBlockedCourseList, forKey: Constants.UserDefaultKeys.blockedCourse)
+        } else {
+            UserDefaults.standard.set([uid], forKey: Constants.UserDefaultKeys.blockedCourse)
+        }
+    }
+    
+    /// 차단해제
+    func unblockCourse(uid: String) {
+        if let blockedCourseList = UserDefaults.standard.array(forKey: Constants.UserDefaultKeys.blockedCourse) as? [String] {
+            let newBlockedCourseList = blockedCourseList.filter { $0 != uid }
+            UserDefaults.standard.set(newBlockedCourseList, forKey: Constants.UserDefaultKeys.blockedCourse)
+        }
+    }
+    
+    /// 신고
+    func report(reason: ReportForm) async {
+        do {
+            let uid = await authViewModel.userInfo.uid
+            try await Firestore.firestore().collection("running").document(course.uid).updateData(["reportLog": course.reportLog + [uid]])
+            try Firestore.firestore().collection("report_running").document(course.uid).collection("reasons").addDocument(from: reason)
+        }  catch {
+            debugPrint(#function + error.localizedDescription)
         }
     }
     

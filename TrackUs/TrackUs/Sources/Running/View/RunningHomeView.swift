@@ -12,9 +12,9 @@ import PopupView
 
 struct RunningHomeView: View {
     @EnvironmentObject var router: Router
+    @EnvironmentObject var courseListViewModel: CourseListViewModel
     
     @StateObject var authViewModel = AuthenticationViewModel.shared
-    @StateObject var courseListViewModel = CourseListViewModel()
     @StateObject var userSearchViewModel = UserSearchViewModel()
     
     @State private var viewport: Viewport = .followPuck(zoom: 13, bearing: .constant(0))
@@ -74,6 +74,7 @@ extension RunningHomeView {
                     
                     // 내주변 러닝메이트
                     runningAroundMe
+                  
                 }
             } onChanged: { gestureValue in
                 let newDeltaY = gestureValue.translation.height
@@ -215,18 +216,20 @@ extension RunningHomeView {
             .padding(.horizontal, 16)
             
             // 가로 스크롤
-            if !courseListViewModel.courseList.isEmpty, authViewModel.userInfo.uid != "" {
+            if !courseListViewModel.courseFromUnBlockList.isEmpty, authViewModel.userInfo.uid != "" {
              
                 ScrollView(.horizontal, showsIndicators: false) {
                     VStack {
                         HStack(spacing: 12) {
-                            ForEach(courseListViewModel.courseList, id: \.self) { course in
+                            ForEach(courseListViewModel.courseFromUnBlockList, id: \.self) { course in
                                 
                                 Button(action: {
-                                    router.push(.courseDetail(CourseViewModel(course: course)))
+                                    router.push(
+                                        .courseDetail(CourseViewModel(course: course),
+                                        userSearchViewModel))
                                 }, label: {
-                                    if let user =  userSearchViewModel.filterdUserData(uid: [course.ownerUid]).first {
-                                        RunningCell(course: course, user: userSearchViewModel.filterdUserData(uid: [user.uid])[0])
+                                    if let user =  userSearchViewModel.findUserWithUID(course.ownerUid) {
+                                        RunningCell(course: course, user: user)
                                     } else {
                                         RunningCell(course: course)
                                     }
