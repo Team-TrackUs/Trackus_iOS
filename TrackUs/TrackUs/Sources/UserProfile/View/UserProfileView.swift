@@ -15,6 +15,12 @@ struct UserProfileView: View {
     @State private var selectedDate: Date?
     let userUid: String
     
+    // 차단된 경우 alert용
+    @State var blockedAlert: Bool = false
+    // 차단여부 확인용
+    @State var blockAlert: Bool = false
+    @State private var sideMenuPresented = false
+    
     init(userUid: String) {
         self.userUid = userUid
     }
@@ -33,6 +39,48 @@ struct UserProfileView: View {
             NavigationText(title: "프로필 확인")
         } left: {
             NavigationBackButton()
+        } right: {
+            Menu("", systemImage: "ellipsis") {
+                if userViewModel.otherUserInfo.uid != authViewModel.userInfo.uid {
+                    Button(role: .destructive) {
+                        blockAlert.toggle()
+                    } label: {
+                        Label(authViewModel.checkBlocking(uid: userViewModel.otherUserInfo.uid) ? "차단 해제" : "차단하기", systemImage: "person.slash")
+                    }
+                    Button {
+                        router.push(.userReport(userUid))
+                    } label: {
+                        Label("신고하기", systemImage: "exclamationmark.circle")
+                    }
+                } else {
+                    Button {
+                        router.push(.profileEdit)
+                    } label: {
+                        Label("프로필 편집", systemImage: "square.and.pencil")
+                    }
+                }
+                
+                Button("취소", action: {})
+            }
+            .foregroundStyle(.gray1)
+        }
+        .alert(Text(authViewModel.checkBlocking(uid: userViewModel.otherUserInfo.uid) ? "차단 해제" : "차단 하기") , isPresented: $blockAlert) {
+            Button("취소", role: .cancel) { }
+            Button(role: .destructive) {
+                
+                if authViewModel.checkBlocking(uid: userViewModel.otherUserInfo.uid){
+                    // 차단 해제
+                    authViewModel.UnblockingUser(uid: userViewModel.otherUserInfo.uid)
+                }else{
+                    // 차단 등록
+                    authViewModel.BlockingUser(uid: userViewModel.otherUserInfo.uid)
+                }
+            } label: {
+                Text(authViewModel.checkBlocking(uid: userViewModel.otherUserInfo.uid) ? "차단 해제" : "차단 하기")
+            }
+        } message: {
+            Text(authViewModel.checkBlocking(uid: userViewModel.otherUserInfo.uid) ? "\(userViewModel.otherUserInfo.username)님 차단을 해제하시겠습니까?" :
+                    "\(userViewModel.otherUserInfo.username)님을 차단하시겠습니까?")
         }
     }
 }
@@ -91,93 +139,33 @@ struct UserProfileContent: View {
             }
             
             VStack {
-                HStack(spacing: 63) {
-                    if userInfo.uid != authViewModel.userInfo.uid {
-                        VStack {
-                            // 채팅 버튼
-                            Button {
-                                if authViewModel.userInfo.blockList.contains(userUid){
-                                    blockedAlert.toggle()
-                                } else {
-                                    router.push(.chatting(ChatViewModel(myInfo: authViewModel.userInfo, opponentInfo: userInfo)))
-                                }
-                            } label: {
-                                Image(systemName: "bubble")
-                                    .resizable()
-                                    .frame(width: 30, height: 30)
-                                    .foregroundStyle(.gray1)
+                if userInfo.uid != authViewModel.userInfo.uid {
+                    VStack {
+                        // 채팅 버튼
+                        Button {
+                            if authViewModel.userInfo.blockList.contains(userUid){
+                                blockedAlert.toggle()
+                            } else {
+                                router.push(.chatting(ChatViewModel(myInfo: authViewModel.userInfo, opponentInfo: userInfo)))
                             }
-                            
-                            Text("1:1 대화")
-                                .customFontStyle(.gray2_R12)
+                        } label: {
+                            Image(systemName: authViewModel.userInfo.blockList.contains(userUid) ? "exclamationmark.bubble" : "bubble")
+                                .resizable()
+                                .frame(width: 40, height: 40)
+                                .foregroundStyle(.gray1)
                         }
-                        .alert("채팅 불가",
-                               isPresented: $blockedAlert) {
-                            Button("확인", role: .cancel) {}
-                        } message: {
-                            Text("차단된 사용자입니다.")
-                        }
-
                         
-                        VStack {
-                            // 차단 버튼
-                            Button {
-                                blockAlert.toggle()
-                                // 차단하기 기능
-//                                if authViewModel.checkBlocking(uid: userInfo.uid){
-//                                    // 차단 해제
-//                                    authViewModel.UnblockingUser(uid: userInfo.uid)
-//                                }else{
-//                                    // 차단 등록
-//                                    authViewModel.BlockingUser(uid: userInfo.uid)
-//                                }
-                            } label: {
-                                Image(systemName: "person.slash")
-                                    .resizable()
-                                    .frame(width: 30, height: 30)
-                                    .foregroundStyle(.gray1)
-                            }
-                            
-                            Text(authViewModel.checkBlocking(uid: userInfo.uid) ? "차단 해제" : "차단")
-                                .customFontStyle(.gray2_R12)
-                        }
-                        .alert(Text(authViewModel.checkBlocking(uid: userInfo.uid) ? "차단 해제" : "차단 하기") , isPresented: $blockAlert) {
-                            Button("취소", role: .cancel) { }
-                            Button(role: .destructive) {
-                                
-                                if authViewModel.checkBlocking(uid: userInfo.uid){
-                                    // 차단 해제
-                                    authViewModel.UnblockingUser(uid: userInfo.uid)
-                                }else{
-                                    // 차단 등록
-                                    authViewModel.BlockingUser(uid: userInfo.uid)
-                                }
-                            } label: {
-                                Text(authViewModel.checkBlocking(uid: userInfo.uid) ? "차단 해제" : "차단 하기")
-                            }
-                        } message: {
-                            Text(authViewModel.checkBlocking(uid: userInfo.uid) ? "\(userInfo.username)님 차단을 해제하시겠습니까?" :
-                                "\(userInfo.username)님을 차단하시겠습니까?")
-                        }
-
-                        
-                        VStack {
-                            // 신고 버튼
-                            Button {
-                                router.push(.userReport(userUid))
-                            } label: {
-                                Image(systemName: "exclamationmark.circle")
-                                    .resizable()
-                                    .frame(width: 30, height: 30)
-                                    .foregroundStyle(.caution)
-                            }
-                            
-                            Text("신고")
-                                .customFontStyle(.gray2_R12)
-                        }
+                        Text("1:1 대화")
+                            .customFontStyle(.gray2_R12)
+                    }
+                    .padding(.top, 16)
+                    .alert("채팅 불가",
+                           isPresented: $blockedAlert) {
+                        Button("확인", role: .cancel) {}
+                    } message: {
+                        Text("차단된 사용자입니다.")
                     }
                 }
-                .padding(.top, 12)
             }
             .padding(.bottom, 15)
         }
@@ -203,7 +191,6 @@ struct UserProfileContent: View {
         }
     }
 }
-
 
 #Preview {
     UserProfileView(userUid: "")
