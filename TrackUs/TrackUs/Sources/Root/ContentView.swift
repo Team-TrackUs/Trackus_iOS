@@ -11,11 +11,24 @@ struct ContentView: View {
     @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var router: Router
     @StateObject var authViewModel = AuthenticationViewModel.shared
+    @ObservedObject var networkManager = NetworkManager()
+    @State private var showAlert = false
     
     var body: some View {
         VStack{
             switch authViewModel.authenticationState {
-                // 로그인
+            case .startapp:
+                VStack{
+                    Spacer()
+                    Image(.trackusBigLogoImg)
+                        .resizable()
+                        .frame(width: 200, height: 65)
+                        .padding(.top,80)
+                    Spacer()
+                    ProgressView()
+                        //.padding(.top,80)
+                    Spacer()
+                }                // 로그인
             case .unauthenticated, .authenticating:
                 VStack {
                     LoginView()
@@ -32,6 +45,18 @@ struct ContentView: View {
             }
         }
         .preferredColorScheme(.light)
+        .popup(isPresented: $showAlert) {
+            NetworkErrorView()
+                .frame(width: 300, height: 150)
+        } customize: {
+            $0
+                .backgroundColor(.black.opacity(0.3))
+                .isOpaque(true)
+        }
+        .onReceive(networkManager.$isConnected, perform: { isConnected in
+            showAlert = !isConnected
+        })
+        .disabled(showAlert)
     }
 }
 

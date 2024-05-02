@@ -16,19 +16,18 @@ struct ProfileEditView: View {
     @State private var nickname: String = ""
     @State private var height: Double?
     @State private var weight: Double?
-    @State private var selectedRunningStyle: RunningStyle = .walking
+    @State private var selectedRunningStyle: RunningStyle = .jogging
     @State private var runningStyle: RunningStyle?
     @State private var setDailyGoal: Double?
-    @State private var goalMinValue: Double?
-    @State private var goalMaxValue: Double?
+    @State private var age: Double?
+    @State private var gender: Bool?
     @State private var isProfilePublic: Bool = false
-    @State private var isProfileSaved: Bool = false
-    
-    
+
     @State private var heightPickerPresented: Bool = false
     @State private var weightPickerPresented: Bool = false
     @State private var runningStylePickerPresented: Bool = false
     @State private var setDailyGoalPickerPresented: Bool = false
+    @State private var agePickerPresented: Bool = false
     
     var body: some View {
         VStack {
@@ -101,7 +100,7 @@ struct ProfileEditView: View {
                                             Text("정보 없음")
                                                 .customFontStyle(.gray2_L12)
                                         }
-                                        Image(.pickerLogo)
+                                        Image(.arrowUpwardIcon)
                                             .resizable()
                                             .frame(width: 9,height: 18)
                                             .scaledToFit()
@@ -114,6 +113,35 @@ struct ProfileEditView: View {
                                     .customFontStyle(.gray1_R16)
                                 Spacer()
                                 pickerButton(pickerPresented: $setDailyGoalPickerPresented, value: setDailyGoal, unit: "km", format: "%.1f")
+                            }
+                            
+                        }
+                        .padding(.vertical, 14)
+                        
+                        VStack(alignment: .leading, spacing: 20) {
+                            Text("연령대 및 성별")
+                                .customFontStyle(.gray1_B20)
+                            VStack(alignment: .leading, spacing: 12) {
+                                HStack {
+                                    Text("연령대")
+                                        .customFontStyle(.gray1_R16)
+                                    Spacer()
+                                    pickerButton(pickerPresented: $agePickerPresented, value: age, unit: "대", format: "%.0f")
+                                }
+                                
+                                HStack {
+                                    Text("성별")
+                                        .customFontStyle(.gray1_R16)
+                                    Spacer()
+                                    HStack(spacing: 8){
+                                        SelectButton(image: [Image(.maleMainImg), Image(.maleGrayImg)],text: "남성", selected: gender == true, widthSize: 80){
+                                            gender = true
+                                        }
+                                        SelectButton(image: [Image(.femaleMainImg), Image(.femaleGrayImg)],text: "여성", selected: gender == false, widthSize: 80){
+                                            gender = false
+                                        }
+                                    }
+                                }
                             }
                             
                         }
@@ -138,15 +166,15 @@ struct ProfileEditView: View {
                         .padding(.vertical, 14)
                     }
                 }
-                .padding(.horizontal, Constants.ViewLayout.VIEW_STANDARD_HORIZONTAL_SPACING)
+                .padding(.horizontal, 16)
             }
             .customNavigation {
                 NavigationText(title: "프로필 변경")
             } left: {
                 NavigationBackButton()
             }
-            MainButton(active: true, buttonText: "수정완료", action: modifyButtonTapped)
-                .padding(Constants.ViewLayout.VIEW_STANDARD_HORIZONTAL_SPACING)
+            MainButton(active: editCheck(userInfo: authViewModel.userInfo), buttonText: "수정완료", action: modifyButtonTapped)
+                .padding(16)
                 .simultaneousGesture(TapGesture().onEnded {
                 })
         }
@@ -161,6 +189,8 @@ struct ProfileEditView: View {
             weight = authViewModel.userInfo.weight.map { Double($0) }
             runningStyle = authViewModel.userInfo.runningStyle
             setDailyGoal = authViewModel.userInfo.setDailyGoal
+            age = authViewModel.userInfo.age.map { Double($0) }
+            gender = authViewModel.userInfo.gender
             isProfilePublic = authViewModel.userInfo.isProfilePublic
         }
         .sheet(isPresented: $heightPickerPresented) {
@@ -178,7 +208,6 @@ struct ProfileEditView: View {
                         Text(value.description).tag(value)
                     }
                 }
-                .customFontStyle(.gray1_M16)
                 .pickerStyle(WheelPickerStyle())
                 .presentationDetents([.height(300)])
                 HStack(spacing: 8){
@@ -211,7 +240,9 @@ struct ProfileEditView: View {
         .sheet(isPresented: $setDailyGoalPickerPresented) {
             PickerSheet(selectedValueBinding: $setDailyGoal, pickerType: .dailyGoal, startingValue: setDailyGoal ?? 1)
         }
-        
+        .sheet(isPresented: $agePickerPresented) {
+            PickerSheet(selectedValueBinding: $age, pickerType: .age, startingValue: age ?? 20)
+        }
     }
     
     
@@ -222,10 +253,26 @@ struct ProfileEditView: View {
         authViewModel.userInfo.weight = weight.map { Int($0) }
         authViewModel.userInfo.runningStyle = runningStyle
         authViewModel.userInfo.setDailyGoal = setDailyGoal
+        authViewModel.userInfo.age = age.map { Int($0) }
+        authViewModel.userInfo.gender = gender
         authViewModel.userInfo.isProfilePublic = isProfilePublic
         authViewModel.storeUserInfoInFirebase()
-        isProfileSaved = true
         presentationMode.wrappedValue.dismiss()
+    }
+    func editCheck(userInfo: UserInfo) -> Bool {
+        if selectedImage != userInfo.image ||
+            nickname != userInfo.username ||
+            height != userInfo.height.map({ Double($0) }) ||
+            weight != userInfo.weight.map({ Double($0) }) ||
+            runningStyle != userInfo.runningStyle ||
+            setDailyGoal != userInfo.setDailyGoal ||
+            age != userInfo.age.map({ Double($0) }) ||
+            gender != userInfo.gender ||
+        isProfilePublic != userInfo.isProfilePublic{
+            return true
+        }else{
+            return false
+        }
     }
 }
 
@@ -254,7 +301,7 @@ struct pickerButton: View {
                     Text("정보 없음")
                         .customFontStyle(.gray2_L12)
                 }
-                Image(.pickerLogo)
+                Image(.arrowUpwardIcon)
                     .resizable()
                     .frame(width: 9,height: 18)
                     .scaledToFit()

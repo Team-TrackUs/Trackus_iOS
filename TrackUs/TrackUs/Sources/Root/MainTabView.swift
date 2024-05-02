@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @EnvironmentObject var router: Router
+    @StateObject var chatViewModel = ChatListViewModel.shared
     @State private var selectedTab: Tab = .running
     
     init() {
@@ -17,72 +18,72 @@ struct MainTabView: View {
         appearance.backgroundColor = UIColor.white
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
+    init(selectedTab: Tab) {
+        let appearance = UITabBarAppearance()
+        appearance.shadowColor = .divider
+        appearance.backgroundColor = UIColor.white
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+        self.selectedTab = selectedTab
+    }
     
     var body: some View {
         NavigationStack(path: $router.path) {
-            TabView(selection: $router.selectedIndex) {
-                // Sheet 애니메이션 끊김현상으로 일시적으로 VStack으로 래핑
-                VStack {
-                    router.buildScreen(page: .running)
+            ZStack{
+                TabView(selection: $router.selectedIndex) {
+                    VStack {
+                        router.buildScreen(page: .running)
+                    }
+                    .tabItem {
+                        Image(.runIcon)
+                            .renderingMode(.template)
+                        Text(Tab.running.tabName)
+                    }
+                    .tag(Tab.running)
+                    
+                    router.buildScreen(page: .chat)
+                        .tabItem {
+                            Image(.chattingIcon)
+                                .renderingMode(.template)
+                            Text(Tab.chat.tabName)
+                        }
+                        .tag(Tab.chat)
+                        .badge(chatViewModel.messageCount)
+                    
+                    router.buildScreen(page: .report)
+                        .tabItem {
+                            Image(.reportIcon)
+                                .renderingMode(.template)
+                            Text(Tab.report.tabName)
+                        }
+                        .tag(Tab.report)
+                    
+                    
+                    router.buildScreen(page: .profile)
+                        .tabItem {
+                            Image(.profileIcon)
+                                .renderingMode(.template)
+                            Text(Tab.profile.tabName)
+                        }
+                        .tag(Tab.profile)
                 }
-                .tabItem {
-                    Image("Running")
-                        .renderingMode(.template)
-                    Text("러닝")
+                .navigationDestination(for: Router.Page.self, destination: { page in
+                    router.buildScreen(page: page)
+                })
+                .sheet(item: $router.sheet, content: { sheet in
+                    router.buildScreen(sheet: sheet)
+                })
+                .fullScreenCover(item: $router.fullScreenCover, content: { fullScreenCover in
+                    router.buildScreen(fullScreenCover: fullScreenCover)
+                })
+                
+                .onChange(of: router.selectedIndex) { _ in
+                    HapticManager.instance.impact(style: .light)
                 }
-                .tag(Tab.running)
-                
-                router.buildScreen(page: .recruitment)
-                    .tabItem {
-                        Image("Recruitment")
-                            .renderingMode(.template)
-                        Text("모집")
-                    }
-                    .tag(Tab.recruitment)
-                
-                
-                router.buildScreen(page: .chat)
-                    .tabItem {
-                        Image("Chatting")
-                            .renderingMode(.template)
-                        Text("채팅")
-                    }
-                    .tag(Tab.chat)
-                
-                router.buildScreen(page: .report)
-                    .tabItem {
-                        Image("Report")
-                            .renderingMode(.template)
-                        Text("리포트")
-                    }
-                    .tag(Tab.report)
-                
-                
-                router.buildScreen(page: .profile)
-                    .tabItem {
-                        Image("Profile")
-                            .renderingMode(.template)
-                        Text("프로필")
-                    }
-                    .tag(Tab.profile)
-            }
-            .navigationDestination(for: Page.self, destination: { page in
-                router.buildScreen(page: page)
-            })
-            .sheet(item: $router.sheet, content: { sheet in
-                router.buildScreen(sheet: sheet)
-            })
-            .fullScreenCover(item: $router.fullScreenCover, content: { fullScreenCover in
-                router.buildScreen(fullScreenCover: fullScreenCover)
-            })
-            
-            .onChange(of: router.selectedIndex) { _ in
-                HapticManager.instance.impact(style: .light)
             }
         }
     }
 }
 
-#Preview {
-    MainTabView()
-}
+//#Preview {
+//    MainTabView()
+//}

@@ -7,6 +7,8 @@
 
 import Foundation
 import SwiftUI
+import FirebaseFirestore
+import FirebaseFirestoreSwift
 
 enum RunningStyle: String, Codable, CaseIterable, Identifiable  {
     case walking = "walking"
@@ -41,12 +43,41 @@ struct UserInfo : Codable {
     var profileImageUrl: String?
     var setDailyGoal: Double?
     var runningStyle: RunningStyle?
+    var token: String
+    var isBlock: Bool
+    // 본인이 차단한 사용자 리스트
+    //var blockUserList: [String]
+    // 본인이 차단한 사용자 + 본인을 차단한 사용자 리스트
+    //var blockedUserMeList: [String]
+    
+    
+//    init(from decoder: any Decoder) throws {
+//        <#code#>
+//    }
+    /// 차단한 사용자 리스트
+    var blockedUserList: [String]?
+    var blockingMeList: [String]?
+    /// 필터링용도 List : 본인이 차단한 사용자 + 본인을 차단한 사용자 리스트
+    var blockList: [String] {
+        var result: [String] = []
+        if let blockedUserList = blockedUserList{
+            result += blockedUserList
+        }
+        if let blockingMeList = blockingMeList {
+            result += blockingMeList
+        }
+        return result
+    }
     
     init(){
         self.uid = ""
         self.username = ""
         self.isProfilePublic = false
         self.isProSubscriber = false
+        self.token = ""
+        self.isBlock = false
+       // self.blockUserList = [""]
+        //self.blockedUserMeList = [""]
     }
     
     enum CodingKeys:String, CodingKey {
@@ -61,6 +92,29 @@ struct UserInfo : Codable {
         case profileImageUrl = "profileImageUrl"
         case setDailyGoal = "setDailyGoal"
         case runningStyle = "runningStyle"
-        //case image = "image"
+        case token = "token"
+        case isBlock = "isBlock"
+        case blockedUserList = "blockedUserList"
+        case blockingMeList = "blockingMeList"
     }
+}
+
+public struct FirestoreUserInfo: Codable, Hashable {
+    @DocumentID public var uid: String?
+    public let username: String
+    public let weight: Int?
+    public let height: Int?
+    public let age: Int?
+    public let gender: Bool?
+    public let isProfilePublic: Bool
+    public let isProSubscriber: Bool
+    public let profileImageUrl: String?
+    public let setDailyGoal: Double?
+    public var runningStyle: String?
+    public let token: String
+    // 본인이 차단한 user List
+    public let blockUsersList: [String]
+    // 본인을 차단한 user List
+    public let blockMeList: [String]
+    public let isBlock: Bool
 }
