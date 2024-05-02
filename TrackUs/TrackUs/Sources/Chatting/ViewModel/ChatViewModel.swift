@@ -10,6 +10,7 @@ import Firebase
 
 @MainActor
 class ChatViewModel: ObservableObject {
+    static let shared = ChatViewModel(chatRoomID: "")
     var chatListViewModel = ChatListViewModel.shared
     var authViewModel = AuthenticationViewModel.shared
     
@@ -76,50 +77,15 @@ class ChatViewModel: ObservableObject {
     // 개인 채팅 신규
     func createChatRoom(myInfo: UserInfo, opponentInfo: UserInfo) {
         // 기존 채팅 있는지 확인
-        ref.whereField("members", isEqualTo: [myInfo.uid, opponentInfo.uid])
-            .whereField("group", isEqualTo: false).getDocuments { snapshot, error in
-                if let error = error {
-                    print("@@@@@ error \(error)")
-                    self.newChat = true
-                    return
-                }
-                guard let documents = snapshot?.documents else { return }
-                
-                let chatRoom = documents.compactMap{ document -> ChatRoom? in
-                    do{
-                        let firestoreChatRoom = try document.data(as: FirestoreChatRoom.self)
-                        
-                        var message: LatestMessageInChat? = nil
-                        if let flm = firestoreChatRoom.latestMessage {
-                            message = LatestMessageInChat(
-                                //senderName: user.name,
-                                timestamp: flm.timestamp,
-                                text: flm.text.isEmpty ? "사진을 보냈습니다." : flm.text
-                            )
-                        }
-                        self.currentChatID = firestoreChatRoom.id!
-                        return ChatRoom(id: document.documentID,
-                                                        title: firestoreChatRoom.title,
-                                                        members: firestoreChatRoom.members,
-                                                        nonSelfMembers: firestoreChatRoom.members.filter { $0 != myInfo.uid },
-                                                        usersUnreadCountInfo: firestoreChatRoom.usersUnreadCountInfo,
-                                                        group: false,
-                                                        latestMessage: message)
-                    }catch {
-                        print(error)
-                    }
-                    return nil
-                }
-                // 비어있음 - 신규
-                if chatRoom.isEmpty {
-                    self.currentChatID = UUID().uuidString
-                    self.newChat = true
-                    return
-                }
-                //self.chatRoom = chatRoom.first!
-                self.currentChatID = chatRoom.first!.id
-                self.subscribeToUpdates()
-            }
+        let chatRoom = chatListViewModel.chatRooms.filter{ $0.group == false && $0.nonSelfMembers.contains(opponentInfo.uid) }
+        guard let currentChatID = chatRoom.first?.id else {
+            // 기존 1대1 대화방 없을경우
+            self.currentChatID = UUID().uuidString
+            self.newChat = true
+            return
+        }
+        self.currentChatID = currentChatID
+        self.subscribeToUpdates()
     }
     
     

@@ -45,15 +45,6 @@ struct UserInfo : Codable {
     var runningStyle: RunningStyle?
     var token: String
     var isBlock: Bool
-    // 본인이 차단한 사용자 리스트
-    //var blockUserList: [String]
-    // 본인이 차단한 사용자 + 본인을 차단한 사용자 리스트
-    //var blockedUserMeList: [String]
-    
-    
-//    init(from decoder: any Decoder) throws {
-//        <#code#>
-//    }
     /// 차단한 사용자 리스트
     var blockedUserList: [String]?
     var blockingMeList: [String]?
@@ -68,6 +59,8 @@ struct UserInfo : Codable {
         }
         return result
     }
+    // 신고 누적 횟수
+    var reportIDList: [String]?
     
     init(){
         self.uid = ""
@@ -96,25 +89,6 @@ struct UserInfo : Codable {
         case isBlock = "isBlock"
         case blockedUserList = "blockedUserList"
         case blockingMeList = "blockingMeList"
+        case reportIDList = "reportIDList"
     }
-}
-
-public struct FirestoreUserInfo: Codable, Hashable {
-    @DocumentID public var uid: String?
-    public let username: String
-    public let weight: Int?
-    public let height: Int?
-    public let age: Int?
-    public let gender: Bool?
-    public let isProfilePublic: Bool
-    public let isProSubscriber: Bool
-    public let profileImageUrl: String?
-    public let setDailyGoal: Double?
-    public var runningStyle: String?
-    public let token: String
-    // 본인이 차단한 user List
-    public let blockUsersList: [String]
-    // 본인을 차단한 user List
-    public let blockMeList: [String]
-    public let isBlock: Bool
 }

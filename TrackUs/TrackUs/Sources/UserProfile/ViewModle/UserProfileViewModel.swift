@@ -143,6 +143,15 @@ class UserProfileViewModel: ObservableObject {
                 }
                 print("success")
             }
+        // userInfo에 신고 누적횟수 기록 용
+        FirebaseManger.shared.firestore.collection("users").document(report.toUserUid).updateData([
+            "reportIDList": FieldValue.arrayUnion([id])
+        ]) { error in
+            if let error = error {
+                print("Error updating document: \(error)")
+            }
+        }
+        
     }
 
 }

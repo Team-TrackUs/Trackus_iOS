@@ -89,7 +89,6 @@ class AuthenticationViewModel: NSObject, ObservableObject {
                         }else {
                             self.getMyInformation()
                             self.chatListViewModel.subscribeToUpdates()
-                            self.authenticationState = .authenticated
                             //self.accessToken = try await user?.getIDToken()
                         }
                     }
@@ -403,6 +402,9 @@ extension AuthenticationViewModel {
                     guard let firestoreUserInfo = try snapshot?.data(as: UserInfo.self) else { return }
                     self.userInfo = firestoreUserInfo
                     
+                    // 이미지 불러오기
+                    self.downloadImageFromStorage()
+                    self.authenticationState = .authenticated
                 } catch {
                     print(error)
                 }
@@ -433,8 +435,8 @@ extension AuthenticationViewModel {
         
     }
 
-    
-    func downloadImageFromStorage(uid: String) {
+    // 사용자 이미지 저장
+    func downloadImageFromStorage() {
         guard let profileImageUrl = self.userInfo.profileImageUrl else {
             return
         }
@@ -450,8 +452,6 @@ extension AuthenticationViewModel {
             }
         }
     }
-    
-
 }
 
 // MARK: - 이미지 수정 부분

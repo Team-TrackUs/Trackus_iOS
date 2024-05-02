@@ -142,7 +142,6 @@ class ChatListViewModel: ObservableObject {
             title: firestoreChatRoom.title,
             members: members,
             nonSelfMembers: members.filter { $0 != currentUId },
-            // 다 불러와야하나??? 저장때문에 불러오는거 아님 본인꺼만 불러오면 되는거 아닌가
             usersUnreadCountInfo: firestoreChatRoom.usersUnreadCountInfo,
             group: firestoreChatRoom.group,
             latestMessage: message
@@ -154,9 +153,23 @@ class ChatListViewModel: ObservableObject {
     // 채팅방 멤버 닉네임, 프로필사진url 불러오기
     private func memberUserInfo(uid: String) {
         FirebaseManger.shared.firestore.collection("users").document(uid).addSnapshotListener { documentSnapshot, error in
-            guard let document = documentSnapshot else { return }
+            guard let document = documentSnapshot else {
+                // 탈퇴 사용자인 경우 리스트에서 삭제
+                self.chatRooms = self.chatRooms.map{
+                    var chatRomm = $0
+                    chatRomm.members = $0.members.filter{ $0 != uid }
+                    chatRomm.nonSelfMembers = $0.nonSelfMembers.filter{ $0 != uid }
+                    return chatRomm
+                }
+                return
+            }
             do {
-                let userInfo = try document.data(as: UserInfo.self)
+                var userInfo = try document.data(as: UserInfo.self)
+//                if userInfo.isBlock {
+//                    userInfo.username = "정지 회원"
+//                    userInfo.profileImageUrl = nil
+//                    userInfo.token = nil
+//                }
                 self.users[uid] = Member(uid: uid, userName: userInfo.username, profileImageUrl: userInfo.profileImageUrl, token: userInfo.token)
             } catch {
                 print("Error decoding document: \(error)")

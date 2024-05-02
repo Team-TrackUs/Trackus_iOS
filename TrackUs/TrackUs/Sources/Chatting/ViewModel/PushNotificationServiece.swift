@@ -29,21 +29,23 @@ class PushNotificationServiece {
     func sendPushNotificationTo(accessToken: String?, chatRoom: ChatRoom, members: [String : Member],body: String) {
         
         if chatRoom.group {
+            // 그룹 채팅 경우
             for userId in chatRoom.nonSelfMembers{
                 if let token = members[userId]?.token{
-                    self.sendMessageToUser(accessToken: accessToken, to: token, title: "🏃🏻" + chatRoom.title, body: body)
+                    self.sendMessageToUser(accessToken: accessToken, to: token, title: "🏃🏻" + chatRoom.title, body: body, chatRoomID: chatRoom.id)
                 }
             }
         }else {
-            if let token = members[chatRoom.nonSelfMembers[0]]?.token{
+            // 1:1 채팅 경우
+            if let token = members[chatRoom.nonSelfMembers[0]]?.token {
                 guard let uid = FirebaseManger.shared.auth.currentUser?.uid else {
                     return }
-                self.sendMessageToUser(accessToken: accessToken, to: token, title: members[uid]!.userName, body: body)
+                self.sendMessageToUser(accessToken: accessToken, to: token, title: members[uid]!.userName, body: body, chatRoomID: chatRoom.id)
             }
         }
     }
     
-    private func sendMessageToUser(accessToken: String?, to token: String, title: String, body: String) {
+    private func sendMessageToUser(accessToken: String?, to token: String, title: String, body: String, chatRoomID: String) {
         // 키값들 다른파일에 넣고 수정
         //guard let projectId = projectId else { return }
         guard let serverKey = serverKey else { return }
@@ -61,6 +63,9 @@ class PushNotificationServiece {
             "notification" : [
                 "title" : title,
                 "body" : body
+            ],
+            "data" : [
+            "chatRoomId" : chatRoomID
             ]
             //]
         ]

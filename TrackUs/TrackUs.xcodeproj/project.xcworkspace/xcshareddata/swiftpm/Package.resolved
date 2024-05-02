@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/openid/AppAuth-iOS.git",
       "state" : {
-        "revision" : "8c0b028aedf617d6d780d448dc836f7048166d0f",
-        "version" : "1.7.4"
+        "revision" : "c89ed571ae140f8eb1142735e6e23d7bb8c34cb2",
+        "version" : "1.7.5"
       }
     },
     {
@@ -69,8 +69,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/google/GoogleUtilities.git",
       "state" : {
-        "revision" : "26c898aed8bed13b8a63057ee26500abbbcb8d55",
-        "version" : "7.13.1"
+        "revision" : "8e5d57ed87057cd7b0e4e8f474d9e78f73eb85f7",
+        "version" : "7.13.2"
       }
     },
     {
@@ -132,8 +132,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mapbox/mapbox-common-ios.git",
       "state" : {
-        "revision" : "15aed0b292a0fe0672113c1b69be04bd350c8bb3",
-        "version" : "24.3.1"
+        "revision" : "2db19ddde415b79f35de497240cd6ba563416657",
+        "version" : "24.4.0-beta.1"
+      }
+    },
+    {
+      "identity" : "mapbox-core-maps-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/mapbox-core-maps-ios.git",
+      "state" : {
+        "revision" : "40da10b7dd365ef2350a35ccb5abefe726a0761c",
+        "version" : "11.4.0-beta.1"
       }
     },
     {
@@ -142,7 +151,7 @@
       "location" : "https://github.com/mapbox/mapbox-maps-ios",
       "state" : {
         "branch" : "main",
-        "revision" : "4d869396b05e0f1480baed030cc1d10889f020c8"
+        "revision" : "a0cd1a8feee63152092e0b3b7a64e13750a92ae9"
       }
     },
     {

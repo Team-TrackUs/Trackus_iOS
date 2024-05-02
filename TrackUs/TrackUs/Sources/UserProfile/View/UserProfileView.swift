@@ -96,6 +96,7 @@ struct UserProfileContent: View {
     @State var blockedAlert: Bool = false
     // 차단여부 확인용
     @State var blockAlert: Bool = false
+    @State private var reportAlert = false
     
     var body: some View {
         VStack {
@@ -143,9 +144,13 @@ struct UserProfileContent: View {
                     VStack {
                         // 채팅 버튼
                         Button {
-                            if authViewModel.userInfo.blockList.contains(userUid){
+                            if authViewModel.userInfo.reportIDList?.count ?? 0 >= 3{
+                                // 신고 누적 횟수 3회 초과
+                                reportAlert.toggle()
+                            }else if authViewModel.userInfo.blockList.contains (userUid){
+                                // 사용자 차단 여부 확인
                                 blockedAlert.toggle()
-                            } else {
+                            }else {
                                 router.push(.chatting(ChatViewModel(myInfo: authViewModel.userInfo, opponentInfo: userInfo)))
                             }
                         } label: {
@@ -164,6 +169,12 @@ struct UserProfileContent: View {
                         Button("확인", role: .cancel) {}
                     } message: {
                         Text("차단된 사용자입니다.")
+                    }
+                    .alert("채팅 제한",
+                           isPresented: $reportAlert) {
+                        Button("확인", role: .cancel) {}
+                    } message: {
+                        Text("신고로 인해 채팅이 일시 제한되었습니다.\n\n자세한 내용은 아래 메일을 통해\n문의해주시기 바랍니다.\nteam.trackus@gmail.com")
                     }
                 }
             }
