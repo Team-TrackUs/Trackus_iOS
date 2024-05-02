@@ -72,7 +72,7 @@ struct ChattingView: View {
                     .onAppear {
                         proxy.scrollTo(chatViewModel.messageMap.last?.message, anchor: .top)
                     }
-                    // 아래 내리기
+                    // 신규 채팅 버튼
 //                    .overlay(
 //                        VStack {
 //                            if !scrollToBottom {
@@ -299,12 +299,10 @@ struct ChattingView: View {
 // MARK: - 채팅 메세지
 struct ChatMessageView: View {
     @EnvironmentObject var router: Router
-    //@Binding var previousUser: String
     
     private let messageMap: MessageMap
     private let mymessge: Bool
     
-    //@State private var previousUser: Bool = false
     @State private var previousdate: Bool = false
     
     init(messageMap: MessageMap, myUid: String) {
@@ -361,17 +359,8 @@ struct ChatMessageView: View {
                         Spacer()
                     }
                 }
-                
             }
-            
-            
         }
-//        .onAppear {
-//            previousUser = previoosUser1 == message.sendMember.uid ? false : true
-//            previousdate = previousdate1 == message.date ? false : true
-//            previoosUser1 = message.sendMember.uid
-//            previousdate1 = message.date
-//        }
     }
 }
 

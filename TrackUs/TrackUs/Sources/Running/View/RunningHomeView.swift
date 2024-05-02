@@ -121,13 +121,26 @@ extension RunningHomeView {
     var profileHeader: some View {
         VStack {
             HStack {
-                KFImage(URL(string: authViewModel.userInfo.profileImageUrl ?? ""))
-                    .placeholder({ProgressView()})
-                    .onFailureImage(KFCrossPlatformImage(named: "profile_img"))
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 48, height: 48)
-                    .clipShape(Circle())
+                if let image = authViewModel.userInfo.image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 48, height: 48)
+                        .clipShape(Circle())
+                        .shadow(radius: 1)
+                } else {
+                    Image(.profileImg)
+                        .resizable()
+                        .frame(width: 48, height: 48)
+                        .clipShape(Circle())
+                }
+//                KFImage(URL(string: authViewModel.userInfo.profileImageUrl ?? ""))
+//                    .placeholder({ProgressView()})
+//                    .onFailureImage(KFCrossPlatformImage(named: "profile_img"))
+//                    .resizable()
+//                    .scaledToFill()
+//                    .frame(width: 48, height: 48)
+//                    .clipShape(Circle())
                 
                 VStack(alignment: .leading) {
                     Text("\(authViewModel.userInfo.username.subString(count: 10))님!")
