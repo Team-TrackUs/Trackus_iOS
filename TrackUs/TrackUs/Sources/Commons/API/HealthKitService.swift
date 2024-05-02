@@ -16,7 +16,6 @@ class HealthKitService {
         case availableOnDevice
     }
     
-    
     static let typesToShare: Set<HKSampleType> = [
         HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!,
         HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!
@@ -36,13 +35,10 @@ class HealthKitService {
     }
     
     func checkReadTypePersmission() async -> Bool {
-        let samplesType: Set<HKSampleType> = [HKObjectType.quantityType(forIdentifier: .distanceWalkingRunning)!,
-                                              HKObjectType.quantityType(forIdentifier: .activeEnergyBurned)!
-        ]
+        let calendar = Calendar.current // 현재날짜
+        var components = calendar.dateComponents([.year, .month, .day], from: Date()) // 현재날짜 컴포넌트
+        components.month = components.month! - 1
         
-        let calendar = Calendar.current
-        var components = calendar.dateComponents([.year, .month, .day], from: Date())
-        components.day = components.month! - 1
         let oneMonthAgo = calendar.date(from: components)
        
         let queryPredicate = HKQuery.predicateForSamples(withStart: oneMonthAgo, end: .now, options: .strictEndDate)
