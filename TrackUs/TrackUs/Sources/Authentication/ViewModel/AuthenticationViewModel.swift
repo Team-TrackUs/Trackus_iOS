@@ -548,3 +548,19 @@ extension AuthenticationViewModel {
     }
     
 }
+
+
+extension AuthenticationViewModel {
+    func getUserInfo(uid: String, completion: @escaping (String?, String?) -> Void) {
+        Firestore.firestore().collection("users").document(uid).getDocument { snapshot, error in
+            if let error = error {
+                print("Error getting user info: \(error.localizedDescription)")
+                completion(nil, nil) 
+            } else if let data = snapshot?.data(), let username = data["username"] as? String, let profileImageUrl = data["profileImageUrl"] as? String {
+                completion(username, profileImageUrl)
+            } else {
+                completion(nil, nil)
+            }
+        }
+    }
+}
