@@ -154,7 +154,10 @@ class ChatListViewModel: ObservableObject {
     // 채팅방 멤버 닉네임, 프로필사진url 불러오기
     private func memberUserInfo(uid: String) {
         FirebaseManger.shared.firestore.collection("users").document(uid).addSnapshotListener { documentSnapshot, error in
-            guard let document = documentSnapshot else { return }
+            guard let document = documentSnapshot else {
+                //self.chatRooms = self.chatRooms.map{ $0.members.filter{ $0 != uid} }
+                return
+            }
             do {
                 let userInfo = try document.data(as: UserInfo.self)
                 self.users[uid] = Member(uid: uid, userName: userInfo.username, profileImageUrl: userInfo.profileImageUrl, token: userInfo.token)

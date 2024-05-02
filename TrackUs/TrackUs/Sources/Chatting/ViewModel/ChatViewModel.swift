@@ -10,6 +10,7 @@ import Firebase
 
 @MainActor
 class ChatViewModel: ObservableObject {
+    static let shared = ChatViewModel(chatRoomID: "")
     var chatListViewModel = ChatListViewModel.shared
     var authViewModel = AuthenticationViewModel.shared
     

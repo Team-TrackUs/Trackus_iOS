@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Firebase
+import UserNotifications
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
@@ -84,9 +85,11 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         let userInfo = notification.request.content.userInfo
         
         // badge 숫자 추가
-        UIApplication.shared.applicationIconBadgeNumber +=  1
-        
-        completionHandler([.banner, .sound, .badge])
+        //UIApplication.shared.applicationIconBadgeNumber +=  1
+        guard let chatRoomId = userInfo["chatRoomId"] as? String else { return }
+        if ChatViewModel.shared.chatRoom.id != chatRoomId {
+            completionHandler([.banner, .sound, .badge])
+        }
     }
     
     // 푸시메세지 받을때
