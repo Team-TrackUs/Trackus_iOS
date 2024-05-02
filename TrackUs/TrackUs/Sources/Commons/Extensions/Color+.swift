@@ -18,7 +18,6 @@ extension Color {
     
     static let background: Color = Color(UIColor.systemBackground)
     static let label: Color = Color(UIColor.label)
-    
     static let circleTrackStart: Color = Color(hex: 0xedf2ff)
     static let circleTrackEnd: Color = Color(hex: 0xebf8ff)
     static let circleRoundStart: Color = Color(hex: 0x47c6ff)

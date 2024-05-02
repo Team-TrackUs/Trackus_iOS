@@ -41,7 +41,9 @@ class CourseListViewModel: ObservableObject, HashableObject {
     
     /// 모집글 데이터 가져오기
     func fetchCourseData() {
-        Firestore.firestore().collection("running").limit(to: 10).order(by: "createdAt", descending: true).getDocuments { snapShot, error in
+        Firestore.firestore().collection("running")
+            .whereField("isBlocked", isEqualTo: false)
+            .limit(to: 10).getDocuments { snapShot, error in
             guard let documents = snapShot?.documents else { return }
             self.courseList = documents.compactMap  {(try? $0.data(as: Course.self))}.filter {$0.members.count > 0}
         }
