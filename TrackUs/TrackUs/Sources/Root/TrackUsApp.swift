@@ -87,7 +87,7 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         // badge 숫자 추가
         //UIApplication.shared.applicationIconBadgeNumber +=  1
         guard let chatRoomId = userInfo["chatRoomId"] as? String else { return }
-        if ChatViewModel.shared.chatRoom.id != chatRoomId {
+        if ChatListViewModel.shared.currentChatRoom != chatRoomId {
             completionHandler([.banner, .sound, .badge])
         }
     }

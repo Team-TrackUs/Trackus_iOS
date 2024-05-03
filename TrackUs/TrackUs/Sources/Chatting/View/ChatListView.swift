@@ -31,6 +31,7 @@ struct ChatListView: View {
                     }else {
                     Button {
                         router.push(.chatting(ChatViewModel(chatRoom: chatRoom, users: chatViewModel.users)))
+                        chatViewModel.currentChatRoom = chatRoom.id
                     } label: {
                         HStack(spacing: 12){
                             // 채팅방 이미지
@@ -94,6 +95,8 @@ struct ChatListView: View {
         .onAppear {
             // 채팅방 목록 리스너 등록
             chatViewModel.subscribeToUpdates()
+            // 현재 채팅방 초기화
+            chatViewModel.currentChatRoom = ""
         }
     }
 }

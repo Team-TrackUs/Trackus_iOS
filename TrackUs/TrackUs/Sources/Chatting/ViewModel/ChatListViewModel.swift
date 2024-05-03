@@ -15,6 +15,8 @@ class ChatListViewModel: ObservableObject {
     @Published var users: [String: Member] = [:]
     @Published var currentUId: String
     @Published var newMessage: Bool
+    // 열려있는 채팅방 확인 용도
+    @Published var currentChatRoom: String = ""
     
     // 신규 메세지 총 카운트 갯수
     var messageCount: String? {
@@ -107,7 +109,7 @@ class ChatListViewModel: ObservableObject {
                 .compactMap { [weak self] document in
                     do {
                         let firestoreChatRoom = try document.data(as: FirestoreChatRoom.self)
-                        return self?.makeChatRooms(document.documentID, firestoreChatRoom, currentUId)
+                        return self?.makeChatRooms(firestoreChatRoom, currentUId)
                     } catch {
                         print(error)
                     }
@@ -124,7 +126,7 @@ class ChatListViewModel: ObservableObject {
     }
     
     // ChatRoom타입에 맞게 변환
-    private func makeChatRooms(_ id: String, _ firestoreChatRoom: FirestoreChatRoom, _ currentUId: String) -> ChatRoom {
+    private func makeChatRooms(_ firestoreChatRoom: FirestoreChatRoom, _ currentUId: String) -> ChatRoom {
         var message: LatestMessageInChat? = nil
         if let flm = firestoreChatRoom.latestMessage {
             message = LatestMessageInChat(
@@ -138,7 +140,7 @@ class ChatListViewModel: ObservableObject {
             memberUserInfo(uid: memberId)
         }
         let chatRoom = ChatRoom(
-            id: id,
+            id: firestoreChatRoom.id ?? "",
             title: firestoreChatRoom.title,
             members: members,
             nonSelfMembers: members.filter { $0 != currentUId },

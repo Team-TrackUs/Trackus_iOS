@@ -34,6 +34,8 @@ struct UserProfileView: View {
             userViewModel.fetchUserLog(userId: userUid) {
                 print(userViewModel.runningLog)
             }
+            // 현재 채팅방 초기화, Notification용도
+            ChatListViewModel.shared.currentChatRoom = ""
         }
         .customNavigation {
             NavigationText(title: "프로필 확인")

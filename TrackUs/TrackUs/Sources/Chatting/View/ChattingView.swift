@@ -13,30 +13,21 @@ struct ChattingView: View {
     @StateObject var authViewModel = AuthenticationViewModel.shared
     @StateObject var chatViewModel: ChatViewModel
     
-    @State private var sideMenuPresented: Bool = false
+    // 채팅방 UI관련
     @State private var sendMessage: String = ""
-    
-    @State private var sideMenuTranslation: CGFloat = 0
+    @State private var title: String = ""
     
     // 높이 확인 용
     @State private var contentHeight: CGFloat = .zero
     
-    @State var previousUser: String?
+    // 사이드 메뉴 관련
+    @State private var sideMenuTranslation: CGFloat = 0
+    @State private var sideMenuPresented: Bool = false
     
-    @State private var title: String = ""
+    // 신규 메세지 하단 내리기 용도
     @State private var scrollToBottom = false // State 변수 추가
     
     @State private var reportAlert = false
-    
-    private func updatePreviousSender(_ sender: String) -> Bool{
-        if previousUser != sender {
-            self.previousUser = sender
-            return true
-        }else{
-            previousUser = nil
-            return false
-        }
-    }
     
     var body: some View {
         ZStack(alignment: .trailing){

@@ -10,10 +10,8 @@ import Firebase
 
 @MainActor
 class ChatViewModel: ObservableObject {
-    static let shared = ChatViewModel(chatRoomID: "")
     var chatListViewModel = ChatListViewModel.shared
     var authViewModel = AuthenticationViewModel.shared
-    
     @Published var currentChatID: String
     @Published var members: [String : Member] = [:]
     @Published var messageMap: [MessageMap] = []
@@ -63,10 +61,10 @@ class ChatViewModel: ObservableObject {
     }
     
     // notification용
-    init(chatRoomID: String){
-        self.currentChatID = chatRoomID
-        self.members = members
-    }
+//    init(chatRoomID: String){
+//        self.currentChatID = chatRoomID
+//        self.members = members
+//    }
     
     // 채팅방 삭제
     func deleteChatRoom(chatRoomID: String) {
