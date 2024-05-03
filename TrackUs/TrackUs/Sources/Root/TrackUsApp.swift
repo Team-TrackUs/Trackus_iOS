@@ -10,6 +10,7 @@ import Firebase
 import UserNotifications
 
 class AppDelegate: NSObject, UIApplicationDelegate {
+    @EnvironmentObject var router: Router
     
     let gcmMessageIDKey = "gcm.message_id"
     
@@ -84,9 +85,8 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         
         let userInfo = notification.request.content.userInfo
         
-        // badge 숫자 추가
-        //UIApplication.shared.applicationIconBadgeNumber +=  1
         guard let chatRoomId = userInfo["chatRoomId"] as? String else { return }
+        // 현재 열려있느 채팅방이 아닐 경우에만 Notification 알림
         if ChatListViewModel.shared.currentChatRoom != chatRoomId {
             completionHandler([.banner, .sound, .badge])
         }
@@ -109,9 +109,10 @@ extension AppDelegate : UNUserNotificationCenterDelegate {
         
         // notification tap 했을때 실행
         if response.actionIdentifier == UNNotificationDefaultActionIdentifier {
-//            let chatRoomID = userInfo["chatRoomID"] as? String {
-//                router.push(.chatting(ChatViewModel(chatRoom: chatRoom, users: chatViewModel.users)))
-//            }
+            guard let chatRoomId = userInfo["chatRoomId"] as? String else { return }
+            print(chatRoomId)
+            NotificationChatManager.shared.navigateToChatRoom(chatRoomID: chatRoomId)
+            ChatListViewModel.shared.currentChatRoom = chatRoomId
         }
         
         completionHandler()
@@ -135,6 +136,7 @@ struct TrackUsApp: App {
             ContentView()
                 .environmentObject(CourseListViewModel())
                 .environmentObject(Router())
+                .environmentObject(NotificationChatManager.shared)
                 
         }
     }

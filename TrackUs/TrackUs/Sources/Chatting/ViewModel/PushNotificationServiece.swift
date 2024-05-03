@@ -85,3 +85,16 @@ class PushNotificationServiece {
         task.resume()
     }
 }
+
+/// Notification 탭시 채팅방 이동 Manager
+class NotificationChatManager: ObservableObject {
+    static let shared = NotificationChatManager()
+    // 채팅방 view 핸들러 변수
+    @Published var isShowingChatView: Bool = false
+    @Published var chatRoomID: String = ""
+    
+    func navigateToChatRoom(chatRoomID: String){
+        self.chatRoomID = chatRoomID
+        self.isShowingChatView = !isShowingChatView
+    }
+}

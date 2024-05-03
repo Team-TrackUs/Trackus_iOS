@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @EnvironmentObject var router: Router
+    @EnvironmentObject var notificatonChat: NotificationChatManager
     @StateObject var chatViewModel = ChatListViewModel.shared
     @State private var selectedTab: Tab = .running
     
@@ -48,6 +49,8 @@ struct MainTabView: View {
                         }
                         .tag(Tab.chat)
                         .badge(chatViewModel.messageCount)
+                        
+                        
                     
                     router.buildScreen(page: .report)
                         .tabItem {
@@ -75,6 +78,9 @@ struct MainTabView: View {
                 .fullScreenCover(item: $router.fullScreenCover, content: { fullScreenCover in
                     router.buildScreen(fullScreenCover: fullScreenCover)
                 })
+                .onChange(of: notificatonChat.isShowingChatView) { _ in
+                    router.push(.chatting(ChatViewModel(chatRoomID: notificatonChat.chatRoomID)))
+                }
                 
                 .onChange(of: router.selectedIndex) { _ in
                     HapticManager.instance.impact(style: .light)

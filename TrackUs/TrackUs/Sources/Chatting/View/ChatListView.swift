@@ -101,7 +101,7 @@ struct ChatListView: View {
     }
 }
 
-/// 채팅방 프로필사진 목록
+/// 채팅방 리스트 프로필사진 목록
 struct ChatRoomImage: View {
     let members: [String]
     let users: [String: Member]
@@ -156,6 +156,7 @@ struct ProfileImage: View {
                 .resizable()
                 .frame(width: size, height: size)
                 .clipShape(Circle())
+                .shadow(radius: 0.5)
         }else {
             Image(.profileImg)
                 .resizable()
@@ -165,6 +166,7 @@ struct ProfileImage: View {
     }
 }
 
+// 채팅방 신규 메세지 갯수 표시 제한
 struct usersUnreadCoun: View {
     let count: Int?
     
@@ -198,10 +200,7 @@ struct usersUnreadCoun: View {
     }
 }
 
-#Preview {
-    ChatListView()
-}
-
+// 최근 채팅 날짜 포멧
 extension Date {
     func timeAgoFormat(numericDates: Bool = false) -> String {
         let calendar = Calendar.current

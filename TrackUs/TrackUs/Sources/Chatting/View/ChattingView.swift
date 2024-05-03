@@ -144,16 +144,14 @@ struct ChattingView: View {
         .onAppear {
             title = chatViewModel.chatRoom.group ? chatViewModel.chatRoom.title : chatViewModel.members[chatViewModel.chatRoom.nonSelfMembers.first!]?.userName ?? "러너"
             chatViewModel.resetUnreadCounter(myuid: authViewModel.userInfo.uid)
-            
+            // Notificaton 제한 용도
+            ChatListViewModel.shared.currentChatRoom = chatViewModel.currentChatID
         }
         .animation(.easeInOut, value: sideMenuPresented)
         .onDisappear {
             // 메세지 읽음 확인
             chatViewModel.resetUnreadCounter(myuid: authViewModel.userInfo.uid)
         }
-
-        
-
     }
     // MARK: - 메세지 전송 바
     var messageBar: some View {

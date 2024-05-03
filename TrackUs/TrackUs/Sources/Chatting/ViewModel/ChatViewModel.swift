@@ -61,10 +61,15 @@ class ChatViewModel: ObservableObject {
     }
     
     // notification용
-//    init(chatRoomID: String){
-//        self.currentChatID = chatRoomID
-//        self.members = members
-//    }
+    init(chatRoomID: String){
+        self.currentChatID = chatRoomID
+        self.members = (chatListViewModel.chatRooms.filter{ $0.id == currentChatID }.first?.members.reduce(into: [String: Member]()) { result, uid in
+            if let member = chatListViewModel.users[uid] {
+                result[uid] = member
+            }
+        })!
+        subscribeToUpdates()
+    }
     
     // 채팅방 삭제
     func deleteChatRoom(chatRoomID: String) {
