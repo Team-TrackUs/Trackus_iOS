@@ -170,6 +170,7 @@ final class RunActivityViewModel: ObservableObject {
                 }
                 DispatchQueue.main.async {
                     self.distance += distance.doubleValue(for: .meter())
+                    self.pace = WorkoutService.calcPace(second: self.seconds, meter: self.distance)
                 }
             }
             self.healthStore.execute(distanceQuery)

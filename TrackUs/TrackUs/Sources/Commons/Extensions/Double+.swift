@@ -45,12 +45,11 @@ extension Double {
         switch unit {
         case .pace:
             guard self != 0.0 && self != .infinity && !self.isNaN  else { return "-'--''" }
-            let formattedString = String(format: "%.3f", self)
-            let paceInMinutes = formattedString[formattedString.startIndex]
-            let paceInSecondsFirst = formattedString[formattedString.index(formattedString.startIndex, offsetBy: 2)]
-            let paceInSecondsThird = formattedString[formattedString.index(formattedString.startIndex, offsetBy: 3)]
-            
-            return "\(paceInMinutes)'\(paceInSecondsFirst)\(paceInSecondsThird)''"
+            let stringValue = String(self).split(separator: ".")
+            let head = stringValue[0]
+            let tail = stringValue[1]
+           
+            return "\(head)'\(tail.prefix(2))''"
         case .kilometer:
             return String(format: "%.2f km", self / 1000.0)
         case .calorie:
